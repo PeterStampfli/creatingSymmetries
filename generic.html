@@ -2,10 +2,51 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <head>
-<title>cakes images</title>
+<title>Caleidoscope</title>
 </head>
-<link rel="stylesheet" type="text/css" href="style.css">
+<link rel="stylesheet" type="text/css" href="symStyle.css">
 <body>
-<h3>
-	Generate cakes images.
-</h3>
+
+<p>
+	Choose the input image file:
+	<input type="file" accept="image/*" id="imageInput" onchange="startLoadImage(this.files)">
+</p>
+<p>
+	Choose the size of the generated image: width
+	<input type="text" id="numbers" value="512" maxlength="4" onchange="setWidth(this.value)"/>
+	, height 
+	<input type="text" id="numbers" value="512" maxlength="4" onchange="setHeight(this.value)"/>
+	.
+</p>
+<p>
+	Choose the size of the periodic cell: width
+	<input type="text" id="numbers" value="256" maxlength="4" onchange="setPeriodWidth(this.value)"/>
+	, height 
+	<input type="text" id="numbers" value="256" maxlength="4" onchange="setPeriodHeight(this.value)"/>
+	.
+</p>
+<h4>
+	To "download" this image 
+	<a id="download" href="">&nbsp click here ! &nbsp</a>
+</h4>
+
+<p style="text-align:center">
+<canvas id="canvas"></canvas>
+</p>
+
+<p style="text-align:center">
+<canvas id="referenceCanvas"></canvas>
+</p>
+
+</body>
+<script src="symLibrary.js"></script>
+<script>
+
+function drawing(){
+	startDrawing();
+	startReferenceDrawing();
+}
+
+</script>
+
+</html>
