@@ -44,8 +44,8 @@ var width=512,
 	height=512;
 	
 // periods/size of periodic cell
-var periodWidth=256,
-	periodHeight=256;
+var periodWidth=256;
+var	periodHeight=256;
 	
 // maximum size of referenceimage
 var maxReferenceImageSize=300;
@@ -75,6 +75,90 @@ function setPeriodHeight(data){
 	drawing();
 }
 
+// pixel data of canvas
+var imageData;
+var imagePixels;
+// get pixels from canvas
+function getPixelsFromCanvas(){
+	imageData = canvasImage.getImageData(0,0,width,height);
+	imagePixels = imageData.data;
+}
+// put pixels on canvas
+function putPixelsOnCanvas(){
+	canvasImage.putImageData(imageData, 0, 0);
+}
+
+// combine index to pixels from integer coordinates
+//  is index to the red component of the pixel, green,blue and alpha follow
+function index(i,j){
+	return 4*(i+width*j);
+}
+
+// copy pixel values upwards
+//  starting points: from=(fromI,fromJ) and to=(toI,toJ)
+//  to goes up to including endTo=(endToI,endToJ)
+//  and from goes up together with to
+//  accounts for (canvas) width and 4 bytes per pixels !!!
+function copyPixels(fromI,fromJ,toI,toJ,endToI,endToJ){
+	var from=index(fromI,fromJ);
+	var to=index(toI,toJ);
+	var endTo=index(endToI,endToJ)+3;   
+	while (to<=endTo) {  // do complete pixels
+		imagePixels[to++]=imagePixels[from++];
+		imagePixels[to++]=imagePixels[from++];
+		imagePixels[to++]=imagePixels[from++];
+		imagePixels[to++]=imagePixels[from++];
+	}
+}
+
+// copy pixel values upwards/downwards, mirrored at vertical axis
+//  starting points: from=(fromI,fromJ) and to=(toI,toJ)
+//  to goes up to endTo=(endToI,endToJ)
+//  and from goes down opposed to "to"
+//  accounts for (canvas) width and 4 bytes per pixels
+//  take care to keep pixels together
+function copyPixelsMirrored(fromI,fromJ,toI,toJ,endToI,endToJ){
+	var from=index(fromI,fromJ);
+	var to=index(toI,toJ);
+	var endTo=index(endToI,endToJ);
+	while (to<=endTo) {  // do one complete pixel
+		imagePixels[to++]=imagePixels[from++];
+		imagePixels[to++]=imagePixels[from++];
+		imagePixels[to++]=imagePixels[from++];
+		imagePixels[to++]=imagePixels[from++];
+		// now go backwards with from
+		from-=8;
+	}
+}
+
+// periodic repetition of unit cell
+function periodic(){
+	//repetition in horizontal direction
+	for (var fromJ=0;fromJ<periodHeight;fromJ++){
+		copyPixels(0,fromJ,periodWidth,fromJ,width-1,fromJ);
+	}
+	// repetition in vertical direction
+	copyPixels(0,0,0,periodHeight,width-1,height-1);
+}
+
+// mirrorsymmetry in the unit cell at a horizontal axis
+// lying at periodicHeight/2 with variable length (number of pixels)
+//  reasonable values are periodicLength or periodicLength/2
+function horizontalMirror(length){
+	for (var fromJ=0;fromJ<periodHeight/2;fromJ++){
+		copyPixels(0,fromJ,0,periodHeight-1-fromJ,length-1,periodHeight-1-fromJ);
+	}
+}
+
+// mirrorsymmetry in the unit cell at a vertical axis
+// lying at periodicWidth/2, with variable length (number of pixels)
+//  reasonable values are periodicLength and periodicLength/2
+function verticalMirror(length){
+	for (var fromJ=0;fromJ<length;fromJ++){
+		copyPixelsMirrored(periodWidth/2-1,fromJ,periodWidth/2,fromJ,periodWidth-1,fromJ);
+	}
+}
+
 // set the canvas size, make a blue background and write the image on it (scale 100%)
 function startDrawing(){
 	canvas.width=width;
@@ -84,6 +168,13 @@ function startDrawing(){
 	if (inputImageLoaded){
 		canvasImage.drawImage(inputImage,0,0);
 	}
+	getPixelsFromCanvas();
+	verticalMirror(periodHeight/2);
+	horizontalMirror(periodWidth);
+	periodic();
+	putPixelsOnCanvas();
+	
+	
 	canvasImage.strokeStyle="Red";	
 	canvasImage.strokeRect(0,0,periodWidth,periodHeight);
 	
@@ -121,4 +212,7 @@ window.onload=function(){
 		}, false);
 	}
 	drawing();
+	var i=0;
+	console.log(i++);
+	console.log(i++);
 }
