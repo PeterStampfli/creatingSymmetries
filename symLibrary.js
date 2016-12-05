@@ -1,4 +1,50 @@
+// a mapping function (i,j) -> float (x,y) in a table
+var mapWidth=1;
+var mapHeight=1;
+var mapX=new Array(mapWidth*mapHeight);     // change mapX.length as needed
+var mapY=new Array(mapWidth*mapHeight);     // change mapX.length as needed
 
+// mapping from (x,y) to inputImagePixels:
+// (mouseX,mouseY) on reference canvas to centerX=mouseX/scaleInputToReferenceImage, centerY
+// (x,y) -> (centerX+scale*x,centerY+scale*y)
+// need a scaling from canvasimage to inputImage ???
+// do that later (changing resolution)
+
+//  primitive copy-paste method
+
+
+// draw an image line on canvas
+// (i,j), i=fromI ... toI,
+// using a rectangle function value map(i,j) with given mapWidth
+function drawImagePixelLine(fromI,toI,j){
+	var atPixelIndex=index(fromI,j);
+	var atMapIndex=fromI+j*mapWidth;
+	var pixel=new Color(0,255,0);
+	var x,y;
+	for (var i=fromI;i<=toI;i++){
+		
+		// mapX(atMapIndex)...
+		//..... some mapping function
+		x=i;
+		y=j;
+		// scale and shift around
+		
+		//  get color of some pixel  define color.method ...
+		
+		//  put it on canvas pixels
+		
+		
+		
+		imagePixels[atPixelIndex++]=pixel.red;
+		imagePixels[atPixelIndex++]=pixel.green;
+		imagePixels[atPixelIndex++]=pixel.blue;
+
+		atPixelIndex++;    //skip alpha
+		atMapIndex++;
+
+	}
+	
+}
 
 
 
@@ -14,7 +60,16 @@ function startDrawing(){
 
 		startReferenceDrawing();
 	}
+	
+		
+		
+	
+	
 	getPixelsFromCanvas();
+	
+	drawImagePixelLine(0,90,100);
+	
+	
 	verticalMirror(periodHeight/2);
 	horizontalMirror(periodWidth);
 	periodic();
@@ -34,8 +89,8 @@ function startReferenceDrawing(){
 		getPixelsFromReferenceCanvas();
 		//  black-out used pixels ??, or whatever
 		setAlphaReferenceImagePixels(128);
-		for (var i=0;i<inputImageWidth/2;i++){
-			for (var j=0;j<inputImageHeight/2;j++){
+		for (var i=0;i<periodWidth/2;i++){
+			for (var j=0;j<periodHeight/2;j++){
 			
 				setOpaqueReferenceImagePixelFromInputImage(i,j);
 			}
@@ -43,21 +98,23 @@ function startReferenceDrawing(){
 		
 		
 		putPixelsOnReferenceCanvas();
+		referenceCanvasImage.strokeStyle="red";
+		if (mousePressed){
+			referenceCanvasImage.strokeStyle="yellow";
+		}
+		referenceCanvasImage.strokeRect(mouseX,mouseY,20*scale,20*scale);
 	}
 }
 
 
-// on loading the page: get canvas and canvas context
-// create image download function, using jpeg image format,default quality=0.92
-// start drawing
+// on loading the page: delete warnings, get canvas and canvas context
+// create image download function, start drawing
 
 window.onload=function(){
+	deleteWarning();
+	deleteWarning();
 	getCanvases();
+	referenceCanvasAddEventListeners();
 	activateImageDownloadButton();
 	drawing();
-	console.log(5/2);
-	var c=color();
-	c.red=9;
-	c.blue=8;
-	console.log(c.green);
 }

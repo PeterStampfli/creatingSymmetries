@@ -1,4 +1,11 @@
-//  canvases and context
+// delete a javascript warning (only the first one with id="warning"
+//==================================
+function deleteWarning(){
+	var element = document.getElementById("warning");
+	element.parentNode.removeChild(element);
+}
+
+//  canvases, their context
 //======================================================
 var canvas, canvasImage;
 var referenceCanvas,referenceCanvasImage;
@@ -10,12 +17,13 @@ function getCanvases(){
 	canvasImage=canvas.getContext("2d");
 }
 
+
 // all about loading an input image file
 // ========================================================================
 
 var inputImageLoaded=false;
-var inputImageWidth;
-var inputImageHeight;
+var inputImageWidth=0;
+var inputImageHeight=0;
 var imageReader=new FileReader();
 var inputImage = new Image();
 
@@ -72,6 +80,9 @@ inputImage.addEventListener("load",
 		}
 		referenceCanvas.width=referenceWidth;
 		referenceCanvas.height=referenceHeight;
+		// put center of readings to image center
+		mouseX=referenceWidth/2;
+		mouseY=referenceHeight/2;
 		scaleInputToReferenceImage=Math.min(referenceWidth/inputImageWidth,
 		                                    referenceHeight/inputImageHeight);
 		// read the pixels
@@ -119,7 +130,7 @@ function setPeriodHeight(data){
 }
 
 
-//  for downloading
+//  for image downloading, using jpeg image format, default quality=0.92
 //=================================================================
 var downloadFilename='theImage.jpg';
 
