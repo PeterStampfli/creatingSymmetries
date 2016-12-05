@@ -55,6 +55,8 @@ function startDrawing(){
 	canvasImage.fillStyle="Blue";	
 	canvasImage.fillRect(0,0,width,height);
 	if (inputImageLoaded){
+		setPatchDimensions();
+		console.log(patchWidth);
 		//canvasImage.drawImage(inputImage,0,0);
 		canvasImage.putImageData(inputImageData,0,0);
 
@@ -81,6 +83,29 @@ function startDrawing(){
 	
 }
 
+//highlight basic patch
+function opaqueBasicPatch(){
+	var referencePatchWidth=patchWidth*scale*scaleInputToReferenceImage;
+	var referencePatchHeight=patchHeight*scale*scaleInputToReferenceImage;
+	console.log(referencePatchWidth);
+	var fromI=Math.max(0,Math.round(mouseX-referencePatchWidth/2));
+	var toI=Math.min(referenceWidth-1,Math.round(mouseX+referencePatchWidth/2));
+	console.log(fromI+" "+toI);
+	var fromJ=Math.max(0,Math.round(mouseY-referencePatchHeight/2));
+	var toJ=Math.min(referenceHeight-1,Math.round(mouseY+referencePatchHeight/2));
+	console.log(fromJ+" "+toJ);
+	var to;
+	for (var j=fromJ;j<=toJ;j++){
+		to=4*(j*referenceWidth+toI)+3;
+		for (var theIndex=4*(j*referenceWidth+fromI)+3;theIndex<=to;theIndex+=4){
+			referenceImagePixels[theIndex]=255;
+		}
+		
+	}
+	
+	
+}
+
 // set the reference canvas size, and write the image on it
 function startReferenceDrawing(){
 	if (inputImageLoaded){
@@ -89,12 +114,14 @@ function startReferenceDrawing(){
 		getPixelsFromReferenceCanvas();
 		//  black-out used pixels ??, or whatever
 		setAlphaReferenceImagePixels(128);
-		for (var i=0;i<periodWidth/2;i++){
+		
+		opaqueBasicPatch();
+	/*	for (var i=0;i<periodWidth/2;i++){
 			for (var j=0;j<periodHeight/2;j++){
 			
 				setOpaqueReferenceImagePixelFromInputImage(i,j);
 			}
-		}
+		}*/
 		
 		
 		putPixelsOnReferenceCanvas();

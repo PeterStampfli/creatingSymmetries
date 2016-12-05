@@ -107,6 +107,15 @@ var width=512,
 var periodWidth=256;
 var	periodHeight=256;
 
+// for basic patching: region sizes
+var patchWidth;
+var patchHeight;
+// their size depends on the period sizes and the symmetry
+function setPatchDimensions(){
+	patchWidth=periodWidth/2;
+	patchHeight=periodHeight/2;
+}
+
 //  choose width and height, periods must be smaller or equal
 function setWidth(data){
 	width=makeEven(parseInt(data));
