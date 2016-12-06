@@ -39,7 +39,18 @@ var referenceHeight;
 //  ratio of input image to reference image
 var scaleInputToReferenceImage;
 
-// we use an off-screen canvas
+// first load the image data file in a file reader
+function startLoadImage(files){
+	imageReader.readAsDataURL(files[0]);
+}
+// then load the new image from the file reader data
+imageReader.onload=function(imageReaderResult){ 
+	inputImage.src=imageReader.result;
+}
+// then use the image
+inputImage.onload=treatNewInputImage;
+
+// we use an off-screen canvas to get the pixels of the input image
 function getPixelsFromInputImage(){
 	var offScreenCanvas;
 	var offScreenCanvasImage;
@@ -52,44 +63,34 @@ function getPixelsFromInputImage(){
 	inputImagePixels=inputImageData.data;
 }
 
-// first load the image data
-function startLoadImage(files){
-	imageReader.readAsDataURL(files[0]);
+function treatNewInputImage() {  
+	// data of the loaded image
+	inputImageLoaded=true;
+	inputImageWidth=inputImage.width;
+	inputImageHeight=inputImage.height;
+	// set up dimensions of the reference image
+	var inputImageSize=Math.max(inputImageWidth,inputImageHeight);
+	if (inputImageSize<maxReferenceImageSize){
+		referenceWidth=inputImageWidth;
+		referenceHeight=inputImageHeight;
+	}
+	else {
+		referenceWidth=Math.round(inputImageWidth*maxReferenceImageSize/inputImageSize);
+		referenceHeight=Math.round(inputImageHeight*maxReferenceImageSize/inputImageSize);			
+	}
+	referenceCanvas.width=referenceWidth;
+	referenceCanvas.height=referenceHeight;
+	// put center of readings to image center
+	mouseX=referenceWidth/2;
+	mouseY=referenceHeight/2;
+	// get scale of mapping from input image to the reference image
+	scaleInputToReferenceImage=Math.min(referenceWidth/inputImageWidth,
+										referenceHeight/inputImageHeight);
+	// read the pixels into
+	getPixelsFromInputImage();		
+	// and finally (re)draw with this image
+	drawing();
 }
-// then create an image object
-imageReader.onload=function(imageReaderResult){ 
-	inputImage.src=imageReader.result;
-}
-
-// using the (new) image
-inputImage.addEventListener("load", 
-	function() {  
-		// data for loaded image
-		inputImageLoaded=true;
-		inputImageWidth=inputImage.width;
-		inputImageHeight=inputImage.height;
-		// set up dimensions of the reference image
-		var inputImageSize=Math.max(inputImageWidth,inputImageHeight);
-		if (inputImageSize<maxReferenceImageSize){
-			referenceWidth=inputImageWidth;
-			referenceHeight=inputImageHeight;
-		}
-		else {
-			referenceWidth=Math.round(inputImageWidth*maxReferenceImageSize/inputImageSize);
-			referenceHeight=Math.round(inputImageHeight*maxReferenceImageSize/inputImageSize);			
-		}
-		referenceCanvas.width=referenceWidth;
-		referenceCanvas.height=referenceHeight;
-		// put center of readings to image center
-		mouseX=referenceWidth/2;
-		mouseY=referenceHeight/2;
-		scaleInputToReferenceImage=Math.min(referenceWidth/inputImageWidth,
-		                                    referenceHeight/inputImageHeight);
-		// read the pixels
-		getPixelsFromInputImage();		
-		// and finally (re)draw with this image
-		drawing();
-	}, false);
 
 // choosing image sizes and lengths of the periodic unit cell
 //=====================================================================

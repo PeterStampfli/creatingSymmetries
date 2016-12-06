@@ -1,5 +1,9 @@
 
 
+
+
+
+
 // combine index to pixels from integer coordinates
 //  is index to the red component of the pixel, green,blue and alpha follow
 function index(i,j){

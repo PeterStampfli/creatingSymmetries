@@ -46,54 +46,64 @@ function drawImagePixelLine(fromI,toI,j){
 	
 }
 
+function showPatch(){
+		
+	canvasImage.strokeStyle="Red";	
+	canvasImage.strokeRect(0,0,patchWidth,patchHeight);
+}
 
 
-// set the canvas size, make a blue background and write the image on it (scale 100%)
+// set the canvas size, make a blue background and write the image on it 
 function startDrawing(){
 	canvas.width=width;
 	canvas.height=height;
 	canvasImage.fillStyle="Blue";	
 	canvasImage.fillRect(0,0,width,height);
+	setPatchDimensions();
 	if (inputImageLoaded){
-		setPatchDimensions();
-		console.log(patchWidth);
+		//console.log(patchWidth);
 		//canvasImage.drawImage(inputImage,0,0);
-		canvasImage.putImageData(inputImageData,0,0);
-
+		//canvasImage.putImageData(inputImageData,0,0);
+		
+		// interactive patch
+		var inputPatchHeight=scale*patchHeight;
+		var inputPatchWidth=scale*patchWidth;
+		var inputPatchCornerX=mouseX/scaleInputToReferenceImage-inputPatchWidth/2;
+		var inputPatchCornerY=mouseY/scaleInputToReferenceImage-inputPatchHeight/2;
+		
+		canvasImage.drawImage(inputImage,inputPatchCornerX,inputPatchCornerY,inputPatchWidth,inputPatchHeight,
+							0,0,patchWidth,patchHeight);
 		startReferenceDrawing();
 	}
-	
+// get the pixels and make symmetries
+
+//  use only the periodic cell !!!!	
 		
-		
-	
-	
 	getPixelsFromCanvas();
-	
-	drawImagePixelLine(0,90,100);
 	
 	
 	verticalMirror(periodHeight/2);
 	horizontalMirror(periodWidth);
 	periodic();
+	 
+	 
 	putPixelsOnCanvas();
 	
-	
-	canvasImage.strokeStyle="Red";	
-	canvasImage.strokeRect(0,0,periodWidth,periodHeight);
-	
+	showPatch();
 }
 
-//highlight basic patch
+//highlight basic patch on reference drawing
 function opaqueBasicPatch(){
+	// scale the patch size: going from output canvas image to input image
+	// and then to reference image
 	var referencePatchWidth=patchWidth*scale*scaleInputToReferenceImage;
 	var referencePatchHeight=patchHeight*scale*scaleInputToReferenceImage;
-	console.log(referencePatchWidth);
+	//center around the mouse position
 	var fromI=Math.max(0,Math.round(mouseX-referencePatchWidth/2));
 	var toI=Math.min(referenceWidth-1,Math.round(mouseX+referencePatchWidth/2));
-	console.log(fromI+" "+toI);
 	var fromJ=Math.max(0,Math.round(mouseY-referencePatchHeight/2));
 	var toJ=Math.min(referenceHeight-1,Math.round(mouseY+referencePatchHeight/2));
-	console.log(fromJ+" "+toJ);
+	// make the rectangle opaque
 	var to;
 	for (var j=fromJ;j<=toJ;j++){
 		to=4*(j*referenceWidth+toI)+3;
@@ -109,27 +119,16 @@ function opaqueBasicPatch(){
 // set the reference canvas size, and write the image on it
 function startReferenceDrawing(){
 	if (inputImageLoaded){
+		// draw the input image on scale
 		referenceCanvasImage.drawImage(inputImage,0,0,inputImageWidth,inputImageHeight,
 		                                          0,0,referenceWidth,referenceHeight);
+		// make that only the used part is opaque and fully visible
 		getPixelsFromReferenceCanvas();
-		//  black-out used pixels ??, or whatever
 		setAlphaReferenceImagePixels(128);
 		
 		opaqueBasicPatch();
-	/*	for (var i=0;i<periodWidth/2;i++){
-			for (var j=0;j<periodHeight/2;j++){
-			
-				setOpaqueReferenceImagePixelFromInputImage(i,j);
-			}
-		}*/
-		
 		
 		putPixelsOnReferenceCanvas();
-		referenceCanvasImage.strokeStyle="red";
-		if (mousePressed){
-			referenceCanvasImage.strokeStyle="yellow";
-		}
-		referenceCanvasImage.strokeRect(mouseX,mouseY,20*scale,20*scale);
 	}
 }
 
