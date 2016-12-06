@@ -1,13 +1,8 @@
-
-
-
-
-
-
 // combine index to pixels from integer coordinates
+// use only the periodic cell???????????????????????????????????????????????????????????
 //  is index to the red component of the pixel, green,blue and alpha follow
 function index(i,j){
-	return 4*(i+width*j);
+	return 4*(i+periodWidth*j);
 }
 
 // copy pixel values, only RGB part
@@ -27,21 +22,6 @@ function copyPixels(targetI,targetEndI,targetJ,
 		imagePixels[target++]=imagePixels[source++];
 		target++;                                       // ... skip alpha
 		source+=sourceStep;                             // walk the source
-	}
-}
-
-
-// periodic repetition of unit cell
-function periodic(){
-	//repetition in horizontal direction
-	for (var fromJ=0;fromJ<periodHeight;fromJ++){
-		copyPixels(periodWidth,width-1,fromJ,
-					0,fromJ,1,0);
-	}
-	// repetition in vertical direction
-	for (var fromJ=periodHeight;fromJ<height;fromJ++){
-		copyPixels(0,width-1,fromJ,
-					0,fromJ-periodHeight,1,0);
 	}
 }
 

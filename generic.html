@@ -6,54 +6,61 @@
 </head>
 <link rel="stylesheet" type="text/css" href="symStyle.css">
 <body>
-	<h1 id="warning" style="background-color:white">
-		Please allow execution of javascript !
-	</h1>
-	<h3 id="warning">
-		(Javascript does all the heavy work on this page.)
-	</h3>
+	<noscript>
+		<h1 style="background-color:white">
+			Please allow execution of javascript !
+			<br>
+			(Else nothing happens.)
+		</h1>
+	</noscript>
+		<p>
+			Choose the input image file:
+			<input type="file" accept="image/*" id="imageInput" 
+				onchange="startLoadImage(this.files)">
+		</p>
+		<p>
+			Choose the size of the generated image: width
+			<input type="text" id="numbers" value="512" maxlength="4" 
+				onchange="setWidth(this.value)"/>
+			, height 
+			<input type="text" id="numbers" value="512" maxlength="4" 
+				onchange="setHeight(this.value)"/>
+			.
+		</p>
+		<p>
+			Choose the size of the periodic cell: width
+			<input type="text" id="numbers" value="256" maxlength="4" 
+				onchange="setPeriodWidth(this.value)"/>
+			, height 
+			<input type="text" id="numbers" value="256" maxlength="4" 
+				onchange="setPeriodHeight(this.value)"/>
+			.
+		</p>
+		<h4>
+			To "download" this image 
+			<a id="download" href="">&nbsp click here ! &nbsp</a>
+		</h4>
 
-	<p>
-		Choose the input image file:
-		<input type="file" accept="image/*" id="imageInput" onchange="startLoadImage(this.files)">
-	</p>
-	<p>
-		Choose the size of the generated image: width
-		<input type="text" id="numbers" value="512" maxlength="4" onchange="setWidth(this.value)"/>
-		, height 
-		<input type="text" id="numbers" value="512" maxlength="4" onchange="setHeight(this.value)"/>
-		.
-	</p>
-	<p>
-		Choose the size of the periodic cell: width
-		<input type="text" id="numbers" value="256" maxlength="4" onchange="setPeriodWidth(this.value)"/>
-		, height 
-		<input type="text" id="numbers" value="256" maxlength="4" onchange="setPeriodHeight(this.value)"/>
-		.
-	</p>
-	<h4>
-		To "download" this image 
-		<a id="download" href="">&nbsp click here ! &nbsp</a>
-	</h4>
+		<p style="text-align:center">
+		<canvas id="canvas" moz-opaque></canvas>
+		</p>
 
-	<p style="text-align:center">
-	<canvas id="canvas" moz-opaque></canvas>
-	</p>
-
-	<p style="text-align:center">
-	<canvas id="referenceCanvas"></canvas>
-	</p>
-
+		<p style="text-align:center">
+		<canvas id="referenceCanvas"></canvas>
+		</p>
 </body>
 	<script src="userInteraction.js"></script>
 	<script src="mouseEvents.js"></script>
 	<script src="pixels.js"></script>
 	<script src="copySymmetries.js"></script>
+	<script src="simplePatching.js"></script>
+	<script src="farris.js"></script>
 	<script src="symLibrary.js"></script>
 	<script>
 
 	function drawing(){
-		startDrawing();
+		//simplePatchingDrawing();
+		farrisDrawing();
 	}
 
 	</script>

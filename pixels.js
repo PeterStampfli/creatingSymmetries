@@ -1,29 +1,33 @@
-// color object
-function Color(red,green,blue){
-	this.red=red;
-	this.green=green;
-	this.blue=blue;
-}
 
-function color(){
-	return new Color(0,0,0);
-}
-
-// pixel data of canvas
+// pixel data of canvas, using only one periodic unit cell
 var imageData;
 var imagePixels;
-// get pixels from canvas
+// get pixels from canvas,use only the unit cell
 function getPixelsFromCanvas(){
-	imageData = canvasImage.getImageData(0,0,width,height);
+	imageData = canvasImage.getImageData(0,0,periodWidth,periodHeight);
 	imagePixels = imageData.data;
 }
-// put pixels on canvas
-function putPixelsOnCanvas(){
-	canvasImage.putImageData(imageData, 0, 0);
+
+//  put pixels periodically on canvas
+function putPixelsPeriodicallyOnCanvas(){
+	var copyWidth;
+	var copyHeight;
+	for (var cornerY=0;cornerY<height;cornerY+=periodHeight){
+		copyHeight=Math.min(height-cornerY,periodHeight);
+		for (var cornerX=0;cornerX<width;cornerX+=periodWidth){
+			copyWidth=Math.min(width-cornerX,periodWidth);
+			canvasImage.putImageData(imageData, cornerX, cornerY,
+			                         0,0,copyWidth,copyHeight);
+
+		}
+	}
+	
 }
 
 
-//  manipulating the reference image
+
+
+//  manipulating the reference image (precision highlighting of sampled pixels)
 //====================================================================
 var referenceImageData;
 var referenceImagePixels;

@@ -1,14 +1,9 @@
-// delete a javascript warning (only the first one with id="warning"
-//==================================
-function deleteWarning(){
-	var element = document.getElementById("warning");
-	element.parentNode.removeChild(element);
-}
-
 //  canvases, their context
 //======================================================
-var canvas, canvasImage;
-var referenceCanvas,referenceCanvasImage;
+var canvas;
+var canvasImage;
+var referenceCanvas;
+var referenceCanvasImage;
 
 function getCanvases(){
 	referenceCanvas=document.getElementById("referenceCanvas");	
@@ -17,10 +12,8 @@ function getCanvases(){
 	canvasImage=canvas.getContext("2d");
 }
 
-
 // all about loading an input image file
 // ========================================================================
-
 var inputImageLoaded=false;
 var inputImageWidth=0;
 var inputImageHeight=0;
@@ -48,7 +41,7 @@ imageReader.onload=function(imageReaderResult){
 	inputImage.src=imageReader.result;
 }
 // then use the image
-inputImage.onload=treatNewInputImage;
+inputImage.onload=useNewInputImage;
 
 // we use an off-screen canvas to get the pixels of the input image
 function getPixelsFromInputImage(){
@@ -58,12 +51,12 @@ function getPixelsFromInputImage(){
 	offScreenCanvas.width=inputImageWidth;
 	offScreenCanvas.height=inputImageHeight;
 	offScreenCanvasImage=offScreenCanvas.getContext("2d");
-	offScreenCanvasImage.drawImage(inputImage,0,0);
+	offScreenCanvasImage.drawImage(inputImage,0,0);	
 	inputImageData=offScreenCanvasImage.getImageData(0,0,inputImageWidth,inputImageHeight);
 	inputImagePixels=inputImageData.data;
 }
 
-function treatNewInputImage() {  
+function useNewInputImage() {  
 	// data of the loaded image
 	inputImageLoaded=true;
 	inputImageWidth=inputImage.width;
@@ -94,8 +87,6 @@ function treatNewInputImage() {
 
 // choosing image sizes and lengths of the periodic unit cell
 //=====================================================================
-
-// make an even number
 function makeEven(i){
 	return i+i%2;
 }
@@ -139,17 +130,17 @@ function setPeriodHeight(data){
 	drawing();
 }
 
-
 //  for image downloading, using jpeg image format, default quality=0.92
 //=================================================================
-var downloadFilename='theImage.jpg';
+var imageFilename='theImage.jpg';
 
 function activateImageDownloadButton(){
 	var downloadButton=document.getElementById('download')
 	if (downloadButton!=null){
 		downloadButton.addEventListener('click', function() {
+			//  use correct data format and filename
 			this.href = canvas.toDataURL("image/jpeg");
-			this.download = downloadFilename;
+			this.download = imageFilename;
 		}, false);
 	}
 }

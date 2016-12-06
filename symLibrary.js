@@ -1,3 +1,18 @@
+// color object
+function Color(red,green,blue){
+	this.red=red;
+	this.green=green;
+	this.blue=blue;
+}
+
+function color(){
+	return new Color(0,0,0);
+}
+
+
+
+
+
 // a mapping function (i,j) -> float (x,y) in a table
 var mapWidth=1;
 var mapHeight=1;
@@ -84,36 +99,11 @@ function startDrawing(){
 	
 	verticalMirror(periodHeight/2);
 	horizontalMirror(periodWidth);
-	periodic();
+	//periodic();
 	 
 	 
-	putPixelsOnCanvas();
-	
+	putPixelsPeriodicallyOnCanvas();
 	showPatch();
-}
-
-//highlight basic patch on reference drawing
-function opaqueBasicPatch(){
-	// scale the patch size: going from output canvas image to input image
-	// and then to reference image
-	var referencePatchWidth=patchWidth*scale*scaleInputToReferenceImage;
-	var referencePatchHeight=patchHeight*scale*scaleInputToReferenceImage;
-	//center around the mouse position
-	var fromI=Math.max(0,Math.round(mouseX-referencePatchWidth/2));
-	var toI=Math.min(referenceWidth-1,Math.round(mouseX+referencePatchWidth/2));
-	var fromJ=Math.max(0,Math.round(mouseY-referencePatchHeight/2));
-	var toJ=Math.min(referenceHeight-1,Math.round(mouseY+referencePatchHeight/2));
-	// make the rectangle opaque
-	var to;
-	for (var j=fromJ;j<=toJ;j++){
-		to=4*(j*referenceWidth+toI)+3;
-		for (var theIndex=4*(j*referenceWidth+fromI)+3;theIndex<=to;theIndex+=4){
-			referenceImagePixels[theIndex]=255;
-		}
-		
-	}
-	
-	
 }
 
 // set the reference canvas size, and write the image on it
@@ -123,12 +113,18 @@ function startReferenceDrawing(){
 		referenceCanvasImage.drawImage(inputImage,0,0,inputImageWidth,inputImageHeight,
 		                                          0,0,referenceWidth,referenceHeight);
 		// make that only the used part is opaque and fully visible
-		getPixelsFromReferenceCanvas();
+		/*
+		 * for general mapping
+		  getPixelsFromReferenceCanvas();
 		setAlphaReferenceImagePixels(128);
 		
 		opaqueBasicPatch();
 		
 		putPixelsOnReferenceCanvas();
+		 */
+		
+		whiteOutsideBasicPatch();
+		
 	}
 }
 
@@ -137,8 +133,7 @@ function startReferenceDrawing(){
 // create image download function, start drawing
 
 window.onload=function(){
-	deleteWarning();
-	deleteWarning();
+//	deleteWarning();
 	getCanvases();
 	referenceCanvasAddEventListeners();
 	activateImageDownloadButton();
