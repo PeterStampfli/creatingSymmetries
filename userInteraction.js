@@ -1,36 +1,36 @@
 //  canvases, their context
 //======================================================
-var canvas;
-var canvasImage;
+var outputCanvas;
+var outputImage;
 var referenceCanvas;
-var referenceCanvasImage;
+var referenceImage;
 
 function getCanvases(){
 	referenceCanvas=document.getElementById("referenceCanvas");	
-	referenceCanvasImage=referenceCanvas.getContext("2d");
-	canvas=document.getElementById("canvas");	
-	canvasImage=canvas.getContext("2d");
+	referenceImage=referenceCanvas.getContext("2d");
+	outputCanvas=document.getElementById("canvas");	
+	outputImage=outputCanvas.getContext("2d");
 }
 
 // all about loading an input image file
 // ========================================================================
-var inputImageLoaded=false;
-var inputImageWidth=0;
-var inputImageHeight=0;
+var inputLoaded=false;
+var inputWidth=0;
+var inputHeight=0;
 var imageReader=new FileReader();
 var inputImage = new Image();
 
 // get pixel data of input image
-var inputImageData;
-var inputImagePixels;
+var inputData;
+var inputPixels;
 	
 // maximum size of reference image
-var maxReferenceImageSize=300;
+var maxReferenceSize=300;
 //  derived dimensions for the reference canvas
 var referenceWidth;
 var referenceHeight;
 //  ratio of input image to reference image
-var scaleInputToReferenceImage;
+var scaleInputToReference;
 
 // first load the image data file in a file reader
 function startLoadImage(files){
@@ -48,28 +48,28 @@ function getPixelsFromInputImage(){
 	var offScreenCanvas;
 	var offScreenCanvasImage;
 	offScreenCanvas=document.createElement("canvas");
-	offScreenCanvas.width=inputImageWidth;
-	offScreenCanvas.height=inputImageHeight;
+	offScreenCanvas.width=inputWidth;
+	offScreenCanvas.height=inputHeight;
 	offScreenCanvasImage=offScreenCanvas.getContext("2d");
 	offScreenCanvasImage.drawImage(inputImage,0,0);	
-	inputImageData=offScreenCanvasImage.getImageData(0,0,inputImageWidth,inputImageHeight);
-	inputImagePixels=inputImageData.data;
+	inputData=offScreenCanvasImage.getImageData(0,0,inputWidth,inputHeight);
+	inputPixels=inputData.data;
 }
 
 function useNewInputImage() {  
 	// data of the loaded image
-	inputImageLoaded=true;
-	inputImageWidth=inputImage.width;
-	inputImageHeight=inputImage.height;
+	inputLoaded=true;
+	inputWidth=inputImage.width;
+	inputHeight=inputImage.height;
 	// set up dimensions of the reference image
-	var inputImageSize=Math.max(inputImageWidth,inputImageHeight);
-	if (inputImageSize<maxReferenceImageSize){
-		referenceWidth=inputImageWidth;
-		referenceHeight=inputImageHeight;
+	var inputSize=Math.max(inputWidth,inputHeight);
+	if (inputSize<maxReferenceSize){
+		referenceWidth=inputWidth;
+		referenceHeight=inputHeight;
 	}
 	else {
-		referenceWidth=Math.round(inputImageWidth*maxReferenceImageSize/inputImageSize);
-		referenceHeight=Math.round(inputImageHeight*maxReferenceImageSize/inputImageSize);			
+		referenceWidth=Math.round(inputWidth*maxReferenceSize/inputSize);
+		referenceHeight=Math.round(inputHeight*maxReferenceSize/inputSize);			
 	}
 	referenceCanvas.width=referenceWidth;
 	referenceCanvas.height=referenceHeight;
@@ -77,8 +77,8 @@ function useNewInputImage() {
 	mouseX=referenceWidth/2;
 	mouseY=referenceHeight/2;
 	// get scale of mapping from input image to the reference image
-	scaleInputToReferenceImage=Math.min(referenceWidth/inputImageWidth,
-										referenceHeight/inputImageHeight);
+	scaleInputToReference=Math.min(referenceWidth/inputWidth,
+										referenceHeight/inputHeight);
 	// read the pixels into
 	getPixelsFromInputImage();		
 	// and finally (re)draw with this image
@@ -92,8 +92,8 @@ function makeEven(i){
 }
 
 // default size for generated image
-var width=512,
-	height=512;
+var outputWidth=512,
+	outputHeight=512;
 	
 // periods/size of periodic cell
 var periodWidth=256;
@@ -110,23 +110,23 @@ function setPatchDimensions(){
 
 //  choose width and height, periods must be smaller or equal
 function setWidth(data){
-	width=makeEven(parseInt(data));
-	periodWidth=Math.min(periodWidth,width);
+	outputWidth=makeEven(parseInt(data));
+	periodWidth=Math.min(periodWidth,outputWidth);
 	drawing();
 }
 function setHeight(data){
-	height=makeEven(parseInt(data));
-	periodHeight=Math.min(periodHeight,height);
+	outputHeight=makeEven(parseInt(data));
+	periodHeight=Math.min(periodHeight,outputHeight);
 	drawing();
 }
 
 // choose width and height of periodic cell
 function setPeriodWidth(data){
-	periodWidth=Math.min(makeEven(parseInt(data)),width);
+	periodWidth=Math.min(makeEven(parseInt(data)),outputWidth);
 	drawing();
 }
 function setPeriodHeight(data){
-	periodHeight=Math.min(makeEven(parseInt(data)),height);
+	periodHeight=Math.min(makeEven(parseInt(data)),outputHeight);
 	drawing();
 }
 
@@ -139,7 +139,7 @@ function activateImageDownloadButton(){
 	if (downloadButton!=null){
 		downloadButton.addEventListener('click', function() {
 			//  use correct data format and filename
-			this.href = canvas.toDataURL("image/jpeg");
+			this.href = outputCanvas.toDataURL("image/jpeg");
 			this.download = imageFilename;
 		}, false);
 	}

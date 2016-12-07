@@ -17,7 +17,7 @@ function setMousePosition(event){
 
 // the wheel changes the scale: map to input image pixels
 //  a larger scale zooms out
-var scale=2;
+var scaleOutputToInput=2;
 var changeScaleFactor=1.1;
 
 function mouseDownHandler(event){
@@ -55,10 +55,10 @@ function mouseOutHandler(event){
 function mouseWheelHandler(event){
 	stopEventPropagationAndDefaultAction(event);
 	if (event.deltaY>0){
-		scale*=changeScaleFactor;
+		scaleOutputToInput*=changeScaleFactor;
 	}
 	else {
-		scale/=changeScaleFactor;
+		scaleOutputToInput/=changeScaleFactor;
 	}
 	drawing();
 	return false;

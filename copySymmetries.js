@@ -9,7 +9,7 @@ function index(i,j){
 // target goes upwards on a horizontal line from (targetI,targetJ) to (targetEndI,targetJ)
 // source starts at (sourceI,sourceJ) and makes steps (sourceStepI,sourceStepJ)
 //  starting points: from=(fromI,fromJ) and to=(toI,toJ)
-//  accounts for (canvas) width and 4 bytes per pixels !!!
+//  accounts for (output canvas) width and 4 bytes per pixels !!!
 function copyPixels(targetI,targetEndI,targetJ,
 					sourceI,sourceJ,sourceStepI,sourceStepJ){
 	var target=index(targetI,targetJ);
@@ -17,9 +17,9 @@ function copyPixels(targetI,targetEndI,targetJ,
 	var source=index(sourceI,sourceJ);
 	var sourceStep=index(sourceStepI,sourceStepJ)-3;  // with compensation for pixel subcomponents 
 	while (target<=targetEnd) {  // do complete pixels ...
-		imagePixels[target++]=imagePixels[source++];
-		imagePixels[target++]=imagePixels[source++];
-		imagePixels[target++]=imagePixels[source++];
+		outputPixels[target++]=outputPixels[source++];
+		outputPixels[target++]=outputPixels[source++];
+		outputPixels[target++]=outputPixels[source++];
 		target++;                                       // ... skip alpha
 		source+=sourceStep;                             // walk the source
 	}

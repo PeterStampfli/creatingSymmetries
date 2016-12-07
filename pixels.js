@@ -1,27 +1,25 @@
 
 // pixel data of canvas, using only one periodic unit cell
-var imageData;
-var imagePixels;
-// get pixels from canvas,use only the unit cell
+var outputData;
+var outputPixels;
+// get the pixels of the output canvas,use only the unit cell
 function getPixelsFromCanvas(){
-	imageData = canvasImage.getImageData(0,0,periodWidth,periodHeight);
-	imagePixels = imageData.data;
+	outputData = outputImage.getImageData(0,0,periodWidth,periodHeight);
+	outputPixels = outputData.data;
 }
 
 //  put pixels periodically on canvas
 function putPixelsPeriodicallyOnCanvas(){
 	var copyWidth;
 	var copyHeight;
-	for (var cornerY=0;cornerY<height;cornerY+=periodHeight){
-		copyHeight=Math.min(height-cornerY,periodHeight);
-		for (var cornerX=0;cornerX<width;cornerX+=periodWidth){
-			copyWidth=Math.min(width-cornerX,periodWidth);
-			canvasImage.putImageData(imageData, cornerX, cornerY,
+	for (var cornerY=0;cornerY<outputHeight;cornerY+=periodHeight){
+		copyHeight=Math.min(outputHeight-cornerY,periodHeight);
+		for (var cornerX=0;cornerX<outputWidth;cornerX+=periodWidth){
+			copyWidth=Math.min(outputWidth-cornerX,periodWidth);
+			outputImage.putImageData(outputData, cornerX, cornerY,
 			                         0,0,copyWidth,copyHeight);
-
 		}
 	}
-	
 }
 
 
@@ -29,34 +27,26 @@ function putPixelsPeriodicallyOnCanvas(){
 
 //  manipulating the reference image (precision highlighting of sampled pixels)
 //====================================================================
-var referenceImageData;
-var referenceImagePixels;
+var referenceData;
+var referencePixels;
 
 // get pixels from reference canvas
 function getPixelsFromReferenceCanvas(){
-	referenceImageData = referenceCanvasImage.getImageData(0,0,referenceWidth,referenceHeight);
-	referenceImagePixels = referenceImageData.data;
+	referenceData = referenceImage.getImageData(0,0,referenceWidth,referenceHeight);
+	referencePixels = referenceData.data;
 }
 
 // put pixels on reference canvas
 function putPixelsOnReferenceCanvas(){
-	referenceCanvasImage.putImageData(referenceImageData, 0, 0);
+	referenceImage.putImageData(referenceData, 0, 0);
 }
 
 // fade-out all pixels by setting alpha
 function setAlphaReferenceImagePixels(alpha){
-	var theEnd=referenceImagePixels.length;
+	var theEnd=referencePixels.length;
 	for (var i=3;i<theEnd;i+=4){
-		referenceImagePixels[i]=alpha;
+		referencePixels[i]=alpha;
 	}
-}
-
-// to show used pixels, make a pixel of the reference image opaque
-// given coordinates of input image  (i,j), already inside the input image
-function setOpaqueReferenceImagePixelFromInputImage(i,j){
-	i=Math.floor(scaleInputToReferenceImage*i);
-	j=Math.floor(scaleInputToReferenceImage*j);
-	referenceImagePixels[4*(referenceWidth*j+i)+3]=255;
 }
 
 	
