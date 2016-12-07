@@ -19,7 +19,9 @@ function drawPixelLine(fromI,toI,j){
 	var locScale=scaleOutputToInput;
 	// input image
 	var locInputWidth=inputWidth;
+	var locInputWidthM3=inputWidth-3;
 	var locInputHeight=inputHeight;
+	var locInputHeightM3=inputHeight-3;
 	var locInputPixels=inputPixels;
 	//  (output) image
 	var locImagePixels=outputPixels;
@@ -49,11 +51,19 @@ function drawPixelLine(fromI,toI,j){
 		// center correspopnds to (x,y)=(0,0)
 		x=locScale*x+centerX;
 		y=locScale*y+centerY;
+		// get integer part and check if inside
+		h=Math.floor(x);
+		// do nothing if outside boundaries (skiping this iteration)
+		//  limits that do for all kinds of interpolation
+		if (h<1) continue;
+		if (h>locInputWidthM3) continue;
+		k=Math.floor(y);
+		if (k<1) continue;
+		if (k>locInputHeightM3) continue;
+		// index of base point
+		inputIndex=4*(k*locInputWidth+h);
 		//  get the pixel color components
 		if (locQuality==locNEXT){
-			h=Math.max(0,Math.min(locInputWidth,Math.round(x)));
-			k=Math.max(0,Math.min(locInputHeight,Math.round(y)));
-			inputIndex=4*(k*locInputWidth+h);
 			red=locInputPixels[inputIndex++];
 			green=locInputPixels[inputIndex++];
 			blue=locInputPixels[inputIndex];
@@ -96,7 +106,10 @@ function farrisDrawing(){
 	// now get the pixels of the periodic unit cell		
 	getPixelsFromCanvas();
 	
-	drawPixelLine(0,patchWidth,0);
+	// depends on symmetry
+	for (var j=0;j<patchHeight;j++){
+		drawPixelLine(0,patchWidth-1,j);
+	}
 
 	
 	
