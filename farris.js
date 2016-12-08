@@ -2,8 +2,12 @@
 //  sampling quality
 var NEXT=0;
 var LINEAR=1;
+var CUBIC=2;
 
 var quality=NEXT;            // chooser ???
+
+quality=LINEAR;
+quality=CUBIC;
 
 // draw a line of pixels on the output pixels
 function drawPixelLine(fromI,toI,j){
@@ -13,6 +17,7 @@ function drawPixelLine(fromI,toI,j){
 	var locQuality=quality;
 	var locNEXT=NEXT;
 	var locLINEAR=LINEAR;
+	var locCUBIC=CUBIC;
 	// center of sampling as defined by the mouse on the reference image
 	var centerX=mouseX/scaleInputToReference;
 	var centerY=mouseY/scaleInputToReference;
@@ -22,13 +27,13 @@ function drawPixelLine(fromI,toI,j){
 	var locInputWidthM3=inputWidth-3;
 	var locInputHeight=inputHeight;
 	var locInputHeightM3=inputHeight-3;
-	var locInputPixels=inputPixels;
+	var iPix=inputPixels;
 	//  (output) image
-	var locImagePixels=outputPixels;
+	var locOutputPixels=outputPixels;
 	//  refernce image
 	var locReferencePixels=referencePixels;
 	var locReferenceWidth=referenceWidth;
-	var locScaleInputToReferenceImage=scaleInputToReference;
+	var locScaleInputToReference=scaleInputToReference;
 	
 	
 	//  sampling coordinates
@@ -42,7 +47,7 @@ function drawPixelLine(fromI,toI,j){
 	var outputIndex=index(fromI,j);
 
 	for (var i=fromI;i<=toI;i++){
-		// some mapping from (i,j) to (x,y)
+		// some mapping from (i,j) to (x,y) stored in a map table !!!
 		// to define later, symmetry dependent
 		// trivial default, equivalent to simple patching
 		x=i;
@@ -64,18 +69,94 @@ function drawPixelLine(fromI,toI,j){
 		inputIndex=4*(k*locInputWidth+h);
 		//  get the pixel color components
 		if (locQuality==locNEXT){
-			red=locInputPixels[inputIndex++];
-			green=locInputPixels[inputIndex++];
-			blue=locInputPixels[inputIndex];
+			red=iPix[inputIndex++];
+			green=iPix[inputIndex++];
+			blue=iPix[inputIndex];
+		}
+		else if (locQuality==locLINEAR){
+			var i00=inputIndex;
+			var i10=i00+4;
+			var i01=i00+4*locInputWidth;
+			var i11=i01+4;
+			var dx=x-h;
+			var dy=y-k;
+			var f00=(1-dx)*(1-dy);
+			var f10=dx*(1-dy);
+			var f01=(1-dx)*dy;
+			var f11=dx*dy;
+			red=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];
+			green=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];
+			blue=f00*iPix[i00]+f10*iPix[i10]+f01*iPix[i01]+f11*iPix[i11];			
+		}
+		else {  //CUBIC interpolation
+			function kernel(x){   // Mitchell-Netrovali, B=C=0.333333, 0<x<2
+				if (x<1){
+					return (1.16666*x-2)*x*x+0.888888;
+				}
+				return ((2-0.388888*x)*x-3.33333)*x+1.777777;				
+			}
+			//  total indizes for varying height offset points
+			var j0=inputIndex-4;
+			var jm=j0-4*locInputWidth;
+			var j1=j0+4*locInputWidth;
+			var j2=j1+4*locInputWidth;
+			// get separated kernel results for the different heights
+			var dy=y-k;     //1 >= dy >= 0 thus kernel arguments 0<=x<=2
+			var kym=kernel(1+dy);
+			var ky0=kernel(dy);
+			var ky1=kernel(1-dy);
+			var ky2=kernel(2-dy);
+			// sum up advancing in x-direction
+			var dx=x-h;
+			var kx=kernel(1+dx);
+			red=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
+			green=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
+			blue=kx*(kym*iPix[jm]+ky0*iPix[j0]+ky1*iPix[j1]+ky2*iPix[j2]);
+			jm+=2;
+			j0+=2;
+			j1+=2;
+			j2+=2;
+			var kx=kernel(dx);
+			red+=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
+			green+=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
+			blue+=kx*(kym*iPix[jm]+ky0*iPix[j0]+ky1*iPix[j1]+ky2*iPix[j2]);
+			jm+=2;
+			j0+=2;
+			j1+=2;
+			j2+=2;
+			var kx=kernel(1-dx);
+			red+=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
+			green+=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
+			blue+=kx*(kym*iPix[jm]+ky0*iPix[j0]+ky1*iPix[j1]+ky2*iPix[j2]);
+			jm+=2;
+			j0+=2;
+			j1+=2;
+			j2+=2;
+			var kx=kernel(2-dx);
+			red+=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
+			green+=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
+			blue+=kx*(kym*iPix[jm]+ky0*iPix[j0]+ky1*iPix[j1]+ky2*iPix[j2]);
+			jm+=2;
+			j0+=2;
+			j1+=2;
+			j2+=2;
+			
+			
+			
+			
+			
+			red=Math.max(0,Math.round(red));
+			green=Math.max(0,Math.round(green));
+			blue=Math.max(0,Math.round(blue));
 		}
 		//  write them on the image
-		locImagePixels[outputIndex++]=red;
-		locImagePixels[outputIndex++]=green;
-		locImagePixels[outputIndex]=blue;
+		locOutputPixels[outputIndex++]=red;
+		locOutputPixels[outputIndex++]=green;
+		locOutputPixels[outputIndex]=blue;
 		outputIndex+=2;    //skip alpha
 		// mark the reference image pixel
-		h=Math.floor(locScaleInputToReferenceImage*h);
-		k=Math.floor(locScaleInputToReferenceImage*k);
+		h=Math.floor(locScaleInputToReference*h);
+		k=Math.floor(locScaleInputToReference*k);
 		locReferencePixels[4*(locReferenceWidth*k+h)+3]=255;
 
 	}
