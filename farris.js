@@ -34,26 +34,34 @@ function drawPixelLine(fromI,toI,j){
 	var locReferencePixels=referencePixels;
 	var locReferenceWidth=referenceWidth;
 	var locScaleInputToReference=scaleInputToReference;
-	
-	
 	//  sampling coordinates
 	var x,y;
 	//  integer part of sampling coordinates
 	var h,k;
 	var inputIndex;
 	// resulting color components
-	var red,green,blue;
-	
+	var red,green,blue;	
 	var outputIndex=index(fromI,j);
-
+	//  index to the mapping function table
+	var mapIndex=fromI+patchWidth*j;
+	var locMapXTab=mapXTab;
+	var locMapYTab=mapYTab;
 	for (var i=fromI;i<=toI;i++){
 		// some mapping from (i,j) to (x,y) stored in a map table !!!
 		// to define later, symmetry dependent
+		
+		
+		
 		// trivial default, equivalent to simple patching
 		x=i;
 		y=j;
+		x=locMapXTab[mapIndex];
+		y=locMapYTab[mapIndex];
+		console.log(mapIndex);
+		console.log(i+" "+x);
+		console.log(j+" "+y);
 		// now going to the input image
-		// center correspopnds to (x,y)=(0,0)
+		// center corresponds to (x,y)=(0,0)
 		x=locScale*x+centerX;
 		y=locScale*y+centerY;
 		// get integer part and check if inside
@@ -136,15 +144,6 @@ function drawPixelLine(fromI,toI,j){
 			red+=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
 			green+=kx*(kym*iPix[jm++]+ky0*iPix[j0++]+ky1*iPix[j1++]+ky2*iPix[j2++]);
 			blue+=kx*(kym*iPix[jm]+ky0*iPix[j0]+ky1*iPix[j1]+ky2*iPix[j2]);
-			jm+=2;
-			j0+=2;
-			j1+=2;
-			j2+=2;
-			
-			
-			
-			
-			
 			red=Math.max(0,Math.round(red));
 			green=Math.max(0,Math.round(green));
 			blue=Math.max(0,Math.round(blue));
@@ -158,11 +157,20 @@ function drawPixelLine(fromI,toI,j){
 		h=Math.floor(locScaleInputToReference*h);
 		k=Math.floor(locScaleInputToReference*k);
 		locReferencePixels[4*(locReferenceWidth*k+h)+3]=255;
-
+		// update the index to the mapping function table
+		mapIndex++;
 	}
-	
 }
-
+//  make the symmetries
+function makeSymmetriesFarris(){
+	// draw the basic patch
+	for (var j=0;j<patchHeight;j++){
+		drawPixelLine(0,patchWidth-1,j);
+	}
+	// the symmetries inside the unit cell
+	verticalMirror(periodHeight/2);
+	horizontalMirror(periodWidth);
+}
 
 // draw the output image on the output canvas 
 function farrisDrawing(){
@@ -170,7 +178,6 @@ function farrisDrawing(){
 	outputCanvas.height=outputHeight;
 	outputImage.fillStyle="Blue";	
 	outputImage.fillRect(0,0,outputWidth,outputHeight);
-	setPatchDimensions();
 	if (!inputLoaded){						// no input means nothing to do
 		return;
 	}
@@ -181,28 +188,17 @@ function farrisDrawing(){
 	getPixelsFromReferenceCanvas();
 	// white out, restore full transparency to scanned pixels
 	setAlphaReferenceImagePixels(128);
-
-	
-		
 	// now get the pixels of the periodic unit cell		
-	getPixelsFromCanvas();
-	
-	// depends on symmetry
-	for (var j=0;j<patchHeight;j++){
-		drawPixelLine(0,patchWidth-1,j);
-	}
-
-	
+	getPixelsFromCanvas();	
 	
 	// and make the symmetries
-	verticalMirror(periodHeight/2);
-	horizontalMirror(periodWidth);
+	makeSymmetriesFarris();
 	// put the symmetric image on the output canvas
 	putPixelsPeriodicallyOnCanvas();
 	// put the reference image
 	putPixelsOnReferenceCanvas();
 	// hint for debugging
-	showPatch();
+	showHintPatch();
 }
 
 

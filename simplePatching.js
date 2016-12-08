@@ -28,6 +28,11 @@ function whiteOutsideBasicPatch(){
 	referenceImage.fill();	
 }
 
+//  make symmetries inside the unit cell
+function makeSymmetriesSimplePatching(){
+	verticalMirror(periodHeight/2);
+	horizontalMirror(periodWidth);
+}
 
 
 // draw the output image on the output canvas 
@@ -36,15 +41,14 @@ function simplePatchingDrawing(){
 	outputCanvas.height=outputHeight;
 	outputImage.fillStyle="Blue";	
 	outputImage.fillRect(0,0,outputWidth,outputHeight);
-	setPatchDimensions();
 	if (!inputLoaded){						// no input means nothing to do
 		return;
 	}
 	// draw the reference image
-	// draw the entire input image
+	// first draw the entire input image
 	referenceImage.drawImage(inputImage,0,0,inputWidth,inputHeight,
 							 0,0,referenceWidth,referenceHeight);
-	// mask, make that only the used part is fully visible
+	// then mask, make that only the used part is fully visible
 	whiteOutsideBasicPatch();	
 	// mapping to the input image as defined by the mouse on the reference image
 	var inputPatchHeight=scaleOutputToInput*patchHeight;
@@ -57,11 +61,10 @@ function simplePatchingDrawing(){
 				          0,0,patchWidth,patchHeight);	
 	// now get the pixels of the periodic unit cell		
 	getPixelsFromCanvas();
-	// and make the symmetries
-	verticalMirror(periodHeight/2);
-	horizontalMirror(periodWidth);
+	// make the symmetries
+	makeSymmetriesSimplePatching();
 	// put the symmetric image on the output canvas
 	putPixelsPeriodicallyOnCanvas();
 	// hint for debugging
-	showPatch();
+	showHintPatch();
 }

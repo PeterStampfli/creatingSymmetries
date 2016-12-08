@@ -87,8 +87,9 @@ function useNewInputImage() {
 
 // choosing image sizes and lengths of the periodic unit cell
 //=====================================================================
-function makeEven(i){
-	return i+i%2;
+// make it a multiple of four
+function makeMultipleOf4(i){
+	return i-i%4;
 }
 
 // default size for generated image
@@ -96,12 +97,17 @@ var outputWidth=512,
 	outputHeight=512;
 	
 // periods/size of periodic cell
-var periodWidth=256;
-var	periodHeight=256;
+var periodWidth=0;
+var	periodHeight=0;
 
-// for basic patching: region sizes
 var patchWidth;
 var patchHeight;
+//  for the cosines: quarters
+var patchWidth4;
+var patchHeight4;
+
+// for basic patching: region sizes
+
 // their size depends on the period sizes and the symmetry
 function setPatchDimensions(){
 	patchWidth=periodWidth/2;
@@ -110,23 +116,39 @@ function setPatchDimensions(){
 
 //  choose width and height, periods must be smaller or equal
 function setWidth(data){
-	outputWidth=makeEven(parseInt(data));
-	periodWidth=Math.min(periodWidth,outputWidth);
+	outputWidth=makeMultipleOf4(parseInt(data));
+	updatePeriod(Math.min(periodWidth,outputWidth),periodHeight);
 	drawing();
 }
 function setHeight(data){
-	outputHeight=makeEven(parseInt(data));
-	periodHeight=Math.min(periodHeight,outputHeight);
+	outputHeight=makeMultipleOf4(parseInt(data));
+	updatePeriod(periodWidth,Math.min(periodHeight,outputHeight));
 	drawing();
 }
 
+// set a new output width and height
+// do something only if changed
+function updatePeriod(newWidth,newHeight){
+	if ((newWidth!=periodWidth)||(newHeight!=periodHeight)){
+		periodWidth=newWidth;
+		periodHeight=newHeight;
+		periodWidth4=periodWidth/4;
+		periodHeight4=periodHeight/4;
+		console.log("updateperiod");
+		setPatchDimensions();
+		setupSinTables();
+		setupMapTables();
+	}
+}
+
 // choose width and height of periodic cell
+
 function setPeriodWidth(data){
-	periodWidth=Math.min(makeEven(parseInt(data)),outputWidth);
+	updatePeriod(Math.min(makeMultipleOf4(parseInt(data)),outputWidth),periodHeight);
 	drawing();
 }
 function setPeriodHeight(data){
-	periodHeight=Math.min(makeEven(parseInt(data)),outputHeight);
+	updatePeriod(periodWidth,Math.min(makeMultipleOf4(parseInt(data)),outputHeight));
 	drawing();
 }
 

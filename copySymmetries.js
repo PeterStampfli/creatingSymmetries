@@ -15,12 +15,12 @@ function copyPixels(targetI,targetEndI,targetJ,
 	var target=index(targetI,targetJ);
 	var targetEnd=index(targetEndI,targetJ)+3;        // all pixel components
 	var source=index(sourceI,sourceJ);
-	var sourceStep=index(sourceStepI,sourceStepJ)-3;  // with compensation for pixel subcomponents 
+	var sourceStep=index(sourceStepI,sourceStepJ)-2;  // with compensation for pixel subcomponents 
 	while (target<=targetEnd) {  // do complete pixels ...
 		outputPixels[target++]=outputPixels[source++];
 		outputPixels[target++]=outputPixels[source++];
-		outputPixels[target++]=outputPixels[source++];
-		target++;                                       // ... skip alpha
+		outputPixels[target]=outputPixels[source];
+		target+=2;                                       // ... skip alpha
 		source+=sourceStep;                             // walk the source
 	}
 }
