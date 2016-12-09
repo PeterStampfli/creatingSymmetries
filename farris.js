@@ -1,17 +1,36 @@
+//  manipulating the reference image (precision highlighting of sampled pixels)
+//====================================================================
+var referenceData;
+var referencePixels;
 
-//  sampling quality
+// get pixels from reference canvas
+function getPixelsFromReferenceCanvas(){
+	referenceData = referenceImage.getImageData(0,0,referenceWidth,referenceHeight);
+	referencePixels = referenceData.data;
+}
+
+// put pixels on reference canvas
+function putPixelsOnReferenceCanvas(){
+	referenceImage.putImageData(referenceData, 0, 0);
+}
+
+// fade-out all pixels by setting alpha
+function setAlphaReferenceImagePixels(alpha){
+	var theEnd=referencePixels.length;
+	for (var i=3;i<theEnd;i+=4){
+		referencePixels[i]=alpha;
+	}
+}
+
+// drawing a line of pixels on the output image
+//===========================================================0
+//  sampling quality: choose interpolation method
 var NEXT=0;
 var LINEAR=1;
 var CUBIC=2;
+var quality=NEXT;            // LINEAR,CUBIC
 
-var quality=NEXT;            // chooser ???
-
-quality=LINEAR;
-quality=CUBIC;
-
-// draw a line of pixels on the output pixels
 function drawPixelLine(fromI,toI,j){
-
 	// local variables for acceleration
 	// quality
 	var locQuality=quality;
@@ -30,7 +49,7 @@ function drawPixelLine(fromI,toI,j){
 	var iPix=inputPixels;
 	//  (output) image
 	var locOutputPixels=outputPixels;
-	//  refernce image
+	//  reference image
 	var locReferencePixels=referencePixels;
 	var locReferenceWidth=referenceWidth;
 	var locScaleInputToReference=scaleInputToReference;
@@ -47,32 +66,33 @@ function drawPixelLine(fromI,toI,j){
 	var locMapXTab=mapXTab;
 	var locMapYTab=mapYTab;
 	for (var i=fromI;i<=toI;i++){
-		// some mapping from (i,j) to (x,y) stored in a map table !!!
-		// to define later, symmetry dependent
-		
-		
-		
-		// trivial default, equivalent to simple patching
-		x=i;
-		y=j;
+		// some "symmetric" mapping from (i,j) to (x,y) stored in a map table !!!
 		x=locMapXTab[mapIndex];
 		y=locMapYTab[mapIndex];
-		console.log(mapIndex);
-		console.log(i+" "+x);
-		console.log(j+" "+y);
 		// now going to the input image
 		// center corresponds to (x,y)=(0,0)
 		x=locScale*x+centerX;
 		y=locScale*y+centerY;
 		// get integer part and check if inside
 		h=Math.floor(x);
-		// do nothing if outside boundaries (skiping this iteration)
-		//  limits that do for all kinds of interpolation
-		if (h<1) continue;
-		if (h>locInputWidthM3) continue;
+		// do blue pixels if outside boundaries
+		if ((h<1)||(h>locInputWidthM3)) {
+			locOutputPixels[outputIndex++]=0;
+			locOutputPixels[outputIndex++]=0;
+			locOutputPixels[outputIndex]=255;
+			outputIndex+=2;    //skip alpha
+			mapIndex++;
+			continue;
+		}
 		k=Math.floor(y);
-		if (k<1) continue;
-		if (k>locInputHeightM3) continue;
+		if ((k<1)||(k>locInputHeightM3)){
+			locOutputPixels[outputIndex++]=0;
+			locOutputPixels[outputIndex++]=0;
+			locOutputPixels[outputIndex]=255;
+			outputIndex+=2;    //skip alpha
+			mapIndex++;
+			continue;
+		 }
 		// index of base point
 		inputIndex=4*(k*locInputWidth+h);
 		//  get the pixel color components
@@ -161,38 +181,20 @@ function drawPixelLine(fromI,toI,j){
 		mapIndex++;
 	}
 }
-//  make the symmetries
-function makeSymmetriesFarris(){
-	// draw the basic patch
-	for (var j=0;j<patchHeight;j++){
-		drawPixelLine(0,patchWidth-1,j);
-	}
-	// the symmetries inside the unit cell
-	verticalMirror(periodHeight/2);
-	horizontalMirror(periodWidth);
-}
 
-// draw the output image on the output canvas 
+//  make the symmetries, draw the full output image
+//==========================================================
 function farrisDrawing(){
-	outputCanvas.width=outputWidth;
-	outputCanvas.height=outputHeight;
-	outputImage.fillStyle="Blue";	
-	outputImage.fillRect(0,0,outputWidth,outputHeight);
 	if (!inputLoaded){						// no input means nothing to do
 		return;
 	}
-	// prepare the reference image
-	// draw the entire input image and get the pixels
-	referenceImage.drawImage(inputImage,0,0,inputWidth,inputHeight,
-											  0,0,referenceWidth,referenceHeight);
-	getPixelsFromReferenceCanvas();
-	// white out, restore full transparency to scanned pixels
+	// white out: make the reference image semitransparent
 	setAlphaReferenceImagePixels(128);
-	// now get the pixels of the periodic unit cell		
-	getPixelsFromCanvas();	
-	
-	// and make the symmetries
+	// make the symmetries on the output image, reuse and overwrite pixels
+	//  make scanned pixels fully opaque on reference image
+	//===========================================================
 	makeSymmetriesFarris();
+	//===========================================================
 	// put the symmetric image on the output canvas
 	putPixelsPeriodicallyOnCanvas();
 	// put the reference image

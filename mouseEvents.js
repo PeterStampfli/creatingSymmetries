@@ -1,3 +1,5 @@
+"use strict";
+
 // override default actions on the reference canvas
 // especially important for the mouse wheel
 function stopEventPropagationAndDefaultAction(event) {
@@ -21,7 +23,7 @@ var scaleOutputToInput=2;
 var changeScaleFactor=1.1;
 
 function mouseDownHandler(event){
-	stopEventPropagationAndDefaultAction(event)
+	stopEventPropagationAndDefaultAction(event);
 	mousePressed=true;
 	setMousePosition(event);
 	drawing();
@@ -29,7 +31,7 @@ function mouseDownHandler(event){
 }
 
 function mouseMoveHandler(event){
-	stopEventPropagationAndDefaultAction(event)
+	stopEventPropagationAndDefaultAction(event);
 	if (mousePressed){
 		setMousePosition(event);
 		drawing();
@@ -38,14 +40,14 @@ function mouseMoveHandler(event){
 }
 
 function mouseUpHandler(event){
-	stopEventPropagationAndDefaultAction(event)
+	stopEventPropagationAndDefaultAction(event);
 	mousePressed=false;	
 	drawing();
 	return false;
 }
 
 function mouseOutHandler(event){
-	stopEventPropagationAndDefaultAction(event)
+	stopEventPropagationAndDefaultAction(event);
 	mousePressed=false;	
 	drawing();
 	return false;

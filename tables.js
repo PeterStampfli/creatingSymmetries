@@ -1,21 +1,33 @@
+"use strict"
+
 // the sine and cosine functions on the lattice taken from tables
-// declare the arrays
 var sinXTab=[];
 var sinYTab=[];
 
 
 //making the tables, update needed if periods change
-function setupSinTables(){
-	var factor=2*Math.PI/periodWidth;
-	sinXTab.length=periodWidth;
-	for (var i=0;i<periodWidth;i++){
-		sinXTab[i]=Math.sin(factor*i);
-	}
-	factor=2*Math.PI/periodHeight;
-	sinYTab.length=periodHeight;
-	for (var i=0;i<periodHeight;i++){
-		sinYTab[i]=Math.sin(factor*i);
+//  we need a full period to make lookup as simple as possible for higher frequencies
+function setupSinTable(sinTab,length){
+	var factor=2*Math.PI/length;
+	var length4=length/4;
+	var length2=length/2;
+	var i;
+	var sinus;
+	sinTab.length=length;
+	sinTab[0]=0;
+	sinTab[length2]=0;
+	for (i=1;i<=length4;i++){
+		sinus=Math.sin(factor*i);
+		sinTab[i]=sinus;
+		sinTab[length2-i]=sinus;
+		sinTab[length2+i]=-sinus;
+		sinTab[length-i]=-sinus;	
 	}	
+}
+
+function setupSinTables(){
+	setupSinTable(sinXTab,periodWidth);
+	setupSinTable(sinYTab,periodHeight);
 }
 
 // getting the functions
@@ -35,28 +47,4 @@ function sinY(i){
 
 function cosY(i){
 	return sinYTab[(i+periodHeight4)%periodHeight];
-}
-
-// the table for the mapping function
-var mapXTab=[];
-var mapYTab=[];
-
-//  a map for the primitive patch !!!
-// this depends on symmetry
-// inline the function?
-//  trivial map for simple patching
-function setupMapTables(){
-	var size=patchWidth*patchHeight;
-	mapXTab.length=size;
-	mapYTab.length=size;
-	var index=0;
-	var i,j;
-	for (j=0;j<patchHeight;j++){
-		for (i=0;i<patchWidth;i++){
-			mapXTab[index]=i;
-			mapYTab[index]=j;		
-			index++;
-		}
-	}
-	
 }

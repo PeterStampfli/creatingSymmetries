@@ -1,6 +1,8 @@
-// combine index to pixels from integer coordinates
-// use only the periodic cell???????????????????????????????????????????????????????????
+"use strict";
+
+// get a simple pixel index from indices (i,j) to pixels in the unit cell
 //  is index to the red component of the pixel, green,blue and alpha follow
+//=============================================================================
 function index(i,j){
 	return 4*(i+periodWidth*j);
 }
@@ -9,7 +11,8 @@ function index(i,j){
 // target goes upwards on a horizontal line from (targetI,targetJ) to (targetEndI,targetJ)
 // source starts at (sourceI,sourceJ) and makes steps (sourceStepI,sourceStepJ)
 //  starting points: from=(fromI,fromJ) and to=(toI,toJ)
-//  accounts for (output canvas) width and 4 bytes per pixels !!!
+//  accounts for (output canvas) width and 4 bytes per pixels, slkipping alpha
+//===================================================================================
 function copyPixels(targetI,targetEndI,targetJ,
 					sourceI,sourceJ,sourceStepI,sourceStepJ){
 	var target=index(targetI,targetJ);
@@ -25,6 +28,8 @@ function copyPixels(targetI,targetEndI,targetJ,
 	}
 }
 
+// and now the special symmetries, that can be done exactly pixel for pixel
+//==========================================================================
 // mirrorsymmetry in the unit cell at a horizontal axis
 // lying at periodicHeight/2 with variable length (number of pixels)
 //  reasonable values are periodicLength or periodicLength/2

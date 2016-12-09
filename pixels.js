@@ -1,3 +1,4 @@
+"use strict";
 
 // pixel data of canvas, using only one periodic unit cell
 var outputData;
@@ -19,33 +20,6 @@ function putPixelsPeriodicallyOnCanvas(){
 			outputImage.putImageData(outputData, cornerX, cornerY,
 			                         0,0,copyWidth,copyHeight);
 		}
-	}
-}
-
-
-
-
-//  manipulating the reference image (precision highlighting of sampled pixels)
-//====================================================================
-var referenceData;
-var referencePixels;
-
-// get pixels from reference canvas
-function getPixelsFromReferenceCanvas(){
-	referenceData = referenceImage.getImageData(0,0,referenceWidth,referenceHeight);
-	referencePixels = referenceData.data;
-}
-
-// put pixels on reference canvas
-function putPixelsOnReferenceCanvas(){
-	referenceImage.putImageData(referenceData, 0, 0);
-}
-
-// fade-out all pixels by setting alpha
-function setAlphaReferenceImagePixels(alpha){
-	var theEnd=referencePixels.length;
-	for (var i=3;i<theEnd;i+=4){
-		referencePixels[i]=alpha;
 	}
 }
 

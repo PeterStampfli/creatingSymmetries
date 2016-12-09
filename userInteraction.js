@@ -1,16 +1,4 @@
-//  canvases, their context
-//======================================================
-var outputCanvas;
-var outputImage;
-var referenceCanvas;
-var referenceImage;
-
-function getCanvases(){
-	referenceCanvas=document.getElementById("referenceCanvas");	
-	referenceImage=referenceCanvas.getContext("2d");
-	outputCanvas=document.getElementById("canvas");	
-	outputImage=outputCanvas.getContext("2d");
-}
+"use strict";
 
 // all about loading an input image file
 // ========================================================================
@@ -38,8 +26,8 @@ function startLoadImage(files){
 }
 // then load the new image from the file reader data
 imageReader.onload=function(imageReaderResult){ 
-	inputImage.src=imageReader.result;
-}
+						inputImage.src=imageReader.result;
+					};
 // then use the image
 inputImage.onload=useNewInputImage;
 
@@ -79,13 +67,20 @@ function useNewInputImage() {
 	// get scale of mapping from input image to the reference image
 	scaleInputToReference=Math.min(referenceWidth/inputWidth,
 										referenceHeight/inputHeight);
-	// read the pixels into
+											// prepare the reference image
+	// for farris only ---------------
+	// refernce image: draw the entire input image and get the pixels
+	referenceImage.drawImage(inputImage,0,0,inputWidth,inputHeight,
+											  0,0,referenceWidth,referenceHeight);
+	getPixelsFromReferenceCanvas();
+	//----------------------------------------------------
+	// read the input image pixels
 	getPixelsFromInputImage();		
 	// and finally (re)draw with this image
 	drawing();
 }
 
-// choosing image sizes and lengths of the periodic unit cell
+// choosing output image sizes and lengths of the periodic unit cell
 //=====================================================================
 // make it a multiple of four
 function makeMultipleOf4(i){
@@ -93,8 +88,8 @@ function makeMultipleOf4(i){
 }
 
 // default size for generated image
-var outputWidth=512,
-	outputHeight=512;
+var outputWidth=0;
+var	outputHeight=0;
 	
 // periods/size of periodic cell
 var periodWidth=0;
@@ -102,67 +97,65 @@ var	periodHeight=0;
 
 var patchWidth;
 var patchHeight;
-//  for the cosines: quarters
-var patchWidth4;
-var patchHeight4;
 
-// for basic patching: region sizes
-
-// their size depends on the period sizes and the symmetry
-function setPatchDimensions(){
-	patchWidth=periodWidth/2;
-	patchHeight=periodHeight/2;
+// set a new output width and height, multiple of 4
+// only do something if they changed
+// set canvas dimensions, and blue screen
+//  limit period lengths
+function updateOutputDimensions(newWidth,newHeight){
+	newWidth=makeMultipleOf4(newWidth);
+	newHeight=makeMultipleOf4(newHeight);
+	if ((newWidth!=outputWidth)||(newHeight!=outputHeight)){
+		outputWidth=newWidth;
+		outputHeight=newHeight;
+		outputCanvas.width=outputWidth;
+		outputCanvas.height=outputHeight;
+		// make the default blue-screen of nothing, sets alpha=255 !!!
+		outputImage.fillStyle="Blue";	
+		outputImage.fillRect(0,0,outputWidth,outputHeight);
+		limitPeriod();   // to output dimensions
+	}
 }
 
 //  choose width and height, periods must be smaller or equal
 function setWidth(data){
-	outputWidth=makeMultipleOf4(parseInt(data));
-	updatePeriod(Math.min(periodWidth,outputWidth),periodHeight);
+	updateOutputDimensions(parseInt(data),outputHeight);
 	drawing();
 }
 function setHeight(data){
-	outputHeight=makeMultipleOf4(parseInt(data));
-	updatePeriod(periodWidth,Math.min(periodHeight,outputHeight));
+	updateOutputDimensions(outputWidth,parseInt(data));
 	drawing();
 }
 
-// set a new output width and height
-// do something only if changed
+// set a new period width and height, limited to output dimensions
+// multiple of 4, do something only if they changed
+//  gets output pixels
 function updatePeriod(newWidth,newHeight){
+	newWidth=Math.min(makeMultipleOf4(newWidth),outputWidth);
+	newHeight=Math.min(makeMultipleOf4(newHeight),outputHeight);
 	if ((newWidth!=periodWidth)||(newHeight!=periodHeight)){
 		periodWidth=newWidth;
 		periodHeight=newHeight;
-		periodWidth4=periodWidth/4;
-		periodHeight4=periodHeight/4;
-		console.log("updateperiod");
 		setPatchDimensions();
+		// only for farris
 		setupSinTables();
-		setupMapTables();
+		setupMapTables();	
+		// for farris: now get the opaque pixels of the periodic unit cell		
+		getPixelsFromCanvas();		
 	}
+}
+
+//  limit period dimensions to output image
+function limitPeriod(){
+	updatePeriod(periodWidth,periodHeight);
 }
 
 // choose width and height of periodic cell
-
 function setPeriodWidth(data){
-	updatePeriod(Math.min(makeMultipleOf4(parseInt(data)),outputWidth),periodHeight);
+	updatePeriod(parseInt(data),periodHeight);
 	drawing();
 }
 function setPeriodHeight(data){
-	updatePeriod(periodWidth,Math.min(makeMultipleOf4(parseInt(data)),outputHeight));
+	updatePeriod(periodWidth,parseInt(data));
 	drawing();
-}
-
-//  for image downloading, using jpeg image format, default quality=0.92
-//=================================================================
-var imageFilename='theImage.jpg';
-
-function activateImageDownloadButton(){
-	var downloadButton=document.getElementById('download')
-	if (downloadButton!=null){
-		downloadButton.addEventListener('click', function() {
-			//  use correct data format and filename
-			this.href = outputCanvas.toDataURL("image/jpeg");
-			this.download = imageFilename;
-		}, false);
-	}
 }
