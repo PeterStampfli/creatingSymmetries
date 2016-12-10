@@ -11,12 +11,16 @@ function setupMapTables(){
 	var size=patchWidth*patchHeight;
 	mapXTab.length=size;
 	mapYTab.length=size;
+	var locPatchWidth=patchWidth;
+	var locPatchHeight=patchHeight;
+	var locPatchWidth2=patchWidth/2;
+	var locPatchHeight2=patchHeight/2;
 	var index=0;
 	var i,j;
-	for (j=0;j<patchHeight;j++){
-		for (i=0;i<patchWidth;i++){
-			mapXTab[index]=i;
-			mapYTab[index++]=j;		
+	for (j=0;j<locPatchHeight;j++){
+		for (i=0;i<locPatchWidth;i++){
+			mapXTab[index]=i-locPatchWidth2;
+			mapYTab[index++]=j-locPatchHeight2;		
 		}
 	}	
 }

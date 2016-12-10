@@ -33,8 +33,8 @@ function drawPixelLine(fromI,toI,j){
 	var locLINEAR=LINEAR;
 	var locCUBIC=CUBIC;
 	// center of sampling as defined by the mouse on the reference image
-	var centerX=mouseX/scaleInputToReference;
-	var centerY=mouseY/scaleInputToReference;
+	var centerX=referenceCenterX/scaleInputToReference;
+	var centerY=referenceCenterY/scaleInputToReference;
 	var locScale=scaleOutputToInput;
 	// input image
 	var locInputWidth=inputWidth;

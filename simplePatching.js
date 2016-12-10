@@ -16,8 +16,8 @@ function simplePatchingDrawing(){
 	// mapping to the input image as defined by the mouse on the reference image
 	var inputPatchHeight=scaleOutputToInput*patchHeight;
 	var inputPatchWidth=scaleOutputToInput*patchWidth;
-	var inputPatchCornerX=mouseX/scaleInputToReference-inputPatchWidth/2;
-	var inputPatchCornerY=mouseY/scaleInputToReference-inputPatchHeight/2;
+	var inputPatchCornerX=referenceCenterX/scaleInputToReference-inputPatchWidth/2;
+	var inputPatchCornerY=referenceCenterY/scaleInputToReference-inputPatchHeight/2;
 	// simply a direct copy of the input image, depending on scaling and position
 	outputImage.drawImage(inputImage,inputPatchCornerX,inputPatchCornerY,
 	                      inputPatchWidth,inputPatchHeight,

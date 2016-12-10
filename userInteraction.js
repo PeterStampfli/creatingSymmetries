@@ -62,8 +62,8 @@ function useNewInputImage() {
 	referenceCanvas.width=referenceWidth;
 	referenceCanvas.height=referenceHeight;
 	// put center of readings to image center
-	mouseX=referenceWidth/2;
-	mouseY=referenceHeight/2;
+	referenceCenterX=referenceWidth/2;
+	referenceCenterY=referenceHeight/2;
 	// get scale of mapping from input image to the reference image
 	scaleInputToReference=Math.min(referenceWidth/inputWidth,
 										referenceHeight/inputHeight);
