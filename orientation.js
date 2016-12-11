@@ -6,6 +6,7 @@ var angle;
 var changeAngle=0.05;
 var cosAngle;
 var sinAngle;
+var radius;
 
 // take care of trigonometric functions
 function setAngle(newAngle){
@@ -20,7 +21,7 @@ function setupOrientationCanvas(size){
 	orientationSize=size;
 	orientationCanvas.width=size;
 	orientationCanvas.height=size;
-	var radius=orientationSize/2-1;
+	radius=orientationSize/2-1;
 	orientationImage.scale(radius,radius);
 	orientationImage.translate(1,1);
 	setAngle(0);
@@ -29,7 +30,6 @@ function setupOrientationCanvas(size){
 
 // we use transformed coordinates
 function drawOrientation(){
-	var radius=orientationSize/2-1;
 	var arrowWidth=0.2;
 	orientationImage.fillStyle="White";	
 	orientationImage.beginPath();
@@ -44,37 +44,47 @@ function drawOrientation(){
 	orientationImage.fill();
 }
 
-
-
 // current mouse data, with respect to orientationCanvas
 var orientationMousePressed=false;
+var orientationMouseX;
+var orientationMouseY;
 var mouseAngle=0;
 var lastMouseAngle=0;
 
 //  set the mouse angle from current event, relative to center
-function setOrientationMouseAngle(event){
-	var orientationMouseX=event.pageX-orientationCanvas.offsetLeft-orientationSize/2;
-	var orientationMouseY=event.pageY-orientationCanvas.offsetTop-orientationSize/2;
+function orientationMouseData(event){
+	orientationMouseX=event.pageX-orientationCanvas.offsetLeft-orientationSize/2;
+	orientationMouseY=event.pageY-orientationCanvas.offsetTop-orientationSize/2;
 	mouseAngle=Math.atan2(orientationMouseY,orientationMouseX);
-	console.log(mouseAngle);
+}
+
+function isMouseOnDisc(){
+	return (orientationMouseX*orientationMouseX+orientationMouseY*orientationMouseY)<radius*radius;
 }
 
 function orientationMouseDownHandler(event){
 	stopEventPropagationAndDefaultAction(event);
-	orientationMousePressed=true;
-	setOrientationMouseAngle(event);
-	lastMouseAngle=mouseAngle;
+	orientationMouseData(event);
+	if (isMouseOnDisc()){
+		orientationMousePressed=true;
+		lastMouseAngle=mouseAngle;
+	}
 	return false;
 }
 
 function orientationMouseMoveHandler(event){
 	stopEventPropagationAndDefaultAction(event);
 	if (orientationMousePressed){
-		setOrientationMouseAngle(event);
-		setAngle(angle+mouseAngle-lastMouseAngle);
-		lastMouseAngle=mouseAngle;
-		drawOrientation();
-		drawing();
+		orientationMouseData(event);
+		if (isMouseOnDisc()){
+			setAngle(angle+mouseAngle-lastMouseAngle);
+			lastMouseAngle=mouseAngle;
+			drawOrientation();
+			drawing();
+		}
+		else {    // out of disc
+				orientationMousePressed=false;	
+		}
 	}
 	return false;
 }
@@ -93,14 +103,18 @@ function orientationMouseOutHandler(event){
 
 function orientationMouseWheelHandler(event){
 	stopEventPropagationAndDefaultAction(event);
-	if (event.deltaY>0){
-		setAngle(angle+changeAngle);
+	orientationMouseData(event);
+	console.log(isMouseOnDisc());
+	if (isMouseOnDisc()){
+		if (event.deltaY>0){
+			setAngle(angle+changeAngle);
+		}
+		else {
+			setAngle(angle-changeAngle);
+		}
+		drawOrientation();
+		drawing();
 	}
-	else {
-		setAngle(angle-changeAngle);
-	}
-	drawOrientation();
-	drawing();
 	return false;
 }
 

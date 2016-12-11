@@ -35,7 +35,8 @@ function drawPixelLine(fromI,toI,j){
 	// center of sampling as defined by the mouse on the reference image
 	var centerX=referenceCenterX/scaleInputToReference;
 	var centerY=referenceCenterY/scaleInputToReference;
-	var locScale=scaleOutputToInput;
+	var locScaleCos=scaleOutputToInput*cosAngle;
+	var locScaleSin=scaleOutputToInput*sinAngle;
 	// input image
 	var locInputWidth=inputWidth;
 	var locInputWidthM3=inputWidth-3;
@@ -49,7 +50,7 @@ function drawPixelLine(fromI,toI,j){
 	var locReferenceWidth=referenceWidth;
 	var locScaleInputToReference=scaleInputToReference;
 	//  sampling coordinates
-	var x,y;
+	var x,y,newX;
 	//  integer part of sampling coordinates
 	var h,k;
 	var inputIndex;
@@ -66,8 +67,9 @@ function drawPixelLine(fromI,toI,j){
 		y=locMapYTab[mapIndex];
 		// now going to the input image
 		// center corresponds to (x,y)=(0,0)
-		x=locScale*x+centerX;
-		y=locScale*y+centerY;
+		newX=locScaleCos*x-locScaleSin*y+centerX;
+		y=locScaleSin*x+locScaleCos*y+centerY;
+		x=newX;
 		//  get the pixel color components, depending on quality
 		if (locQuality==locNEXT){		
 			// get nearest integer pixel coordinates
