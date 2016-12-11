@@ -6,12 +6,16 @@ var outputCanvas;
 var outputImage;
 var referenceCanvas;
 var referenceImage;
+var orientationCanvas;
+var orientationImage;
 
 function getCanvases(){
 	referenceCanvas=document.getElementById("referenceCanvas");	
 	referenceImage=referenceCanvas.getContext("2d");
-	outputCanvas=document.getElementById("canvas");	
+	outputCanvas=document.getElementById("outputCanvas");	
 	outputImage=outputCanvas.getContext("2d");
+	orientationCanvas=document.getElementById("orientationCanvas");	
+	orientationImage=orientationCanvas.getContext("2d");
 }
 
 //  for image downloading, using jpeg image format, default quality=0.92
@@ -32,6 +36,8 @@ function activateImageDownloadButton(){
 window.onload=function(){
 	getCanvases();
 	referenceCanvasAddEventListeners();
+	setupOrientationCanvas(200);
+	orientationCanvasAddEventListeners();
 	activateImageDownloadButton();
 	updateOutputDimensions(512,512);
 	updatePeriod(256,256);

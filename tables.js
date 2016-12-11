@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 // the sine and cosine functions on the lattice taken from tables
 var sinXTab=[];

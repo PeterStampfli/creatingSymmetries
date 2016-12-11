@@ -34,7 +34,6 @@ function referenceMouseDownHandler(event){
 	setReferenceMousePosition(event);
 	lastReferenceMouseX=referenceMouseX;
 	lastReferenceMouseY=referenceMouseY;
-	drawing();
 	return false;
 }
 
@@ -56,14 +55,12 @@ function referenceMouseMoveHandler(event){
 function referenceMouseUpHandler(event){
 	stopEventPropagationAndDefaultAction(event);
 	referenceMousePressed=false;	
-	drawing();
 	return false;
 }
 
 function referenceMouseOutHandler(event){
 	stopEventPropagationAndDefaultAction(event);
 	referenceMousePressed=false;	
-	drawing();
 	return false;
 }
 
