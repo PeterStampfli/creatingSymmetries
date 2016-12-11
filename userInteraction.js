@@ -98,6 +98,19 @@ var	periodHeight=0;
 var patchWidth;
 var patchHeight;
 
+// connect the choosers
+var outputWidthChooser;
+var outputHeightChooser;
+var periodWidthChooser;
+var periodHeightChooser;
+
+function getChoosers(){
+	outputWidthChooser=document.getElementById('outputWidthChooser');
+	outputHeightChooser=document.getElementById('outputHeightChooser');
+	periodWidthChooser=document.getElementById('periodWidthChooser');
+	periodHeightChooser=document.getElementById('periodHeightChooser');
+}
+
 // set a new output width and height, multiple of 4
 // only do something if they changed
 // set canvas dimensions, and blue screen
@@ -105,6 +118,8 @@ var patchHeight;
 function updateOutputDimensions(newWidth,newHeight){
 	newWidth=makeMultipleOf4(newWidth);
 	newHeight=makeMultipleOf4(newHeight);
+	outputWidthChooser.value=newWidth.toString();
+	outputHeightChooser.value=newHeight.toString();
 	if ((newWidth!=outputWidth)||(newHeight!=outputHeight)){
 		outputWidth=newWidth;
 		outputHeight=newHeight;
@@ -133,6 +148,8 @@ function setHeight(data){
 function updatePeriod(newWidth,newHeight){
 	newWidth=Math.min(makeMultipleOf4(newWidth),outputWidth);
 	newHeight=Math.min(makeMultipleOf4(newHeight),outputHeight);
+	periodWidthChooser.value=newWidth.toString();
+	periodHeightChooser.value=newHeight.toString();
 	if ((newWidth!=periodWidth)||(newHeight!=periodHeight)){
 		periodWidth=newWidth;
 		periodHeight=newHeight;

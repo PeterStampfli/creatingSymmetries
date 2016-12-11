@@ -1,3 +1,5 @@
+"use strict";
+
 //  manipulating the reference image (precision highlighting of sampled pixels)
 //====================================================================
 var referenceData;

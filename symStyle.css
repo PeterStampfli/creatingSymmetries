@@ -11,13 +11,12 @@
 		border-width:1px;
 		}
 
-	#numbers{
-		width: 30px;
+	.numbers{
+		width: 35px;
 		}
 		
 	#warning{
 		color:red;
-
 		}
 
 	p{

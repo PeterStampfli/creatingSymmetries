@@ -20,19 +20,19 @@
 		</p>
 		<p>
 			Choose the size of the generated image: width
-			<input type="text" id="numbers" value="512" maxlength="4" 
+			<input type="text" class="numbers" id="outputWidthChooser" maxlength="4" 
 				onchange="setWidth(this.value)"/>
 			, height 
-			<input type="text" id="numbers" value="512" maxlength="4" 
+			<input type="text" class="numbers" id="outputHeightChooser" maxlength="4" 
 				onchange="setHeight(this.value)"/>
 			.
 		</p>
 		<p>
 			Choose the size of the periodic cell: width
-			<input type="text" id="numbers" value="256" maxlength="4" 
+			<input type="text" class="numbers" id="periodWidthChooser" maxlength="4" 
 				onchange="setPeriodWidth(this.value)"/>
 			, height 
-			<input type="text" id="numbers" value="256" maxlength="4" 
+			<input type="text" class="numbers" id="periodHeightChooser" maxlength="4" 
 				onchange="setPeriodHeight(this.value)"/>
 			.
 		</p>
@@ -47,7 +47,7 @@
 		</p>
 		<h4>
 			To "download" this image 
-			<a id="download" href="">&nbsp click here ! &nbsp</a>
+			<a id="downloadImageButton" href="">&nbsp click here ! &nbsp</a>
 		</h4>
 
 		<p style="text-align:center">
@@ -60,6 +60,7 @@
 		</p>
 </body>
 	<script src="userInteraction.js"></script>
+	<script src="outputPosition.js"></script>
 	<script src="orientation.js"></script>
 	<script src="interpolationChoice.js"></script>
 	<script src="tables.js"></script>

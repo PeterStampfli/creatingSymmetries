@@ -103,8 +103,6 @@ function orientationMouseOutHandler(event){
 
 function orientationMouseWheelHandler(event){
 	stopEventPropagationAndDefaultAction(event);
-	orientationMouseData(event);
-	console.log(isMouseOnDisc());
 	if (isMouseOnDisc()){
 		if (event.deltaY>0){
 			setAngle(angle+changeAngle);

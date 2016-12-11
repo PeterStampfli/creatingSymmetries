@@ -23,9 +23,9 @@ function getCanvases(){
 var imageFilename='theImage.jpg';
 
 function activateImageDownloadButton(){
-	var downloadButton=document.getElementById('download');
-	if (downloadButton!==null){
-		downloadButton.addEventListener('click', function() {
+	var downloadImageButton=document.getElementById('downloadImageButton');
+	if (downloadImageButton!==null){
+		downloadImageButton.addEventListener('click', function() {
 			//  use correct data format and filename
 			this.href = outputCanvas.toDataURL("image/jpeg");
 			this.download = imageFilename;
@@ -35,12 +35,13 @@ function activateImageDownloadButton(){
 
 window.onload=function(){
 	getCanvases();
+	getChoosers();
 	referenceCanvasAddEventListeners();
+	outputCanvasAddEventListeners();
 	setupOrientationCanvas(200);
 	orientationCanvasAddEventListeners();
 	activateImageDownloadButton();
 	updateOutputDimensions(512,512);
 	updatePeriod(256,256);
 	drawing();
-
 }
