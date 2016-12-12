@@ -33,7 +33,10 @@ function whiteOutsideBasicPatch(){
 
 //  make symmetries inside the unit cell, after input image has been copied
 function makeSymmetriesSimplePatching(){
-	verticalMirror(periodHeight/2);
-	horizontalMirror(periodWidth);
+	//verticalMirror(periodHeight/2);
+	//horizontalMirror(periodWidth);
+	upDiagonalMirror(periodWidth/2);
+	quarterTurn();
+	halfTurn();
 }
 

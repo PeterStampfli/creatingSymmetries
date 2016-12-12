@@ -31,6 +31,7 @@ function copyPixels(targetI,targetEndI,targetJ,
 // and now the special symmetries, that can be done exactly pixel for pixel
 //==========================================================================
 // mirrorsymmetry in the unit cell at a horizontal axis
+//  overwrites upper half
 // lying at periodicHeight/2 with variable length (number of pixels)
 //  reasonable values are periodicLength or periodicLength/2
 function horizontalMirror(length){
@@ -42,12 +43,57 @@ function horizontalMirror(length){
 
 // mirror symmetry in the unit cell at a vertical axis
 // lying at periodicWidth/2, with variable length (number of pixels)
+//  overwrites right side
 //  reasonable values are periodicLength and periodicLength/2
 function verticalMirror(length){
 	var periodWidth2=periodWidth/2;
 	for (var fromJ=0;fromJ<length;fromJ++){
 		copyPixels(periodWidth2,periodWidth-1,fromJ,
 					periodWidth2-1,fromJ,-1,0);
+	}
+}
+
+// quarter turn rotational symmetry around center of unit cell
+// turns (numerical) lower right quarter 90 degrees counterclockwise
+// to the upper right quarter, which is overwritten
+function quarterTurn(){
+	var period2=Math.min(periodWidth,periodHeight)/2;
+	for (var j=0;j<period2;j++){
+		copyPixels(0,period2-1,j+period2,
+					period2-1-j,0,0,1);
+	}
+}
+
+// half turn rotational symmetry around center of unit cell
+// turns right half 180 degrees 
+// to the right half, which is overwritten
+function halfTurn(){
+	var periodWidth2=periodWidth/2;
+	for (var j=0;j<periodHeight;j++){
+		copyPixels(periodWidth2,periodWidth-1,j,
+					periodWidth2-1,periodWidth-1-j,-1,0);
+	}
+}
+
+//  mirror at the upwards going diagonal x=y
+//  take the sector i>j and overwrite j<i
+// square lattice
+//  length=period/2 typically (length=period ???)
+function upDiagonalMirror(length){
+	for (var j=0;j<length;j++){
+		copyPixels(0,j-1,j,
+					j,0,0,1);	
+	}
+}
+
+// mirror at the down going diagonal x+y=period/2
+//  take the sector x+y<period/2 and overwrite x+y>period/2
+//  both in the lower right quarter
+// square lattice
+function downDiagonalMirror(length){
+	for (var j=0;j<length;j++){
+		//copyPixels(0,j-1,j,
+		//			j,0,0,1);	
 	}
 }
 
