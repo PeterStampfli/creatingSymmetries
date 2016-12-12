@@ -7,6 +7,8 @@ var mapYTab=[];
 //  a "symmetric" map for the primitive patch !!!
 // ========================================================================
 //  trivial map for simple patching
+
+
 function setupMapTables(){
 	var size=patchWidth*patchHeight;
 	mapXTab.length=size;
@@ -15,12 +17,13 @@ function setupMapTables(){
 	var locPatchHeight=patchHeight;
 	var locPatchWidth2=patchWidth/2;
 	var locPatchHeight2=patchHeight/2;
+	var patchScale=initialInputPatchWidth/locPatchWidth;
 	var index=0;
 	var i,j;
 	for (j=0;j<locPatchHeight;j++){
 		for (i=0;i<locPatchWidth;i++){
-			mapXTab[index]=i-locPatchWidth2;
-			mapYTab[index++]=j-locPatchHeight2;		
+			mapXTab[index]=(i-locPatchWidth2)*patchScale;
+			mapYTab[index++]=(j-locPatchHeight2)*patchScale;		
 		}
 	}	
 }

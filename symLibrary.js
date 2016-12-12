@@ -33,7 +33,11 @@ function activateImageDownloadButton(){
 	}
 }
 
+//  switching on and off the hint for the patch
+var hintPatch=false;
+
 window.onload=function(){
+	hintPatch=true;
 	getCanvases();
 	getChoosers();
 	referenceCanvasAddEventListeners();

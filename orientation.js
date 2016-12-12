@@ -74,8 +74,8 @@ function orientationMouseDownHandler(event){
 
 function orientationMouseMoveHandler(event){
 	stopEventPropagationAndDefaultAction(event);
+	orientationMouseData(event);
 	if (orientationMousePressed){
-		orientationMouseData(event);
 		if (isMouseOnDisc()){
 			setAngle(angle+mouseAngle-lastMouseAngle);
 			lastMouseAngle=mouseAngle;
@@ -103,6 +103,7 @@ function orientationMouseOutHandler(event){
 
 function orientationMouseWheelHandler(event){
 	stopEventPropagationAndDefaultAction(event);
+	orientationMouseData(event)
 	if (isMouseOnDisc()){
 		if (event.deltaY>0){
 			setAngle(angle+changeAngle);

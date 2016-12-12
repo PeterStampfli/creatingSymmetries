@@ -25,7 +25,9 @@ function setReferenceMousePosition(event){
 
 // the wheel changes the scale: map to input image pixels
 //  a larger scale zooms out
-var scaleOutputToInput=2;
+var initialInputPatchWidth=256;       // make the patch range in image coordinates independent of the output size
+                                     // thats the effective input patch size for scaleOutputToInput=1
+var scaleOutputToInput=1;
 var changeScaleFactor=1.1;
 
 function referenceMouseDownHandler(event){

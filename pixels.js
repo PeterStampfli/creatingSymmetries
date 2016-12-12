@@ -10,15 +10,40 @@ function getPixelsFromCanvas(){
 }
 
 //  put pixels periodically on canvas
+//  with offset
 function putPixelsPeriodicallyOnCanvas(){
 	var copyWidth;
 	var copyHeight;
-	for (var cornerY=0;cornerY<outputHeight;cornerY+=periodHeight){
-		copyHeight=Math.min(outputHeight-cornerY,periodHeight);
-		for (var cornerX=0;cornerX<outputWidth;cornerX+=periodWidth){
-			copyWidth=Math.min(outputWidth-cornerX,periodWidth);
-			outputImage.putImageData(outputData, cornerX, cornerY,
-			                         0,0,copyWidth,copyHeight);
+	var targetX;
+	var targetY;
+	var sourceX;
+	var sourceY;
+	for (var cornerY=outputOffsetY-periodHeight;cornerY<outputHeight;cornerY+=periodHeight){
+		if (cornerY<0){
+			sourceY=-cornerY;
+			targetY=cornerY;      // strange, actually difference between source corner and intended
+			//sourceY=0;
+			copyHeight=outputOffsetY;
+		}
+		else {
+			sourceY=0;
+			targetY=cornerY;
+			copyHeight=Math.min(outputHeight-cornerY,periodHeight);
+		}
+		for (var cornerX=outputOffsetX-periodWidth;cornerX<outputWidth;cornerX+=periodWidth){
+			if (cornerX<0){
+				sourceX=-cornerX;
+				targetX=cornerX;
+				copyWidth=outputOffsetX;
+				
+			}
+			else {			
+				sourceX=0;
+				targetX=cornerX;
+				copyWidth=Math.min(outputWidth-cornerX,periodWidth);
+			}
+			outputImage.putImageData(outputData, 
+			                         targetX, targetY,sourceX,sourceY,copyWidth,copyHeight);
 		}
 	}
 }

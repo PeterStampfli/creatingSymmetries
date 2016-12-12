@@ -5,14 +5,14 @@
 function whiteOutsideBasicPatch(){
 	// scale the patch size: going from output canvas image to input image
 	// and then to reference image
-	var referencePatchWidth=patchWidth*scaleOutputToInput*scaleInputToReference;
-	var referencePatchHeight=patchHeight*scaleOutputToInput*scaleInputToReference;
+	var referencePatchWidth=initialInputPatchWidth*scaleOutputToInput*scaleInputToReference;
+	var referencePatchHeight=initialInputPatchWidth*patchHeight/patchWidth*scaleOutputToInput*scaleInputToReference;
 	//center is the mouse position
 	//  coordinates of the corners of the rectangle
-	var fromI=Math.max(0,Math.round(mouseX-referencePatchWidth/2));
-	var toI=Math.min(referenceWidth-1,Math.round(mouseX+referencePatchWidth/2));
-	var fromJ=Math.max(0,Math.round(mouseY-referencePatchHeight/2));
-	var toJ=Math.min(referenceHeight-1,Math.round(mouseY+referencePatchHeight/2));
+	var fromI=Math.max(0,Math.round(referenceCenterX-referencePatchWidth/2));
+	var toI=Math.min(referenceWidth-1,Math.round(referenceCenterX+referencePatchWidth/2));
+	var fromJ=Math.max(0,Math.round(referenceCenterY-referencePatchHeight/2));
+	var toJ=Math.min(referenceHeight-1,Math.round(referenceCenterY+referencePatchHeight/2));
 	//path around border
 	referenceImage.fillStyle="rgba(255,255,255,0.5)";
 	referenceImage.beginPath();

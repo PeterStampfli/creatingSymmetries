@@ -116,8 +116,8 @@ function getChoosers(){
 // set canvas dimensions, and blue screen
 //  limit period lengths
 function updateOutputDimensions(newWidth,newHeight){
-	newWidth=makeMultipleOf4(newWidth);
-	newHeight=makeMultipleOf4(newHeight);
+	newWidth=makeMultipleOf4(Math.round(newWidth));
+	newHeight=makeMultipleOf4(Math.round(newHeight));
 	outputWidthChooser.value=newWidth.toString();
 	outputHeightChooser.value=newHeight.toString();
 	if ((newWidth!=outputWidth)||(newHeight!=outputHeight)){
@@ -146,8 +146,8 @@ function setHeight(data){
 // multiple of 4, do something only if they changed
 //  gets output pixels
 function updatePeriod(newWidth,newHeight){
-	newWidth=Math.min(makeMultipleOf4(newWidth),outputWidth);
-	newHeight=Math.min(makeMultipleOf4(newHeight),outputHeight);
+	newWidth=Math.min(makeMultipleOf4(Math.round(newWidth)),outputWidth);
+	newHeight=Math.min(makeMultipleOf4(Math.round(newHeight)),outputHeight);
 	periodWidthChooser.value=newWidth.toString();
 	periodHeightChooser.value=newHeight.toString();
 	if ((newWidth!=periodWidth)||(newHeight!=periodHeight)){

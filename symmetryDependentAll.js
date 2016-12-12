@@ -10,7 +10,9 @@ function setPatchDimensions(){
 //for debugging: show the basic patch on output as red lines
 //================================================================
 function showHintPatch(){
-	outputImage.strokeStyle="Red";	
-	outputImage.strokeRect(0,0,patchWidth,patchHeight);
+	if (hintPatch&&inputLoaded){
+		outputImage.strokeStyle="Red";	
+		outputImage.strokeRect(outputOffsetX,outputOffsetY,patchWidth,patchHeight);
+	}
 }
 

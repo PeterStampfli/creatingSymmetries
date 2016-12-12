@@ -1,5 +1,8 @@
 "use strict";
 
+	var inputPatchHeight;
+	var inputPatchWidth;
+	
 // draw the output image on the output canvas 
 function simplePatchingDrawing(){
 	if (!inputLoaded){						// no input means nothing to do
@@ -14,10 +17,13 @@ function simplePatchingDrawing(){
 	whiteOutsideBasicPatch();
 	//================================	
 	// mapping to the input image as defined by the mouse on the reference image
-	var inputPatchHeight=scaleOutputToInput*patchHeight;
-	var inputPatchWidth=scaleOutputToInput*patchWidth;
+	inputPatchHeight=scaleOutputToInput*initialInputPatchWidth*patchHeight/patchWidth;
+	inputPatchWidth=scaleOutputToInput*initialInputPatchWidth;
 	var inputPatchCornerX=referenceCenterX/scaleInputToReference-inputPatchWidth/2;
 	var inputPatchCornerY=referenceCenterY/scaleInputToReference-inputPatchHeight/2;
+	// make the default blue-screen of nothing, sets alpha=255 !!!
+	outputImage.fillStyle="Blue";	
+	outputImage.fillRect(0,0,outputWidth,outputHeight);
 	// simply a direct copy of the input image, depending on scaling and position
 	outputImage.drawImage(inputImage,inputPatchCornerX,inputPatchCornerY,
 	                      inputPatchWidth,inputPatchHeight,
