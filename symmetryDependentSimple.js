@@ -37,6 +37,7 @@ function makeSymmetriesSimplePatching(){
 	//horizontalMirror(periodWidth);
 	upDiagonalMirror(periodWidth/2);
 	quarterTurn();
-	halfTurn();
+	//halfTurn();
+	copyRectangle(periodWidth/2,0,0,0,periodWidth/2,periodHeight);
 }
 

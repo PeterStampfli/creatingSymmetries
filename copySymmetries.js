@@ -97,3 +97,24 @@ function downDiagonalMirror(length){
 	}
 }
 
+//  copy a rectangular piece, same orientation, only other place
+function copyRectangle(targetX,targetY,sourceX,sourceY,width,height){
+	var targetYEnd=targetY+height;
+	var targetEnd;
+	var target;
+	var source;
+	while (targetY<targetYEnd){
+		target=index(targetX,targetY);
+		source=index(sourceX,sourceY);
+		targetY++;
+		sourceY++;
+		targetEnd=target+4*width;
+		while (target<targetEnd){
+			outputPixels[target++]=outputPixels[source++];
+			outputPixels[target++]=outputPixels[source++];
+			outputPixels[target]=outputPixels[source];
+			target+=2;
+			source+=2;
+		}
+	}
+}

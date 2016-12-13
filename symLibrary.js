@@ -43,7 +43,7 @@ var hexagonSymmetry=false;
 window.onload=function(){
 	hintPatch=true;
 	//squareSymmetry=true;
-	hexagonSymmetry=true;
+	//hexagonSymmetry=true;
 	getCanvases();
 	getChoosers();
 	referenceCanvasAddEventListeners();

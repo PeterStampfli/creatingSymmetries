@@ -128,17 +128,18 @@ function updateOutputDimensions(newWidth,newHeight){
 		// make the default blue-screen of nothing, sets alpha=255 !!!
 		outputImage.fillStyle="Blue";	
 		outputImage.fillRect(0,0,outputWidth,outputHeight);
-		limitPeriod();   // to output dimensions
 	}
 }
 
 //  choose width and height, periods must be smaller or equal
 function setWidth(data){
 	updateOutputDimensions(parseInt(data),outputHeight);
+	limitPeriod();   // to output dimensions
 	drawing();
 }
 function setHeight(data){
 	updateOutputDimensions(outputWidth,parseInt(data));
+	limitPeriod();   // to output dimensions
 	drawing();
 }
 
