@@ -144,20 +144,45 @@ function setHeight(data){
 
 // set a new period width and height, limited to output dimensions
 // multiple of 4, do something only if they changed
+//  take into account symmtries
 //  gets output pixels
 function updatePeriod(newWidth,newHeight){
 	newWidth=Math.min(makeMultipleOf4(Math.round(newWidth)),outputWidth);
 	newHeight=Math.min(makeMultipleOf4(Math.round(newHeight)),outputHeight);
-	periodWidthChooser.value=newWidth.toString();
-	periodHeightChooser.value=newHeight.toString();
 	if ((newWidth!=periodWidth)||(newHeight!=periodHeight)){
-		periodWidth=newWidth;
-		periodHeight=newHeight;
+		if (periodWidth!=newWidth){
+			periodWidth=newWidth;
+			if (squareSymmetry){
+				periodHeight=newWidth;
+			}
+			else if (hexagonSymmetry){
+				periodHeight=Math.round(0.5774*newWidth);
+			}
+			else {
+				periodHeight=newHeight;
+			}
+		}
+		else {
+			periodHeight=newHeight;
+			if (squareSymmetry){
+				periodWidth=newHeight;
+			}
+			else if (hexagonSymmetry){
+				periodWidth=Math.round(1.732*newHeight);
+			}
+			else {
+				periodWidth=newWidth;
+			}
+		}
+		periodWidthChooser.value=periodWidth.toString();
+		periodHeightChooser.value=periodHeight.toString();
+
 		setPatchDimensions();
 		// only for farris
 		setupSinTables();
 		setupMapTables();	
-		// for farris: now get the opaque pixels of the periodic unit cell		
+		// for farris: now get the opaque pixels of the periodic unit cell	
+		// output canvas	
 		getPixelsFromCanvas();		
 	}
 }

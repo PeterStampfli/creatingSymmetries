@@ -36,8 +36,14 @@ function activateImageDownloadButton(){
 //  switching on and off the hint for the patch
 var hintPatch=false;
 
+// using special symmetries
+var squareSymmetry=false;
+var hexagonSymmetry=false;
+
 window.onload=function(){
 	hintPatch=true;
+	//squareSymmetry=true;
+	hexagonSymmetry=true;
 	getCanvases();
 	getChoosers();
 	referenceCanvasAddEventListeners();
