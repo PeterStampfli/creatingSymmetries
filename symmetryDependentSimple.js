@@ -34,11 +34,17 @@ function whiteOutsideBasicPatch(){
 //  make symmetries inside the unit cell, after input image has been copied
 function makeSymmetriesSimplePatching(){
 	//downDiagonalMirror(periodWidth/2);
-	verticalMirror(periodHeight/2);
-	horizontalMirror(periodWidth);
+	//verticalMirror(periodHeight/2);
+	//horizontalMirror(periodWidth);
 	//upDiagonalMirror(periodWidth/2);
 	//quarterTurn();
 	//halfTurn();
 	//copyRectangle(periodWidth/2,0,0,0,periodWidth/2,periodHeight);
+	
+	for (var j=periodHeight/2;j<periodHeight;j++){
+		
+		copyPixelSkewed(periodWidth/2,periodWidth-1,j,
+					j-periodHeight/2,periodHeight-j,0.5,0.5);
+	}
 }
 
