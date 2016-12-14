@@ -87,13 +87,14 @@ function upDiagonalMirror(length){
 }
 
 // mirror at the down going diagonal x+y=period/2
-//  take the sector x+y<period/2 and overwrite x+y>period/2
+//  take the sector x+y<length-1 and overwrite x+y>length-1
 //  both in the lower right quarter
 // square lattice
+//  reasonable value length=perioWidth/2
 function downDiagonalMirror(length){
 	for (var j=0;j<length;j++){
-		//copyPixels(0,j-1,j,
-		//			j,0,0,1);	
+		copyPixels(length-1-j,length-1,j,
+					length-1-j,j,0,-1);	
 	}
 }
 
