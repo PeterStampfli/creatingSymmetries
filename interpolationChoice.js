@@ -12,3 +12,10 @@ function setInterpolation(string){
 	if (string==="cubic") quality=CUBIC;
 	drawing();
 }
+
+function mitchellNetrovalli(x){   // Mitchell-Netrovali, B=C=0.333333, 0<x<2
+	if (x<1){
+		return (1.16666*x-2)*x*x+0.888888;
+	}
+	return ((2-0.388888*x)*x-3.33333)*x+1.777777;				
+}

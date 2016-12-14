@@ -34,8 +34,7 @@ function putPixelsPeriodicallyOnCanvas(){
 			if (cornerX<0){
 				sourceX=-cornerX;
 				targetX=cornerX;
-				copyWidth=outputOffsetX;
-				
+				copyWidth=outputOffsetX;			
 			}
 			else {			
 				sourceX=0;
