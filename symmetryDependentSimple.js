@@ -41,10 +41,13 @@ function makeSymmetriesSimplePatching(){
 	//halfTurn();
 	//copyRectangle(periodWidth/2,0,0,0,periodWidth/2,periodHeight);
 	
-	for (var j=periodHeight/2;j<periodHeight;j++){
+	/*for (var j=periodHeight/2;j<periodHeight;j++){
 		
 		copyPixelSkewed(periodWidth/2,periodWidth-1,j,
 					j-periodHeight/2,periodHeight-j,0.5,0.5);
 	}
+	* */
+	sixFoldRotational();
+	//rhombicCopy();
 }
 

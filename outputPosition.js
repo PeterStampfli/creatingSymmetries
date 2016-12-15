@@ -14,6 +14,22 @@ var lastOutputMouseY;
 // change in size
 var changeSize=1.1;
 
+// limit offset to the first unit cell
+function limitOffset(){
+	if (outputOffsetX<0) {
+		outputOffsetX+=periodWidth;
+	}
+	if (outputOffsetX>=periodWidth) {
+		outputOffsetX-=periodWidth;
+	}
+	if (outputOffsetY<0) {
+		outputOffsetY+=periodHeight;
+	}
+	if (outputOffsetY>=periodHeight) {
+		outputOffsetY-=periodHeight;
+	}
+}
+
 //  set the mouse angle from current event, relative to center
 function outputMouseData(event){
 	outputMouseX=event.pageX-outputCanvas.offsetLeft;
@@ -34,19 +50,8 @@ function outputMouseMoveHandler(event){
 	if (outputMousePressed){
 		outputMouseData(event);
 		outputOffsetX+=outputMouseX-lastOutputMouseX;
-		if (outputOffsetX<0) {
-			outputOffsetX+=periodWidth;
-		}
-		if (outputOffsetX>=periodWidth) {
-			outputOffsetX-=periodWidth;
-		}
 		outputOffsetY+=outputMouseY-lastOutputMouseY;
-		if (outputOffsetY<0) {
-			outputOffsetY+=periodHeight;
-		}
-		if (outputOffsetY>=periodHeight) {
-			outputOffsetY-=periodHeight;
-		}
+		limitOffset();
 		lastOutputMouseX=outputMouseX;
 		lastOutputMouseY=outputMouseY;
 		// we don't need a full redraw
@@ -71,14 +76,12 @@ function outputMouseOutHandler(event){
 
 function outputMouseWheelHandler(event){
 	stopEventPropagationAndDefaultAction(event);
-	if (event.deltaY>0){
-		updateOutputDimensions(changeSize*outputWidth,changeSize*outputHeight);
-		updatePeriod(changeSize*periodWidth,changeSize*periodHeight);
-	}
-	else {
-		updateOutputDimensions(outputWidth/changeSize,outputHeight/changeSize);
-		updatePeriod(periodWidth/changeSize,periodHeight/changeSize);
-	}
+	var factor=event.deltaY>0?changeSize:1/changeSize;
+	updateOutputDimensions(factor*outputWidth,factor*outputHeight);
+	updatePeriod(factor*periodWidth,factor*periodHeight);
+	outputOffsetX*=factor;
+	outputOffsetY*=factor;
+	limitOffset();
 	drawing();
 	return false;
 }

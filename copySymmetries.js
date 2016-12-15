@@ -28,6 +28,30 @@ function copyPixels(targetI,targetEndI,targetJ,
 	}
 }
 
+
+//  copy a rectangular piece, same orientation, only other place
+//  inside the unit cell
+function copyRectangle(targetX,targetY,sourceX,sourceY,width,height){
+	var targetYEnd=targetY+height;
+	var targetEnd;
+	var target;
+	var source;
+	while (targetY<targetYEnd){
+		target=index(targetX,targetY);
+		source=index(sourceX,sourceY);
+		targetY++;
+		sourceY++;
+		targetEnd=target+4*width;
+		while (target<targetEnd){
+			outputPixels[target++]=outputPixels[source++];
+			outputPixels[target++]=outputPixels[source++];
+			outputPixels[target]=outputPixels[source];
+			target+=2;
+			source+=2;
+		}
+	}
+}
+
 // and now the special symmetries, that can be done exactly pixel for pixel
 //==========================================================================
 // mirrorsymmetry in the unit cell at a horizontal axis
@@ -98,24 +122,10 @@ function downDiagonalMirror(length){
 	}
 }
 
-//  copy a rectangular piece, same orientation, only other place
-function copyRectangle(targetX,targetY,sourceX,sourceY,width,height){
-	var targetYEnd=targetY+height;
-	var targetEnd;
-	var target;
-	var source;
-	while (targetY<targetYEnd){
-		target=index(targetX,targetY);
-		source=index(sourceX,sourceY);
-		targetY++;
-		sourceY++;
-		targetEnd=target+4*width;
-		while (target<targetEnd){
-			outputPixels[target++]=outputPixels[source++];
-			outputPixels[target++]=outputPixels[source++];
-			outputPixels[target]=outputPixels[source];
-			target+=2;
-			source+=2;
-		}
-	}
+// copying the left half crosswise to the right
+//  as needed for rhombic or hexagonal symmetry
+function rhombicCopy(){
+	copyRectangle(periodWidth/2,0,0,periodHeight/2,periodWidth/2,periodHeight/2);
+	copyRectangle(periodWidth/2,periodHeight/2,0,0,periodWidth/2,periodHeight/2);
 }
+

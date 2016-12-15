@@ -98,6 +98,7 @@ var	periodHeight=0;
 var patchWidth;
 var patchHeight;
 
+
 // connect the choosers
 var outputWidthChooser;
 var outputHeightChooser;
@@ -157,7 +158,7 @@ function updatePeriod(newWidth,newHeight){
 				periodHeight=newWidth;
 			}
 			else if (hexagonSymmetry){
-				periodHeight=Math.round(0.5774*newWidth);
+				periodHeight=makeMultipleOf4(Math.round(0.5774*newWidth));
 			}
 			else {
 				periodHeight=newHeight;
@@ -169,7 +170,7 @@ function updatePeriod(newWidth,newHeight){
 				periodWidth=newHeight;
 			}
 			else if (hexagonSymmetry){
-				periodWidth=Math.round(1.732*newHeight);
+				periodWidth=makeMultipleOf4(Math.round(1.732*newHeight));
 			}
 			else {
 				periodWidth=newWidth;
@@ -177,7 +178,6 @@ function updatePeriod(newWidth,newHeight){
 		}
 		periodWidthChooser.value=periodWidth.toString();
 		periodHeightChooser.value=periodHeight.toString();
-
 		setPatchDimensions();
 		// only for farris
 		setupSinTables();
