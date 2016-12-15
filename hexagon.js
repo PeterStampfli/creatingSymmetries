@@ -28,7 +28,6 @@ function copyPixelSkewed(targetI,targetEndI,targetJ,
 	var target=index(targetI,targetJ);
 	var targetEnd=index(targetEndI,targetJ)+3;        // all pixel components
 	while (target<=targetEnd) {  // do complete pixels ...
-					
 	k=Math.floor(sourceJ);
 	dy=sourceJ-k;
 	if (k<0){   // out of the bottom
@@ -125,3 +124,35 @@ function sixFoldRotational(){
 	rhombicCopy();
 }
 
+//  p3symmetry: threeFold rotational symmetry
+function threeFoldRotational(){
+	
+	var j;
+	//copyPixelSkewed(targetI,targetEndI,targetJ,
+	//				sourceI,sourceJ,sourceStepI,sourceStepJ)
+	
+	//copyPixels(targetI,targetEndI,targetJ,
+	//				sourceI,sourceJ,sourceStepI,sourceStepJ){
+	
+	// the upper half-tringle at the right border with corners
+	//(0,periodHeight-1),(0,periodHeight/2),(periodWidth/6,periodHeight)
+	// getting data from triangle with corners
+	//(0,0),(periodWidth/4,periodHeight/4),(periodWidth/6,periodHeight/2-1)
+	var x;
+	// lower right triangle
+	for (j=0;j<periodHeight/2;j++){
+		x=Math.round(0.3333*periodWidth*(1+j/periodHeight));
+		copyPixelSkewed(x,0.5*periodWidth-1,j,
+					x,periodHeight-1-j,-0.5,-1.5*periodHeight/periodWidth);
+		
+	}
+	// upper right triangle
+	for (j=0;j<periodHeight/2;j++){
+		x=math.round(0.3333*periodWidth*(0.5-j/periodHeight));
+		copyPixelSkewed(0.5*periodWidth-1-x,0.5*periodWidth-1,periodHeight-1-j,
+					0.25*periodWidth+0.5*x,j,-0.5,1.5*periodHeight/periodWidth);
+		
+	}
+
+
+}

@@ -48,6 +48,7 @@ function makeSymmetriesSimplePatching(){
 	}
 	* */
 	sixFoldRotational();
+	//threeFoldRotational();
 	//rhombicCopy();
 }
 
