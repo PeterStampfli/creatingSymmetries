@@ -157,21 +157,29 @@ function threeFoldRotational(){
 	//(0,periodHeight-1),(0,periodHeight/2),(periodWidth/6,periodHeight)
 	// getting data from triangle with corners
 	//(0,0),(periodWidth/4,periodHeight/4),(periodWidth/6,periodHeight/2-1)
-	var x;
-	// lower right triangle
+	//lower left trapeze
 	for (j=0;j<periodHeight/2;j++){
-		x=Math.round(0.3333*periodWidth*(1+j/periodHeight));
-		copyPixelSkewed(x,0.5*periodWidth-1,j,
-					x,periodHeight-1-j,-0.5,-1.5*periodHeight/periodWidth);
-		
+		copyPixelSkewed(0,0.3333*periodWidth*(1-j/periodHeight),j,
+		                0.5*periodWidth-0.5*j/periodHeight*periodWidth,0.5*periodHeight-0.5*j,-0.5,1.5*periodHeight/periodWidth);
+	}
+	// upper left trapeze
+	for (j=0;j<periodHeight/2;j++){
+		copyPixelSkewed(0,0.3333*periodWidth*(0.5+j/periodHeight),periodHeight/2+j,
+		                0.25*periodWidth+0.5*j/periodHeight*periodWidth,0.75*periodHeight-0.5*j,-0.5,-1.5*periodHeight/periodWidth);
+	}
+		// lower right triangle
+	for (j=0;j<periodHeight/2;j++){
+		copyPixelSkewedRightToLeft(periodWidth/2-1,0.3333*periodWidth*(1+j/periodHeight),j,
+					0.5*periodWidth*(0.5+j/periodHeight),0.75*periodHeight-0.5*j,0.5,1.5*periodHeight/periodWidth);
+
 	}
 	// upper right triangle
 	for (j=0;j<periodHeight/2;j++){
-		x=math.round(0.3333*periodWidth*(0.5-j/periodHeight));
-		copyPixelSkewed(0.5*periodWidth-1-x,0.5*periodWidth-1,periodHeight-1-j,
-					0.25*periodWidth+0.5*x,j,-0.5,1.5*periodHeight/periodWidth);
-		
+		copyPixelSkewedRightToLeft(periodWidth/2-1,periodWidth/2-1-0.3333*j*periodWidth/periodHeight,periodHeight/2+j,
+					0.5*periodWidth-0.5*j/periodHeight*periodWidth,0.5*periodHeight-0.5*j,0.5,-1.5*periodHeight/periodWidth);
+
 	}
 
+	rhombicCopy();
 
 }

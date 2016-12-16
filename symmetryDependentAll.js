@@ -14,7 +14,7 @@ function setPatchDimensions(){
 function showHintPatch(){
 	if (hintPatch&&inputLoaded){
 		outputImage.strokeStyle="Red";	
-		outputImage.strokeRect(outputOffsetX,outputOffsetY,patchWidth,patchHeight);
+	//	outputImage.strokeRect(outputOffsetX,outputOffsetY,patchWidth,patchHeight);
 	}
 }
 

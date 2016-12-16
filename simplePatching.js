@@ -25,9 +25,11 @@ function simplePatchingDrawing(){
 	outputImage.fillStyle="Blue";	
 	outputImage.fillRect(0,0,outputWidth,outputHeight);
 	// simply a direct copy of the input image, depending on scaling and position
+	//  java uses linear interpolation!!!!!!!!!!!!!!
 	outputImage.drawImage(inputImage,inputPatchCornerX,inputPatchCornerY,
 	                      inputPatchWidth,inputPatchHeight,
 				          0,0,patchWidth,patchHeight);	
+	//  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// now get the pixels of the periodic unit cell	
 	//  input image info has changed	
 	getPixelsFromCanvas();
