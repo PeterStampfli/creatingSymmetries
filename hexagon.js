@@ -14,8 +14,15 @@ var outputGreen;
 //  linear interpolation should be good enough (no magnification of pixels)
 
 // set pixel at targetindex position from (sourceI,sourceJ) with linear interpolation
-function setOutputPixel(targetIndex,sourceI,sourceJ){
-	var h,k;
+
+function setOutputPixel(targetIndex,x,y){
+	//copyPixNearest(x,y,outputPixels,targetIndex,outputPixels,periodWidth,periodHeight);
+	copyPixLinear(x,y,outputPixels,targetIndex,outputPixels,periodWidth,periodHeight);
+}
+
+
+function setOutputPixelWWWWWW(targetIndex,sourceI,sourceJ){
+	var h,k,h0,k0,h1,k1;
 	var dx,dy;
 	var i00,i01,i10,i11;
 	var f00,f01,f10,f11;
@@ -25,40 +32,40 @@ function setOutputPixel(targetIndex,sourceI,sourceJ){
 	k=Math.floor(sourceJ);
 	dy=sourceJ-k;
 	if (k<0){   // out of the bottom
-		i00=0;
-		i10=0;
+		k0=0;
+		k1=0;
 	}
 	else if (k>=periodHeight-1){   // out of top
-		i00=4*periodWidth*(periodHeight-1);
-		i10=i00;
+		k0=4*periodWidth*(periodHeight-1);
+		k1=k0;
 	}
 	else {
-		i00=4*periodWidth*k;
-		i10=i00+4*periodWidth;
+		k0=4*periodWidth*k;
+		k1=k0+4*periodWidth;
 	}
 	h=Math.floor(sourceI);
 	dx=sourceI-h;	
 	if (h<0){	// out left
-		i01=i00;
-		i11=i10;
+		h0=0;
+		h1=0;
 	}
 	else if (h>=periodWidth-1){    // out right
-		i00+=4*(periodWidth-1);
-		i01=i00;
-		i10+=4*(periodWidth-1);
-		i11=i10;
+		h0=4*(periodWidth-1);
+		h1=h0;
 	}
 	else {
-		i00+=4*h;
-		i01=i00+4;
-		i10+=4*h;
-		i11=i10+4;
+		h0=4*h;
+		h1=h0+4;
 	}
+	i00=h0+k0;
+	i01=h0+k1;
+	i10=h1+k0;
+	i11=h1+k1;
 	// now all index points are inside
 	// same calculation for all cases
-	f00=(1-dy)*(1-dx);
-	f01=(1-dy)*dx;
-	f10=dy*(1-dx);
+	f00=(1-dx)*(1-dy);
+	f01=(1-dx)*dy;
+	f10=dx*(1-dy);
 	f11=dy*dx;
 	iPix[targetIndex++]=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];
 	iPix[targetIndex++]=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];

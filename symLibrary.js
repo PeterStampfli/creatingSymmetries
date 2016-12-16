@@ -52,6 +52,6 @@ window.onload=function(){
 	orientationCanvasAddEventListeners();
 	activateImageDownloadButton();
 	updateOutputDimensions(512,512);
-	updatePeriod(512,356);
+	updatePeriod(400,400);
 	drawing();
 }

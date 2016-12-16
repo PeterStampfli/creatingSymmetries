@@ -50,6 +50,7 @@ function drawPixelLine(fromI,toI,j){
 	//  reference image
 	var locReferencePixels=referencePixels;
 	var locReferenceWidth=referenceWidth;
+	var locReferenceHeight=referenceHeight;
 	var locScaleInputToReference=scaleInputToReference;
 	//  sampling coordinates
 	var x,y,newX;
@@ -178,9 +179,11 @@ function drawPixelLine(fromI,toI,j){
 		locOutputPixels[outputIndex]=blue;
 		outputIndex+=2;    //skip alpha
 		// mark the reference image pixel
-		h=Math.floor(locScaleInputToReference*h);
-		k=Math.floor(locScaleInputToReference*k);
-		locReferencePixels[4*(locReferenceWidth*k+h)+3]=255;
+		h=Math.round(locScaleInputToReference*h);
+		k=Math.round(locScaleInputToReference*k);
+		if ((h>=0)&&(h<locReferenceWidth)&&(k>=0)&&(k<locReferenceHeight)){
+			locReferencePixels[4*(locReferenceWidth*k+h)+3]=255;
+		}
 		// update the index to the mapping function table
 		mapIndex++;
 	}
