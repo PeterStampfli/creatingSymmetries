@@ -13,10 +13,8 @@ var outputGreen;
 // clamp coordinates at boundary
 //  linear interpolation should be good enough (no magnification of pixels)
 
-
-// copy a line of pixels on ouput pixels, source may be at any angle
-function copyPixelSkewed(targetI,targetEndI,targetJ,
-					sourceI,sourceJ,sourceStepI,sourceStepJ){
+// set pixel at targetindex position from (sourceI,sourceJ) with linear interpolation
+function setOutputPixel(targetIndex,sourceI,sourceJ){
 	var h,k;
 	var dx,dy;
 	var i00,i01,i10,i11;
@@ -24,10 +22,6 @@ function copyPixelSkewed(targetI,targetEndI,targetJ,
 	var iPix=outputPixels;
 	var locPeriodWidth=periodWidth;
 	var periodWidth4=4*periodWidth;
-						
-	var target=index(targetI,targetJ);
-	var targetEnd=index(targetEndI,targetJ)+3;        // all pixel components
-	while (target<=targetEnd) {  // do complete pixels ...
 	k=Math.floor(sourceJ);
 	dy=sourceJ-k;
 	if (k<0){   // out of the bottom
@@ -66,12 +60,35 @@ function copyPixelSkewed(targetI,targetEndI,targetJ,
 	f01=(1-dy)*dx;
 	f10=dy*(1-dx);
 	f11=dy*dx;
-	iPix[target++]=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];
-	iPix[target++]=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];
-	iPix[target]=f00*iPix[i00]+f10*iPix[i10]+f01*iPix[i01]+f11*iPix[i11];	
-	target+=2;
-	sourceI+=sourceStepI;
-	sourceJ+=sourceStepJ;
+	iPix[targetIndex++]=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];
+	iPix[targetIndex++]=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];
+	iPix[targetIndex]=f00*iPix[i00]+f10*iPix[i10]+f01*iPix[i01]+f11*iPix[i11];	
+}
+
+// copy a line of pixels on ouput pixels, source may be at any angle
+function copyPixelSkewed(targetI,targetEndI,targetJ,
+					sourceI,sourceJ,sourceStepI,sourceStepJ){
+	var target=index(targetI,targetJ);
+	var targetEnd=index(targetEndI,targetJ);        
+	while (target<=targetEnd) {  
+		setOutputPixel(target,sourceI,sourceJ);
+		target+=4;
+		sourceI+=sourceStepI;
+		sourceJ+=sourceStepJ;
+	}	
+}
+
+// copy a line of pixels on ouput pixels, source may be at any angle
+//   going from target right to left 
+function copyPixelSkewedRightToLeft(targetI,targetEndI,targetJ,
+					sourceI,sourceJ,sourceStepI,sourceStepJ){
+	var target=index(targetI,targetJ);
+	var targetEnd=index(targetEndI,targetJ);        // all pixel components
+	while (target>=targetEnd) {  
+		setOutputPixel(target,sourceI,sourceJ);
+		target-=4;
+		sourceI+=sourceStepI;
+		sourceJ+=sourceStepJ;
 	}	
 }				
 
@@ -90,35 +107,37 @@ function sixFoldRotational(){
 	// getting data from triangle with corners
 	//(0,0),(periodWidth/4,periodHeight/4),(periodWidth/6,periodHeight/2-1)
 	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewed(0,0.3333*j*periodWidth/periodHeight,periodHeight-1-j,
-					0.5*j*periodWidth/periodHeight,0.5*j,-0.5,1.5*periodHeight/periodWidth);
-		
+		copyPixelSkewed(0,0.3333*periodWidth*(0.5-j/periodHeight),periodHeight/2+j,
+					0.5*periodWidth*(0.5-j/periodHeight),0.5*(periodHeight/2-1-j),-0.5,1.5*periodHeight/periodWidth);		
 	}
-		// the lower half-triangle at the right border
+	// the lower half-triangle at the right border
 
 	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewed(0,0.3333*j*periodWidth/periodHeight,j,
-					0.5*j*periodWidth/periodHeight,0.5*j,0.5,-1.5*periodHeight/periodWidth)
-		
+		copyPixelSkewed(0,0.3333*periodWidth*j/periodHeight,j,
+					0.5*j*periodWidth/periodHeight,0.5*j,0.5,-1.5*periodHeight/periodWidth)	
 	}
-	// the upper equilateral triangle at left
+	// the upper equilateral triangle at left,right half
 	//  
 	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewed(Math.floor(j*0.3333*periodWidth/periodHeight),0.3333*periodWidth*(1-j/periodHeight),periodHeight-1-j,
-					j,0,0.5,1.5*periodHeight/periodWidth);
-		
+		copyPixelSkewed(0.16666*periodWidth,0.3333*periodWidth*(0.5+j/periodHeight),periodHeight/2+j,
+					periodWidth*(0.3333-0.5*j/periodHeight),0.5*j,0.5,1.5*periodHeight/periodWidth);		
+	}
+	// the upper equilateral triangle at left,left half
+	//  
+	for (j=0;j<periodHeight/2;j++){
+		copyPixelSkewedRightToLeft(0.16666*periodWidth,0.3333*periodWidth*(0.5-j/periodHeight),periodHeight/2+j,
+					periodWidth*(0.3333-0.5*j/periodHeight),0.5*j,-0.5,-1.5*periodHeight/periodWidth);	
 	}
 	// local inversion symmetry at (periodWidth/4,periodHeight/4)
 	for (j=0;j<periodHeight/2;j++){
-		copyPixels(Math.round(0.3333*periodWidth*(1-j/periodHeight)),periodWidth/2-1,j,
-					Math.round(0.3333*periodWidth*(0.5+j/periodHeight)),periodHeight/2-1-j,-1,0);
+		copyPixelsRightToLeft(periodWidth/2-1,0.3333*periodWidth*(1-j/periodHeight),j,
+					               0,periodHeight/2-1-j,1,0);
 
 	}
 	// local inversion symmetry at (periodWidth/4,periodHeight*3/4)
 	for (j=0;j<periodHeight/2;j++){
-		copyPixels(Math.round(0.3333*periodWidth*(1-j/periodHeight)),periodWidth/2-1,periodHeight-1-j,
-					Math.round(0.3333*periodWidth*(0.5+j/periodHeight)),periodHeight/2+j,-1,0);
-
+		copyPixelsRightToLeft(periodWidth/2-1,0.3333*periodWidth*(0.5+j/periodHeight),periodHeight/2+j,
+					          0,periodHeight-1-j,1,0);
 	}
 	
 	rhombicCopy();

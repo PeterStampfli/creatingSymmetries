@@ -2,9 +2,10 @@
 
 // get a simple pixel index from indices (i,j) to pixels in the unit cell
 //  is index to the red component of the pixel, green,blue and alpha follow
+//  round the values to get integer pixels !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //=============================================================================
 function index(i,j){
-	return 4*(i+periodWidth*j);
+	return 4*(Math.round(i)+periodWidth*Math.round(j));
 }
 
 // copy pixel values, only RGB part
@@ -24,6 +25,24 @@ function copyPixels(targetI,targetEndI,targetJ,
 		outputPixels[target++]=outputPixels[source++];
 		outputPixels[target]=outputPixels[source];
 		target+=2;                                       // ... skip alpha
+		source+=sourceStep;                             // walk the source
+	}
+}
+
+
+// same, but from right to left, decreasing x-values
+//  targetI>targetEndI
+function copyPixelsRightToLeft(targetI,targetEndI,targetJ,
+					sourceI,sourceJ,sourceStepI,sourceStepJ){
+	var target=index(targetI,targetJ);
+	var targetEnd=index(targetEndI,targetJ);       
+	var source=index(sourceI,sourceJ);
+	var sourceStep=index(sourceStepI,sourceStepJ)-2;  // with compensation for pixel subcomponents 
+	while (target>=targetEnd) {  // do complete pixels ...
+		outputPixels[target++]=outputPixels[source++];
+		outputPixels[target++]=outputPixels[source++];
+		outputPixels[target]=outputPixels[source];
+		target-=6;                                       // ... skip alpha
 		source+=sourceStep;                             // walk the source
 	}
 }
