@@ -75,24 +75,7 @@ function drawPixelLine(fromI,toI,j){
 		x=newX;
 		//  get the pixel color components, depending on quality
 		if (locQuality==locNEXT){		
-			// get nearest integer pixel coordinates
-			h=Math.round(x);
-			k=Math.round(y);
-			// do blue pixels if outside boundaries
-			if ((h<0)||(h>=locInputWidth)||
-				(k<0)||(k>=locInputHeight)) {
-				red=0;
-				green=0;
-				blue=255;
-			}
-			else {
-				// index of base point
-				inputIndex=4*(k*locInputWidth+h);
-				// get nearest pixels
-				red=iPix[inputIndex++];
-				green=iPix[inputIndex++];
-				blue=iPix[inputIndex];
-			}
+			copyPixCubic(x,y,outputPixels,outputIndex,inputPixels,inputWidth,inputHeight)
 		}
 		else {			
 			// get integer part below sampling point
@@ -109,6 +92,7 @@ function drawPixelLine(fromI,toI,j){
 				// index of base point
 				inputIndex=4*(k*locInputWidth+h);
 				if (locQuality==locLINEAR){		
+					//copyPixCubic(x,y,outputPixels,outputIndex,inputPixels,inputWidth,inputHeight)
 					// 	
 					var i00=inputIndex;
 					var i01=i00+4;
@@ -125,6 +109,9 @@ function drawPixelLine(fromI,toI,j){
 					blue=f00*iPix[i00]+f10*iPix[i10]+f01*iPix[i01]+f11*iPix[i11];			
 				}
 				else {  //CUBIC interpolation
+					
+					
+					
 					var kernel=mitchellNetrovalli;
 					//  total indizes for varying height offset points
 					var j0=inputIndex-4;
@@ -170,17 +157,24 @@ function drawPixelLine(fromI,toI,j){
 					red=Math.max(0,Math.round(red));
 					green=Math.max(0,Math.round(green));
 					blue=Math.max(0,Math.round(blue));
+			
 				}
 			}
+			locOutputPixels[outputIndex++]=red;
+			locOutputPixels[outputIndex++]=green;
+			locOutputPixels[outputIndex]=blue;
+			outputIndex-=2;    //skip alpha
 		}
 		//  write them on the image
-		locOutputPixels[outputIndex++]=red;
+/*		locOutputPixels[outputIndex++]=red;
 		locOutputPixels[outputIndex++]=green;
 		locOutputPixels[outputIndex]=blue;
-		outputIndex+=2;    //skip alpha
+		outputIndex+=2;    //skip alpha*/
+		outputIndex+=4;    //skip alpha
+		
 		// mark the reference image pixel
-		h=Math.round(locScaleInputToReference*h);
-		k=Math.round(locScaleInputToReference*k);
+		h=Math.round(locScaleInputToReference*x);
+		k=Math.round(locScaleInputToReference*y);
 		if ((h>=0)&&(h<locReferenceWidth)&&(k>=0)&&(k<locReferenceHeight)){
 			locReferencePixels[4*(locReferenceWidth*k+h)+3]=255;
 		}

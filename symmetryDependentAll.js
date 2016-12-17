@@ -5,8 +5,8 @@
 function setPatchDimensions(){
 	patchWidth=periodWidth/2;
 	patchHeight=periodHeight/2;
-	patchWidth=periodWidth;
-	patchHeight=periodHeight;
+	//patchWidth=periodWidth;
+	//patchHeight=periodHeight;
 }
 
 //for debugging: show the basic patch on output as red lines

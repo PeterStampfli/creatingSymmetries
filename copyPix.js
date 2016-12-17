@@ -8,8 +8,8 @@
 
 // out of border coordinates give nearest border pixel
 function copyPixNearest(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
-	var h=Math.max(0,Math.min(inWidth,Math.round(x)));
-	var k=Math.max(0,Math.min(inHeight,Math.round(y)));
+	var h=Math.max(0,Math.min(inWidth-1,Math.round(x)));
+	var k=Math.max(0,Math.min(inHeight-1,Math.round(y)));
 	var inIndex=4*(inWidth*k+h);
 	outPixels[outIndex++]=inPixels[inIndex++];   //red
 	outPixels[outIndex++]=inPixels[inIndex++];   // green
@@ -59,20 +59,18 @@ function copyPixLinear(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
 	f01=(1-dx)*dy;
 	f10=dx*(1-dy);
 	f11=dy*dx;
-	outPixels[outIndex++]=f00*inPixels[i00++]+f10*inPixels[i10++]+f01*inPixels[i01++]+f11*inPixels[i11++];
-	outPixels[outIndex++]=f00*inPixels[i00++]+f10*inPixels[i10++]+f01*inPixels[i01++]+f11*inPixels[i11++];
-	outPixels[outIndex]=f00*inPixels[i00]+f10*inPixels[i10]+f01*inPixels[i01]+f11*inPixels[i11];		
+	outPixels[outIndex++]=Math.round(f00*inPixels[i00++]+f10*inPixels[i10++]+f01*inPixels[i01++]+f11*inPixels[i11++]);
+	outPixels[outIndex++]=Math.round(f00*inPixels[i00++]+f10*inPixels[i10++]+f01*inPixels[i01++]+f11*inPixels[i11++]);
+	outPixels[outIndex]=Math.round(f00*inPixels[i00]+f10*inPixels[i10]+f01*inPixels[i01]+f11*inPixels[i11]);		
 }
 
 //  cubic interpolation
-function copyPixCubic(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
-	
+function copyPixCubic(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){	
 	var h=Math.floor(x);
 	var dx=x-h;
 	var k=Math.floor(y);
-	var dy=y-k;
-	
-	//  the various vertical positions
+	var dy=y-k;	
+	//  the various vertical positions, getting the correct row numbers of pixels
 	var j0=k;
 	var jm=j0-1;
 	var j1=j0+1;
@@ -80,21 +78,22 @@ function copyPixCubic(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
 	// too low
 	if (jm<0){
 		jm=0;
-		j0=Math.max(0,j0);
+		j0=0;
 		j1=Math.max(0,j1);
 		j2=Math.max(0,j2);
 	}
 	else if (j2>=inHeight){   // to high
 		j2=inHeight-1;
-		j1=Math.min(j1,inHeight-1);
+		j1=inHeight-1;
 		j0=Math.min(j1,inHeight-1);
 		jm=Math.min(j1,inHeight-1);
 	}
+	//  transforming pixelrow numbers to indices of the input image data
 	jm*=4*inWidth;
 	j0*=4*inWidth;
 	j1*=4*inWidth;
 	j2*=4*inWidth;
-	// the various horizontal positions
+	// the various horizontal positions (column numbers of pixels)
 	var i0=h;
 	var im=i0-1;
 	var i1=i0+1;
@@ -102,16 +101,17 @@ function copyPixCubic(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
 	// too low
 	if (im<0){
 		im=0;
-		i0=Math.max(0,i0);
+		i0=0;
 		i1=Math.max(0,i1);
 		i2=Math.max(0,i2);
 	}
 	else if (i2>=inWidth) {    // too high
 		i2=inWidth-1;
-		i1=Math.min(i1,inWidth-1);
+		i1=inWidth-1;
 		i0=Math.min(i0,inWidth-1);
 		im=Math.min(im,inWidth-1);
 	}
+	//  transforming column numbers to indices to input image data
 	im*=4;
 	i0*=4;
 	i1*=4;
@@ -129,8 +129,44 @@ function copyPixCubic(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
 	var kx;
 	// color summation in parts
 	var red,green,blue;
-
-
-
-	
+	// the first column
+	indexM=jm+im;
+	index0=j0+im;
+	index1=j1+im;
+	index2=j2+im;
+	kx=kernel(1+dx);
+	red=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
+	green=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
+	blue=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
+	// the second column, just below (x,y)
+	indexM=jm+i0;
+	index0=j0+i0;
+	index1=j1+i0;
+	index2=j2+i0;
+	kx=kernel(dx);
+	red+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
+	green+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
+	blue+=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
+	//  the third column, above (x,y)
+	indexM=jm+i1;
+	index0=j0+i1;
+	index1=j1+i1;
+	index2=j2+i1;
+	kx=kernel(1-dx);
+	red+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
+	green+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
+	blue+=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
+	// the forth column
+	indexM=jm+i2;
+	index0=j0+i2;
+	index1=j1+i2;
+	index2=j2+i2;
+	kx=kernel(2-dx);
+	red+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
+	green+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
+	blue+=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
+	// beware of negative values
+	outPixels[outIndex++]=Math.max(0,Math.round(red));
+	outPixels[outIndex++]=Math.max(0,Math.round(green));
+	outPixels[outIndex]=Math.max(0,Math.round(blue));
 }
