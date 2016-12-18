@@ -28,7 +28,6 @@ function setAlphaReferenceImagePixels(alpha){
 //===========================================================0
 
 function drawPixelLine(fromI,toI,j){
-	// local variables for acceleration
 	// quality dependent pixel interpolation
 	var copyInterpolation;
 	switch (quality){
@@ -54,14 +53,15 @@ function drawPixelLine(fromI,toI,j){
 	//  integer part of reference coordinates
 	var h,k;
 	//  index to the output image pixel, initialization
-	var inputIndex;
 	var outputIndex=index(fromI,j);
+	//  the last
+	var outputEnd=index(toI,j);
 	//  index to the mapping function table, initialization
 	var mapIndex=fromI+patchWidth*j;
 	// local reference to the mapping table
 	var locMapXTab=mapXTab;
 	var locMapYTab=mapYTab;
-	for (var i=fromI;i<=toI;i++){
+	while (outputIndex<=outputEnd){
 		// some "symmetric" mapping from (i,j) to (x,y) stored in a map table !!!
 		x=locMapXTab[mapIndex];
 		y=locMapYTab[mapIndex];
@@ -71,7 +71,7 @@ function drawPixelLine(fromI,toI,j){
 		y=scaleSin*x+scaleCos*y+centerY;
 		x=newX;
 		//  get the pixel color components, depending on quality
-		copyInterpolation(x,y,outputPixels,outputIndex,inputPixels,inputWidth,inputHeight);
+		copyInterpolation(x,y,outputData,outputIndex,inputData);
 		outputIndex+=4;    //go to next output pixel (red component)	
 		// mark the reference image pixel
 		h=Math.round(locScaleInputToReference*x);

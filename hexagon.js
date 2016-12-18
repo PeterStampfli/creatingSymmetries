@@ -17,7 +17,7 @@ var outputGreen;
 
 function setOutputPixel(targetIndex,x,y){
 	//copyPixNearest(x,y,outputPixels,targetIndex,outputPixels,periodWidth,periodHeight);
-	copyPixLinear(x,y,outputPixels,targetIndex,outputPixels,periodWidth,periodHeight);
+	copyPixLinear(x,y,outputData,targetIndex,outputData);
 }
 
 

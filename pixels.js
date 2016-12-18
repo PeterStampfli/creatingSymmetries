@@ -1,14 +1,5 @@
 "use strict";
 
-// pixel data of canvas, using only one periodic unit cell
-var outputData;
-var outputPixels;
-// get the pixels of the output canvas,use only the unit cell
-function getPixelsFromCanvas(){
-	outputData = outputImage.getImageData(0,0,periodWidth,periodHeight);
-	outputPixels = outputData.data;
-}
-
 //  put pixels periodically on canvas
 //  with offset
 // note that putImageData has different interface than drawImage

@@ -9,6 +9,11 @@ var referenceImage;
 var orientationCanvas;
 var orientationImage;
 
+// image and pixel data of output canvas, using only one periodic unit cell
+var outputData;
+var outputPixels;
+
+
 function getCanvases(){
 	referenceCanvas=document.getElementById("referenceCanvas");	
 	referenceImage=referenceCanvas.getContext("2d");

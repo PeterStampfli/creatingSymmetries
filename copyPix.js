@@ -1,13 +1,26 @@
 "use strict";
 
-//  copy a pixel using nearest neighbor
-//  x, y are coordinates of pixel in input image data (pixels)
-// outPixels is the output image data (pixels)
-// outIndex is the index of red component of the pixel to write
-//  inPixels is the input image data (pixels), inWidth,inHeight the dimensions
+/* functions for copying pixels from inputData to outputData image data object
+ *==============================================================================
+ * 
+ * inputData and outputData are ImageData objects
+ * where ImageData.data is a byte array of pixel-components, ImageData.width and ImageData.height the length
+ * 
+ * outIndex is the integer index of the red component of the pixel 
+ *          we have to write in outPixels image data
+ * 
+ * x,y      are the float coordinates of the pixel to read from inPixels image data
+ *          if these coordinates lie outside we read the nearest pixel of the border
+ */ 
 
-// out of border coordinates give nearest border pixel
-function copyPixNearest(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
+// nearest neighbor
+function copyPixNearest(x,y,outputData,outIndex,inputData){
+	// local variables for fast access
+	var outPixels=outputData.data;
+	var inPixels=inputData.data;
+	var inWidth=inputData.width;
+	var inHeight=inputData.height;
+	//  rounded coordinates
 	var h=Math.max(0,Math.min(inWidth-1,Math.round(x)));
 	var k=Math.max(0,Math.min(inHeight-1,Math.round(y)));
 	var inIndex=4*(inWidth*k+h);
@@ -17,7 +30,13 @@ function copyPixNearest(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
 }
 
 //  linear interpolation
-function copyPixLinear(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
+function copyPixLinear(x,y,outputData,outIndex,inputData){
+	// local variables for fast access
+	var outPixels=outputData.data;
+	var inPixels=inputData.data;
+	var inWidth=inputData.width;
+	var inHeight=inputData.height;
+	//  coordinates of base pixel
 	var h=Math.floor(x);
 	var dx=x-h;
 	var k=Math.floor(y);
@@ -65,7 +84,13 @@ function copyPixLinear(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
 }
 
 //  cubic interpolation
-function copyPixCubic(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){	
+function copyPixCubic(x,y,outputData,outIndex,inputData){	
+	// local variables for fast access
+	var outPixels=outputData.data;
+	var inPixels=inputData.data;
+	var inWidth=inputData.width;
+	var inHeight=inputData.height;
+	//  coordinates of base pixel
 	var h=Math.floor(x);
 	var dx=x-h;
 	var k=Math.floor(y);
@@ -138,7 +163,7 @@ function copyPixCubic(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
 	red=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
 	green=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
 	blue=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
-	// the second column, just below (x,y)
+	// the second column, just at the left of (x,y)
 	indexM=jm+i0;
 	index0=j0+i0;
 	index1=j1+i0;
@@ -147,7 +172,7 @@ function copyPixCubic(x,y,outPixels,outIndex,inPixels,inWidth,inHeight){
 	red+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
 	green+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
 	blue+=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
-	//  the third column, above (x,y)
+	//  the third column, just at the right of (x,y)
 	indexM=jm+i1;
 	index0=j0+i1;
 	index1=j1+i1;

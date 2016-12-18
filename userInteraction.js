@@ -74,7 +74,7 @@ function useNewInputImage() {
 											  0,0,referenceWidth,referenceHeight);
 	getPixelsFromReferenceCanvas();
 	//----------------------------------------------------
-	// read the input image pixels
+	// read the input image data
 	getPixelsFromInputImage();		
 	// and finally (re)draw with this image
 	drawing();
@@ -182,9 +182,9 @@ function updatePeriod(newWidth,newHeight){
 		// only for farris
 		setupSinTables();
 		setupMapTables();	
-		// for farris: now get the opaque pixels of the periodic unit cell	
-		// output canvas	
-		getPixelsFromCanvas();		
+		// output canvas, get data of unit cell	
+		outputData = outputImage.getImageData(0,0,periodWidth,periodHeight);
+		outputPixels = outputData.data;
 	}
 }
 
