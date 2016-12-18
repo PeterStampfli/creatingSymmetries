@@ -11,6 +11,7 @@ function getPixelsFromCanvas(){
 
 //  put pixels periodically on canvas
 //  with offset
+// note that putImageData has different interface than drawImage
 function putPixelsPeriodicallyOnCanvas(){
 	var copyWidth;
 	var copyHeight;
@@ -21,8 +22,7 @@ function putPixelsPeriodicallyOnCanvas(){
 	for (var cornerY=outputOffsetY-periodHeight;cornerY<outputHeight;cornerY+=periodHeight){
 		if (cornerY<0){
 			sourceY=-cornerY;
-			targetY=cornerY;      // strange, actually difference between source corner and intended
-			//sourceY=0;
+			targetY=cornerY;            // strange, actually difference between source corner and intended
 			copyHeight=outputOffsetY;
 		}
 		else {

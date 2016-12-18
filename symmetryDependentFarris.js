@@ -37,6 +37,8 @@ function makeSymmetriesFarris(){
 		drawPixelLine(0,patchWidth-1,j);
 	}
 	// the symmetries inside the unit cell
-	verticalMirror(periodHeight/2);
-	horizontalMirror(periodWidth);
+	//verticalMirror(periodHeight/2);
+	//horizontalMirror(periodWidth);
+		threeFoldRotational();
+
 }
