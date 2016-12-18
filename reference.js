@@ -1,11 +1,6 @@
 "use strict";
 
-// override default actions on the reference canvas
-// especially important for the mouse wheel
-function stopEventPropagationAndDefaultAction(event) {
-	event.stopPropagation();
-	event.preventDefault();   
-}
+// interaction with the refernce canvas
 
 // current mouse data, with respect to referenceCanvas
 var referenceMousePressed=false;
@@ -63,12 +58,6 @@ function referenceMouseUpHandler(event){
 	return false;
 }
 
-function referenceMouseOutHandler(event){
-	stopEventPropagationAndDefaultAction(event);
-	referenceMousePressed=false;	
-	return false;
-}
-
 //  change the scaling with the mouse wheel
 function referenceMouseWheelHandler(event){
 	stopEventPropagationAndDefaultAction(event);
@@ -88,6 +77,28 @@ function referenceCanvasAddEventListeners(){
 		referenceCanvas.addEventListener("mousedown",referenceMouseDownHandler,true);
 		referenceCanvas.addEventListener("mouseup",referenceMouseUpHandler,true);
 		referenceCanvas.addEventListener("mousemove",referenceMouseMoveHandler,true);
-		referenceCanvas.addEventListener("mouseout",referenceMouseOutHandler,true);
+		referenceCanvas.addEventListener("mouseout",referenceMouseUpHandler,true);
 		referenceCanvas.addEventListener("wheel",referenceMouseWheelHandler,true);	
+}
+
+//  manipulating the reference image (precision highlighting of sampled pixels)
+//====================================================================
+
+// get pixels from reference canvas
+function getPixelsFromReferenceCanvas(){
+	referenceData = referenceImage.getImageData(0,0,referenceWidth,referenceHeight);
+	referencePixels = referenceData.data;
+}
+
+// put pixels on reference canvas
+function putPixelsOnReferenceCanvas(){
+	referenceImage.putImageData(referenceData, 0, 0);
+}
+
+// fade-out all pixels by setting alpha
+function setAlphaReferenceImagePixels(alpha){
+	var theEnd=referencePixels.length;
+	for (var i=3;i<theEnd;i+=4){
+		referencePixels[i]=alpha;
+	}
 }

@@ -1,11 +1,5 @@
 "use strict";
 
-// we need this for simple patching
-
-// the colors, directly for speed
-var outputRed;
-var outputBlue;
-var outputGreen;
 
 // get a output pixel color values for noninteger coordinates
 // in the unit cell
@@ -21,64 +15,13 @@ function setOutputPixel(targetIndex,x,y){
 }
 
 
-function setOutputPixelWWWWWW(targetIndex,sourceI,sourceJ){
-	var h,k,h0,k0,h1,k1;
-	var dx,dy;
-	var i00,i01,i10,i11;
-	var f00,f01,f10,f11;
-	var iPix=outputPixels;
-	var locPeriodWidth=periodWidth;
-	var periodWidth4=4*periodWidth;
-	k=Math.floor(sourceJ);
-	dy=sourceJ-k;
-	if (k<0){   // out of the bottom
-		k0=0;
-		k1=0;
-	}
-	else if (k>=periodHeight-1){   // out of top
-		k0=4*periodWidth*(periodHeight-1);
-		k1=k0;
-	}
-	else {
-		k0=4*periodWidth*k;
-		k1=k0+4*periodWidth;
-	}
-	h=Math.floor(sourceI);
-	dx=sourceI-h;	
-	if (h<0){	// out left
-		h0=0;
-		h1=0;
-	}
-	else if (h>=periodWidth-1){    // out right
-		h0=4*(periodWidth-1);
-		h1=h0;
-	}
-	else {
-		h0=4*h;
-		h1=h0+4;
-	}
-	i00=h0+k0;
-	i01=h0+k1;
-	i10=h1+k0;
-	i11=h1+k1;
-	// now all index points are inside
-	// same calculation for all cases
-	f00=(1-dx)*(1-dy);
-	f01=(1-dx)*dy;
-	f10=dx*(1-dy);
-	f11=dy*dx;
-	iPix[targetIndex++]=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];
-	iPix[targetIndex++]=f00*iPix[i00++]+f10*iPix[i10++]+f01*iPix[i01++]+f11*iPix[i11++];
-	iPix[targetIndex]=f00*iPix[i00]+f10*iPix[i10]+f01*iPix[i01]+f11*iPix[i11];	
-}
-
-// copy a line of pixels on ouput pixels, source may be at any angle
+// copy a line of pixels on output pixels, source may be at any angle
 function copyPixelSkewed(targetI,targetEndI,targetJ,
 					sourceI,sourceJ,sourceStepI,sourceStepJ){
 	var target=index(targetI,targetJ);
 	var targetEnd=index(targetEndI,targetJ);        
 	while (target<=targetEnd) {  
-		setOutputPixel(target,sourceI,sourceJ);
+		copyPixLinear(sourceI,sourceJ,outputData,target,outputData);
 		target+=4;
 		sourceI+=sourceStepI;
 		sourceJ+=sourceStepJ;

@@ -29,11 +29,7 @@ var mapYTab=[];
 // ========================================================================
 //  trivial map for simple patching
 
-
-function setupMapTables(){
-	var size=patchWidth*patchHeight;
-	mapXTab.length=size;
-	mapYTab.length=size;
+function trivialMapTable(){
 	var locPatchWidth=patchWidth;
 	var locPatchHeight=patchHeight;
 	var locPatchWidth2=patchWidth/2;
@@ -49,6 +45,16 @@ function setupMapTables(){
 	}	
 }
 
+function setupMapTables(){
+	trivialMapTable();
+}
+
+// presetting special symmetries, fixing the height to width ratio of the unit cell
+function setSymmetries(){
+	squareSymmetry=false;
+	hexagonSymmetry=true;
+}
+
 // draw the unit cell on output image
 // the shape of the basic patch and symmetries in unit cell depend on symmetry of the image
 //=================================================================================
@@ -58,8 +64,8 @@ function makeSymmetriesFarris(){
 		drawPixelLine(0,patchWidth-1,j);
 	}
 	// the symmetries inside the unit cell
-	verticalMirror(periodHeight/2);
-	horizontalMirror(periodWidth);
-	//	threeFoldRotational();
+	//verticalMirror(periodHeight/2);
+	//horizontalMirror(periodWidth);
+		threeFoldRotational();
 
 }

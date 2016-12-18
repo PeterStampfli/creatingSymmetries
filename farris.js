@@ -1,43 +1,56 @@
 "use strict";
 
-//  manipulating the reference image (precision highlighting of sampled pixels)
-//====================================================================
-var referenceData;
-var referencePixels;
+// for the mapping functions:
+// tables for the sine and cosine functions
+var sinXTab=[];
+var sinYTab=[];
 
-// get pixels from reference canvas
-function getPixelsFromReferenceCanvas(){
-	referenceData = referenceImage.getImageData(0,0,referenceWidth,referenceHeight);
-	referencePixels = referenceData.data;
+// making the tables, depending on the period lengths of the unit cell
+// we need a full period to make lookup as simple as possible for higher frequencies
+function setupSinTable(sinTab,length){
+	var factor=2*Math.PI/length;
+	var length4=length/4;
+	var length2=length/2;
+	var i;
+	var sinus;
+	sinTab.length=length;
+	sinTab[0]=0;
+	sinTab[length2]=0;
+	for (i=1;i<=length4;i++){
+		sinus=Math.sin(factor*i);
+		sinTab[i]=sinus;
+		sinTab[length2-i]=sinus;
+		sinTab[length2+i]=-sinus;
+		sinTab[length-i]=-sinus;	
+	}	
 }
 
-// put pixels on reference canvas
-function putPixelsOnReferenceCanvas(){
-	referenceImage.putImageData(referenceData, 0, 0);
+// the sin and cos functions, periodic on the unit lattice dimensions,
+//  for any integer multiple of the side length of a pixel
+//====================================================
+//  horizontal
+function sinX(i){
+	return sinXTab[i%periodWidth];
 }
 
-// fade-out all pixels by setting alpha
-function setAlphaReferenceImagePixels(alpha){
-	var theEnd=referencePixels.length;
-	for (var i=3;i<theEnd;i+=4){
-		referencePixels[i]=alpha;
-	}
+function cosX(i){
+	return sinXTab[(i+periodWidth4)%periodWidth];
 }
+
+// vertical
+function sinY(i){
+	return sinYTab[i%periodHeight];
+}
+
+function cosY(i){
+	return sinYTab[(i+periodHeight4)%periodHeight];
+}
+
 
 // drawing a line of pixels on the output image
 //===========================================================0
 
 function drawPixelLine(fromI,toI,j){
-	// quality dependent pixel interpolation
-	var copyInterpolation;
-	switch (quality){
-		case NEXT: copyInterpolation=copyPixNearest;
-				   break;
-		case LINEAR: copyInterpolation=copyPixLinear;
-				   break;
-		case CUBIC: copyInterpolation=copyPixCubic;
-				   break;		
-	}
 	// center of sampling as defined by the mouse on the reference image
 	var centerX=referenceCenterX/scaleInputToReference;
 	var centerY=referenceCenterY/scaleInputToReference;
@@ -73,7 +86,7 @@ function drawPixelLine(fromI,toI,j){
 		//  get the pixel color components, depending on quality
 		copyInterpolation(x,y,outputData,outputIndex,inputData);
 		outputIndex+=4;    //go to next output pixel (red component)	
-		// mark the reference image pixel
+		// mark the reference image pixel, make it fully opaque
 		h=Math.round(locScaleInputToReference*x);
 		k=Math.round(locScaleInputToReference*y);
 		if ((h>=0)&&(h<locReferenceWidth)&&(k>=0)&&(k<locReferenceHeight)){
@@ -86,7 +99,7 @@ function drawPixelLine(fromI,toI,j){
 
 //  make the symmetries, draw the full output image
 //==========================================================
-function farrisDrawing(){
+function drawing(){
 	if (!inputLoaded){						// no input means nothing to do
 		return;
 	}
@@ -94,9 +107,7 @@ function farrisDrawing(){
 	setAlphaReferenceImagePixels(128);
 	// make the symmetries on the output image, reuse and overwrite pixels
 	//  make scanned pixels fully opaque on reference image
-	//===========================================================
 	makeSymmetriesFarris();
-	//===========================================================
 	// put the symmetric image on the output canvas
 	putPixelsPeriodicallyOnCanvas();
 	// put the reference image

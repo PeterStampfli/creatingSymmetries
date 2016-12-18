@@ -12,6 +12,21 @@
  * x,y      are the float coordinates of the pixel to read from inPixels image data
  *          if these coordinates lie outside we read the nearest pixel of the border
  */ 
+ 
+// quality dependent pixel interpolation
+var copyInterpolation=copyPixNearest;
+
+function setInterpolation(string){
+	switch (string){
+		case "nearest": copyInterpolation=copyPixNearest;
+				   break;
+		case "linear": copyInterpolation=copyPixLinear;
+				   break;
+		case "cubic": copyInterpolation=copyPixCubic;
+				   break;		
+	}	
+	drawing();
+}
 
 // nearest neighbor
 function copyPixNearest(x,y,outputData,outIndex,inputData){
@@ -81,6 +96,14 @@ function copyPixLinear(x,y,outputData,outIndex,inputData){
 	outPixels[outIndex++]=Math.round(f00*inPixels[i00++]+f10*inPixels[i10++]+f01*inPixels[i01++]+f11*inPixels[i11++]);
 	outPixels[outIndex++]=Math.round(f00*inPixels[i00++]+f10*inPixels[i10++]+f01*inPixels[i01++]+f11*inPixels[i11++]);
 	outPixels[outIndex]=Math.round(f00*inPixels[i00]+f10*inPixels[i10]+f01*inPixels[i01]+f11*inPixels[i11]);		
+}
+
+//  the kernel function for cubic interpolation
+function mitchellNetrovalli(x){   // Mitchell-Netrovali, B=C=0.333333, 0<x<2
+	if (x<1){
+		return (1.16666*x-2)*x*x+0.888888;
+	}
+	return ((2-0.388888*x)*x-3.33333)*x+1.777777;				
 }
 
 //  cubic interpolation

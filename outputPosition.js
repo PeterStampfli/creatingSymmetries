@@ -68,12 +68,6 @@ function outputMouseUpHandler(event){
 	return false;
 }
 
-function outputMouseOutHandler(event){
-	stopEventPropagationAndDefaultAction(event);
-	outputMousePressed=false;	
-	return false;
-}
-
 function outputMouseWheelHandler(event){
 	stopEventPropagationAndDefaultAction(event);
 	var factor=event.deltaY>0?changeSize:1/changeSize;
@@ -92,7 +86,7 @@ function outputCanvasAddEventListeners(){
 		outputCanvas.addEventListener("mousedown",outputMouseDownHandler,true);
 		outputCanvas.addEventListener("mouseup",outputMouseUpHandler,true);
 		outputCanvas.addEventListener("mousemove",outputMouseMoveHandler,true);
-		outputCanvas.addEventListener("mouseout",outputMouseOutHandler,true);
+		outputCanvas.addEventListener("mouseout",outputMouseUpHandler,true);
 		outputCanvas.addEventListener("wheel",outputMouseWheelHandler,true);	
 }
 

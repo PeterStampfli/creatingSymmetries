@@ -1,16 +1,57 @@
 "use strict";
 
 // get a simple pixel index from indices (i,j) to pixels in the unit cell
-//  is index to the red component of the pixel, green,blue and alpha follow
-//  round the values to get integer pixels !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//  this is the index to the red component of the pixel, green,blue and alpha follow
+//  round the values to get integer pixels !!!!
 //=============================================================================
 function index(i,j){
 	return 4*(Math.round(i)+periodWidth*Math.round(j));
 }
 
+//  put the pixels of the ImageData object outputData periodically on the output canvas
+//  outputData contains xactly one periodic cell
+//  the images are offset by outputOffsetX and outputOffsetY
+//  note that putImageData has different interface than drawImage
+//================================================================================0
+function putPixelsPeriodicallyOnCanvas(){
+	var copyWidth;
+	var copyHeight;
+	var targetX;
+	var targetY;
+	var sourceX;
+	var sourceY;
+	for (var cornerY=outputOffsetY-periodHeight;cornerY<outputHeight;cornerY+=periodHeight){
+		if (cornerY<0){
+			sourceY=-cornerY;
+			targetY=cornerY;            // strange, actually difference between source corner and intended
+			copyHeight=outputOffsetY;
+		}
+		else {
+			sourceY=0;
+			targetY=cornerY;
+			copyHeight=Math.min(outputHeight-cornerY,periodHeight);
+		}
+		for (var cornerX=outputOffsetX-periodWidth;cornerX<outputWidth;cornerX+=periodWidth){
+			if (cornerX<0){
+				sourceX=-cornerX;
+				targetX=cornerX;
+				copyWidth=outputOffsetX;			
+			}
+			else {			
+				sourceX=0;
+				targetX=cornerX;
+				copyWidth=Math.min(outputWidth-cornerX,periodWidth);
+			}
+			outputImage.putImageData(outputData, 
+			                         targetX, targetY,sourceX,sourceY,copyWidth,copyHeight);
+		}
+	}
+}
+
 // copy pixel values, only RGB part
 // target goes upwards on a horizontal line from (targetI,targetJ) to (targetEndI,targetJ)
 // source starts at (sourceI,sourceJ) and makes steps (sourceStepI,sourceStepJ)
+//  they have to be integer values
 //  starting points: from=(fromI,fromJ) and to=(toI,toJ)
 //  accounts for (output canvas) width and 4 bytes per pixels, skipping alpha
 //===================================================================================
@@ -19,16 +60,15 @@ function copyPixels(targetI,targetEndI,targetJ,
 	var target=index(targetI,targetJ);
 	var targetEnd=index(targetEndI,targetJ);        
 	var source=index(sourceI,sourceJ);
-	var sourceStep=index(sourceStepI,sourceStepJ)-2;  // with compensation for pixel subcomponents 
+	var sourceStep=index(sourceStepI,sourceStepJ)-2;  // combined step, with compensation for pixel subcomponents 
 	while (target<=targetEnd) {  // do complete pixels ...
 		outputPixels[target++]=outputPixels[source++];
 		outputPixels[target++]=outputPixels[source++];
 		outputPixels[target]=outputPixels[source];
-		target+=2;                                       // ... skip alpha
-		source+=sourceStep;                             // walk the source
+		target+=2;                                       // ... skip blu,alpha, go to next pixel at right
+		source+=sourceStep;                             // walk through the source
 	}
 }
-
 
 // same, but from right to left, decreasing x-values
 //  targetI>targetEndI
@@ -37,19 +77,20 @@ function copyPixelsRightToLeft(targetI,targetEndI,targetJ,
 	var target=index(targetI,targetJ);
 	var targetEnd=index(targetEndI,targetJ);       
 	var source=index(sourceI,sourceJ);
-	var sourceStep=index(sourceStepI,sourceStepJ)-2;  // with compensation for pixel subcomponents 
+	var sourceStep=index(sourceStepI,sourceStepJ)-2;  // combined step, with compensation for pixel subcomponents 
 	while (target>=targetEnd) {  // do complete pixels ...
 		outputPixels[target++]=outputPixels[source++];
 		outputPixels[target++]=outputPixels[source++];
 		outputPixels[target]=outputPixels[source];
-		target-=6;                                       // ... skip alpha
-		source+=sourceStep;                             // walk the source
+		target-=6;                                       // ... skip red,green, go to next pixel at left
+		source+=sourceStep;                             // walk through the source
 	}
 }
 
 
 //  copy a rectangular piece, same orientation, only other place
 //  inside the unit cell
+//  target rectangle ,may not overlap the source rectangle
 function copyRectangle(targetX,targetY,sourceX,sourceY,width,height){
 	var targetYEnd=targetY+height;
 	var targetEnd;
@@ -71,7 +112,7 @@ function copyRectangle(targetX,targetY,sourceX,sourceY,width,height){
 	}
 }
 
-// and now the special symmetries, that can be done exactly pixel for pixel
+// and now the special symmetries, that can be done with integer pixel coordinates
 //==========================================================================
 // mirrorsymmetry in the unit cell at a horizontal axis
 //  overwrites upper half
@@ -129,7 +170,7 @@ function upDiagonalMirror(length){
 	}
 }
 
-// mirror at the down going diagonal x+y=period/2
+// mirror at the down going diagonal x+y=length-1
 //  take the sector x+y<length-1 and overwrite x+y>length-1
 //  both in the lower right quarter
 // square lattice

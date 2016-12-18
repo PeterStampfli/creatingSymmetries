@@ -12,6 +12,9 @@ var orientationImage;
 // image and pixel data of output canvas, using only one periodic unit cell
 var outputData;
 var outputPixels;
+// image and pixel data of the reference canvas
+var referenceData;
+var referencePixels;
 
 
 function getCanvases(){
@@ -42,13 +45,12 @@ function activateImageDownloadButton(){
 var hintPatch=false;
 
 // using special symmetries
-var squareSymmetry=false;
-var hexagonSymmetry=false;
+var squareSymmetry;
+var hexagonSymmetry;
 
 window.onload=function(){
 	hintPatch=true;
-	//squareSymmetry=true;
-	hexagonSymmetry=true;
+	setSymmetries();
 	getCanvases();
 	getChoosers();
 	referenceCanvasAddEventListeners();
@@ -57,6 +59,6 @@ window.onload=function(){
 	orientationCanvasAddEventListeners();
 	activateImageDownloadButton();
 	updateOutputDimensions(512,512);
-	updatePeriod(400,400);
+	updatePeriod(256,256);
 	drawing();
 }

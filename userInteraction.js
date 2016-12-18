@@ -49,6 +49,8 @@ function useNewInputImage() {
 	inputLoaded=true;
 	inputWidth=inputImage.width;
 	inputHeight=inputImage.height;
+	// read the input image data
+	getPixelsFromInputImage();		
 	// set up dimensions of the reference image
 	var inputSize=Math.max(inputWidth,inputHeight);
 	if (inputSize<maxReferenceSize){
@@ -68,14 +70,11 @@ function useNewInputImage() {
 	scaleInputToReference=Math.min(referenceWidth/inputWidth,
 										referenceHeight/inputHeight);
 											// prepare the reference image
-	// for farris only ---------------
-	// refernce image: draw the entire input image and get the pixels
+	// reference image: draw the entire input image and get the pixels
 	referenceImage.drawImage(inputImage,0,0,inputWidth,inputHeight,
 											  0,0,referenceWidth,referenceHeight);
 	getPixelsFromReferenceCanvas();
 	//----------------------------------------------------
-	// read the input image data
-	getPixelsFromInputImage();		
 	// and finally (re)draw with this image
 	drawing();
 }
@@ -87,13 +86,16 @@ function makeMultipleOf4(i){
 	return i-i%4;
 }
 
-// default size for generated image
-var outputWidth=0;
-var	outputHeight=0;
+// size for generated image
+var outputWidth;
+var	outputHeight;
 	
 // periods/size of periodic cell
-var periodWidth=0;
-var	periodHeight=0;
+var periodWidth;
+var	periodHeight;
+//  quarters
+var periodWidth4;
+var periodHeight4;
 
 var patchWidth;
 var patchHeight;
@@ -179,9 +181,14 @@ function updatePeriod(newWidth,newHeight){
 		periodWidthChooser.value=periodWidth.toString();
 		periodHeightChooser.value=periodHeight.toString();
 		setPatchDimensions();
-		// only for farris
-		setupSinTables();
+		setupSinTable(sinXTab,periodWidth);
+		setupSinTable(sinYTab,periodHeight);
+		var size=patchWidth*patchHeight;
+		mapXTab.length=size;
+		mapYTab.length=size;
 		setupMapTables();	
+		periodWidth4=periodWidth/4;
+		periodHeight4=periodHeight/4;
 		// output canvas, get data of unit cell	
 		outputData = outputImage.getImageData(0,0,periodWidth,periodHeight);
 		outputPixels = outputData.data;

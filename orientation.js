@@ -83,19 +83,13 @@ function orientationMouseMoveHandler(event){
 			drawing();
 		}
 		else {    // out of disc
-				orientationMousePressed=false;	
+			orientationMousePressed=false;	
 		}
 	}
 	return false;
 }
 
 function orientationMouseUpHandler(event){
-	stopEventPropagationAndDefaultAction(event);
-	orientationMousePressed=false;	
-	return false;
-}
-
-function orientationMouseOutHandler(event){
 	stopEventPropagationAndDefaultAction(event);
 	orientationMousePressed=false;	
 	return false;
@@ -117,12 +111,10 @@ function orientationMouseWheelHandler(event){
 	return false;
 }
 
-// listeners for useCapture, acting in bottom down capturing phase
-//  they should return false to stop event propagation ...
 function orientationCanvasAddEventListeners(){
 		orientationCanvas.addEventListener("mousedown",orientationMouseDownHandler,true);
 		orientationCanvas.addEventListener("mouseup",orientationMouseUpHandler,true);
 		orientationCanvas.addEventListener("mousemove",orientationMouseMoveHandler,true);
-		orientationCanvas.addEventListener("mouseout",orientationMouseOutHandler,true);
+		orientationCanvas.addEventListener("mouseout",orientationMouseUpHandler,true);
 		orientationCanvas.addEventListener("wheel",orientationMouseWheelHandler,true);	
 }
