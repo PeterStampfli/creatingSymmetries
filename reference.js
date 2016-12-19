@@ -1,4 +1,40 @@
 "use strict";
+	
+// maximum size of reference image
+var maxReferenceSize=300;
+//  derived dimensions for the reference canvas
+var referenceWidth;
+var referenceHeight;
+//  ratio of input image to reference image
+var scaleInputToReference;
+
+function setupReference(){
+	// set up dimensions of the reference image
+	var inputSize=Math.max(inputWidth,inputHeight);
+	if (inputSize<maxReferenceSize){
+		referenceWidth=inputWidth;
+		referenceHeight=inputHeight;
+	}
+	else {
+		referenceWidth=Math.round(inputWidth*maxReferenceSize/inputSize);
+		referenceHeight=Math.round(inputHeight*maxReferenceSize/inputSize);			
+	}
+	referenceCanvas.width=referenceWidth;
+	referenceCanvas.height=referenceHeight;
+	// put center of readings to image center
+	referenceCenterX=referenceWidth/2;
+	referenceCenterY=referenceHeight/2;
+	// get scale of mapping from input image to the reference image
+	scaleInputToReference=Math.min(referenceWidth/inputWidth,
+										referenceHeight/inputHeight);
+											// prepare the reference image
+	// reference image: draw the entire input image and get the pixels
+	referenceImage.drawImage(inputImage,0,0,inputWidth,inputHeight,
+											  0,0,referenceWidth,referenceHeight);
+	getPixelsFromReferenceCanvas();
+
+}
+
 
 // interaction with the refernce canvas
 

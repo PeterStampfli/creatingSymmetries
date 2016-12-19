@@ -74,5 +74,4 @@ window.onload=function(){
 	updateOutputDimensions(512,512);
 	updatePeriod(256,256);
 	drawing();
-	console.log("333");
 }
