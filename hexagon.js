@@ -1,20 +1,6 @@
 "use strict";
 
 
-// get a output pixel color values for noninteger coordinates
-// in the unit cell
-//  need a good result for all values
-// clamp coordinates at boundary
-//  linear interpolation should be good enough (no magnification of pixels)
-
-// set pixel at targetindex position from (sourceI,sourceJ) with linear interpolation
-
-function setOutputPixel(targetIndex,x,y){
-	//copyPixNearest(x,y,outputPixels,targetIndex,outputPixels,periodWidth,periodHeight);
-	copyPixLinear(x,y,outputData,targetIndex,outputData);
-}
-
-
 // copy a line of pixels on output pixels, source may be at any angle
 function copyPixelSkewed(targetI,targetEndI,targetJ,
 					sourceI,sourceJ,sourceStepI,sourceStepJ){
@@ -35,7 +21,7 @@ function copyPixelSkewedRightToLeft(targetI,targetEndI,targetJ,
 	var target=index(targetI,targetJ);
 	var targetEnd=index(targetEndI,targetJ);        // all pixel components
 	while (target>=targetEnd) {  
-		setOutputPixel(target,sourceI,sourceJ);
+		copyPixLinear(sourceI,sourceJ,outputData,target,outputData);
 		target-=4;
 		sourceI+=sourceStepI;
 		sourceJ+=sourceStepJ;

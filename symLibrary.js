@@ -28,18 +28,31 @@ function getCanvases(){
 
 //  for image downloading, using jpeg image format, default quality=0.92
 //=================================================================
-var imageFilename='theImage.jpg';
 
-function activateImageDownloadButton(){
-	var downloadImageButton=document.getElementById('downloadImageButton');
-	if (downloadImageButton!==null){
-		downloadImageButton.addEventListener('click', function() {
-			//  use correct data format and filename
-			this.href = outputCanvas.toDataURL("image/jpeg");
-			this.download = imageFilename;
+var imageFilename='theImage.jpg';
+var htmlFilename='caleidoscope.html';
+var cssFilename='caleidoscope.css';
+var jsFilename='caleidoscope.js';
+
+function activateDownloadButtons(){
+	function addDownload(button,filename){
+		button.addEventListener('click', function() {
+			this.href = filename;
+			this.download = filename;
 		}, false);
 	}
+	var downloadImageButton=document.getElementById('downloadImageButton');
+	downloadImageButton.addEventListener('click', function() {
+		//  use correct data format and filename
+		this.href = outputCanvas.toDataURL("image/jpeg");  // this needs to be done live at click
+		this.download = imageFilename;
+	}, false);
+	addDownload(document.getElementById('downloadHTMLButton'),htmlFilename);
+	addDownload(document.getElementById('downloadCSSButton'),cssFilename);
+	addDownload(document.getElementById('downloadJSButton'),jsFilename);
 }
+
+
 
 //  switching on and off the hint for the patch
 var hintPatch=false;
@@ -57,8 +70,9 @@ window.onload=function(){
 	outputCanvasAddEventListeners();
 	setupOrientationCanvas(200);
 	orientationCanvasAddEventListeners();
-	activateImageDownloadButton();
+	activateDownloadButtons();
 	updateOutputDimensions(512,512);
 	updatePeriod(256,256);
 	drawing();
+	console.log("333");
 }
