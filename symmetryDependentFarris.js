@@ -6,8 +6,8 @@
 function setPatchDimensions(){
 	patchWidth=periodWidth/2;
 	patchHeight=periodHeight/2;
-	//patchWidth=periodWidth;
-	//patchHeight=periodHeight;
+	patchWidth=periodWidth;
+	patchHeight=periodHeight;
 }
 
 //for debugging: show the basic patch on output as red lines
@@ -49,7 +49,7 @@ function setupMapTables(){
 }
 
 // check if outside pixels are interpolated
-var interpolationOutside=false;
+var interpolationOutside=true;
 // the replacement color for outside pixels
 var outsideRed=0;
 var outsideGreen=0;
@@ -70,8 +70,11 @@ function makeSymmetriesFarris(){
 		drawPixelLine(0,patchWidth-1,j);
 	}
 	// the symmetries inside the unit cell
-	verticalMirror(periodHeight/2);
-	horizontalMirror(periodWidth);
-		//threeFoldRotational();
+	//verticalMirror(periodHeight/2);
+	//horizontalMirror(periodWidth);
+		threeFoldRotational();
+		//sixFoldRotational();
 
 }
+
+// six-fold and threefold rotational symmetries
