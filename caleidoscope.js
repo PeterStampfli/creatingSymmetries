@@ -68,23 +68,28 @@ function cosY(i){
 var inputLoaded=false;
 var inputWidth;
 var inputHeight;
-var imageReader=new FileReader();
-var inputImage = new Image();
+var inputImage;
 
 // get pixel data of input image
 var inputData;
 var inputPixels;
 
 // first load the image data file in a file reader
+var imageReader=new FileReader();
 function startLoadImage(files){
 	imageReader.readAsDataURL(files[0]);
 }
-// then load the new image from the file reader data
-imageReader.onload=function(imageReaderResult){ 
-						inputImage.src=imageReader.result;
-					};
-// then use the image
-inputImage.onload=useNewInputImage;
+
+// connect the inputImage to the file reader and to subsequent processing
+function connectNewInputImage(){
+	inputImage=new Image();
+	 // load the new image from the file reader data
+	imageReader.onload=function(imageReaderResult){ 
+							inputImage.src=imageReader.result;
+						};
+	// then use the image
+	inputImage.onload=useNewInputImage;
+}
 
 function useNewInputImage() {  
 	var offScreenCanvas;
@@ -99,10 +104,17 @@ function useNewInputImage() {
 	offScreenCanvas.height=inputHeight;
 	offScreenCanvasImage=offScreenCanvas.getContext("2d");
 	offScreenCanvasImage.drawImage(inputImage,0,0);	
-	inputData=offScreenCanvasImage.getImageData(0,0,inputWidth,inputHeight);
-	inputPixels=inputData.data;	
 	// set the dimensions of the reference canvas and draw image on it
 	setupReference();
+	// reference image: draw the entire input image and get the pixels
+	referenceImage.drawImage(inputImage,0,0,inputWidth,inputHeight,
+											  0,0,referenceWidth,referenceHeight);
+	// free image for garbage collection
+	connectNewInputImage();
+	referenceData = referenceImage.getImageData(0,0,referenceWidth,referenceHeight);
+	referencePixels = referenceData.data;
+	inputData=offScreenCanvasImage.getImageData(0,0,inputWidth,inputHeight);
+	inputPixels=inputData.data;	
 	drawing();
 }
 
@@ -223,5 +235,164 @@ function setPeriodWidth(data){
 function setPeriodHeight(data){
 	updatePeriod(periodWidth,parseInt(data));
 	drawing();
+}
+
+//  the download buttons
+//=========================================================================
+
+var imageFilename='theImage.jpg';
+var htmlFilename='caleidoscope.html';
+var cssFilename='caleidoscope.css';
+// using a minified js file for the actual html page -> download the unminified js file
+var jsDownloadname='caleidoscope.js';
+var jsFilename='caleidoscope.js';
+
+function activateDownloadButtons(){
+	function addDownload(button,downloadname,filename){
+		button.addEventListener('click', function() {
+			this.href = filename;
+			this.download = filename;
+		}, false);
+	}
+	var downloadImageButton=document.getElementById('downloadImageButton');
+	//  for image downloading, using jpeg image format, default quality=0.92
+	downloadImageButton.addEventListener('click', function() {
+		//  use correct data format and filename
+		this.href = outputCanvas.toDataURL("image/jpeg");  // this needs to be done at the time of the click
+		this.download = imageFilename;
+	}, false);
+	addDownload(document.getElementById('downloadHTMLButton'),htmlFilename,htmlFilename);
+	addDownload(document.getElementById('downloadCSSButton'),cssFilename,cssFilename);
+	addDownload(document.getElementById('downloadJSButton'),jsDownloadname,jsFilename);
+}
+
+//  the canvases and their interaction
+//============================================================================
+var outputCanvas;
+var outputImage;
+var referenceCanvas;
+var referenceImage;
+var orientationCanvas;
+var orientationImage;
+
+// image and pixel data of output canvas, using only one periodic unit cell
+var outputData;
+var outputPixels;
+// image and pixel data of the reference canvas
+var referenceData;
+var referencePixels;
+
+
+function getCanvases(){
+	referenceCanvas=document.getElementById("referenceCanvas");	
+	referenceImage=referenceCanvas.getContext("2d");
+	outputCanvas=document.getElementById("outputCanvas");	
+	outputImage=outputCanvas.getContext("2d");
+	orientationCanvas=document.getElementById("orientationCanvas");	
+	orientationImage=orientationCanvas.getContext("2d");
+}
+
+// the mouse is only on one canvas at a time
+// current mouse data, with respect to the current canvas
+var mousePressed=false;
+var mouseX;
+var mouseY;
+var lastMouseX;
+var lastMouseY;
+
+//  set the mouse position from current event
+function setMousePosition(event,theCanvas){
+	mouseX=event.pageX-theCanvas.offsetLeft;
+	mouseY=event.pageY-theCanvas.offsetTop;
+}
+
+//  set the last mouse position from current mouse position
+function setLastMousePosition(){
+	lastMouseX=mouseX;
+	lastMouseY=mouseY;
+}
+
+// for all canvases: mouse down start interaction and sets last mouse position
+function mouseDownHandler(event,theCanvas){
+	stopEventPropagationAndDefaultAction(event);
+	mousePressed=true;
+	setMousePosition(event,theCanvas);
+	setLastMousePosition();
+}
+
+// for all canvases: mouse up or mouse out stops mouse interaction
+function mouseUpHandler(event){
+	stopEventPropagationAndDefaultAction(event);
+	mousePressed=false;	
+	return false;
+}
+
+// the output canvas interactions
+//=================================================
+
+// control the offset of the output
+var outputOffsetX=0;
+var outputOffsetY=0;
+
+// and change its size
+var changeSize=1.1;
+
+// limit offset the upper left corner of the first fully visible unit cell
+function limitOffset(){
+	if (outputOffsetX<0) {
+		outputOffsetX+=periodWidth;
+	}
+	if (outputOffsetX>=periodWidth) {
+		outputOffsetX-=periodWidth;
+	}
+	if (outputOffsetY<0) {
+		outputOffsetY+=periodHeight;
+	}
+	if (outputOffsetY>=periodHeight) {
+		outputOffsetY-=periodHeight;
+	}
+}
+
+function outputMouseDownHandler(event){
+	mouseDownHandler(event,outputCanvas);
+	return false;
+}
+
+function outputMouseMoveHandler(event){
+	stopEventPropagationAndDefaultAction(event);
+	if (mousePressed){
+		setMousePosition(event,outputCanvas);
+		outputOffsetX+=mouseX-lastMouseX;
+		outputOffsetY+=mouseY-lastMouseY;
+		limitOffset();
+		setLastMousePosition();
+		// we don't need a full redraw
+		putPixelsPeriodicallyOnCanvas();
+		// hint for debugging
+		showHintPatch();
+	}
+	return false;
+}
+
+function outputMouseWheelHandler(event){
+	stopEventPropagationAndDefaultAction(event);
+	var factor=event.deltaY>0?changeSize:1/changeSize;
+	updateOutputDimensions(factor*outputWidth,factor*outputHeight);
+	updatePeriod(factor*periodWidth,factor*periodHeight);
+	outputOffsetX*=factor;
+	outputOffsetY*=factor;
+	limitOffset();
+	drawing();
+	return false;
+}
+
+// listeners for useCapture, acting in bottom down capturing phase
+//  they should return false to stop event propagation ...
+function outputCanvasAddEventListeners(){
+		outputCanvas.addEventListener("mousedown",outputMouseDownHandler,true);
+		outputCanvas.addEventListener("mouseup",mouseUpHandler,true);
+		outputCanvas.addEventListener("mousemove",outputMouseMoveHandler,true);
+		outputCanvas.addEventListener("mouseout",mouseUpHandler,true);
+		outputCanvas.addEventListener("wheel",outputMouseWheelHandler,true);	
 }
 

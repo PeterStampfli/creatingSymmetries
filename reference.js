@@ -27,12 +27,6 @@ function setupReference(){
 	// get scale of mapping from input image to the reference image
 	scaleInputToReference=Math.min(referenceWidth/inputWidth,
 										referenceHeight/inputHeight);
-											// prepare the reference image
-	// reference image: draw the entire input image and get the pixels
-	referenceImage.drawImage(inputImage,0,0,inputWidth,inputHeight,
-											  0,0,referenceWidth,referenceHeight);
-	getPixelsFromReferenceCanvas();
-
 }
 
 
@@ -120,11 +114,6 @@ function referenceCanvasAddEventListeners(){
 //  manipulating the reference image (precision highlighting of sampled pixels)
 //====================================================================
 
-// get pixels from reference canvas
-function getPixelsFromReferenceCanvas(){
-	referenceData = referenceImage.getImageData(0,0,referenceWidth,referenceHeight);
-	referencePixels = referenceData.data;
-}
 
 // put pixels on reference canvas
 function putPixelsOnReferenceCanvas(){
