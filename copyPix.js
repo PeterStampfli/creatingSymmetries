@@ -11,6 +11,7 @@
  * 
  * x,y      are the float coordinates of the pixel to read from inPixels image data
  *          if these coordinates lie outside we read the nearest pixel of the border
+ *          or we get a pixel of fixed color
  */ 
  
 // quality dependent pixel interpolation
@@ -36,8 +37,17 @@ function copyPixNearest(x,y,outputData,outIndex,inputData){
 	var inWidth=inputData.width;
 	var inHeight=inputData.height;
 	//  rounded coordinates
-	var h=Math.max(0,Math.min(inWidth-1,Math.round(x)));
-	var k=Math.max(0,Math.min(inHeight-1,Math.round(y)));
+	h=Math.round(x);
+	k=Math.round(y);
+	//  catch the case that the point is outside and we use there a solid color
+	if (!interpolationOutside&&((h<0)||(k<0)||(h>=inWidth)||(k>=inHeight))){
+		outPixels[outIndex++]=outsideRed;  
+		outPixels[outIndex++]=outsideGreen;  
+		outPixels[outIndex]=outsideBlue;  
+		return;
+	}
+	var h=Math.max(0,Math.min(inWidth-1,h));
+	var k=Math.max(0,Math.min(inHeight-1,k));
 	var inIndex=4*(inWidth*k+h);
 	outPixels[outIndex++]=inPixels[inIndex++];   //red
 	outPixels[outIndex++]=inPixels[inIndex++];   // green
@@ -53,8 +63,15 @@ function copyPixLinear(x,y,outputData,outIndex,inputData){
 	var inHeight=inputData.height;
 	//  coordinates of base pixel
 	var h=Math.floor(x);
-	var dx=x-h;
 	var k=Math.floor(y);
+	//  catch the case that the point is outside and we use there a solid color
+	if (!interpolationOutside&&((h<0)||(k<0)||(h>=inWidth-1)||(k>=inHeight-1))){
+		outPixels[outIndex++]=outsideRed;  
+		outPixels[outIndex++]=outsideGreen;  
+		outPixels[outIndex]=outsideBlue;  
+		return;
+	}
+	var dx=x-h;
 	var dy=y-k;
 	var h0,h1,k0,k1;
 	var i00,i01,i10,i11;
@@ -115,8 +132,15 @@ function copyPixCubic(x,y,outputData,outIndex,inputData){
 	var inHeight=inputData.height;
 	//  coordinates of base pixel
 	var h=Math.floor(x);
-	var dx=x-h;
 	var k=Math.floor(y);
+	//  catch the case that the point is outside and we use there a solid color
+	if (!interpolationOutside&&((h<0)||(k<0)||(h>=inWidth-1)||(k>=inHeight-1))){
+		outPixels[outIndex++]=outsideRed;  
+		outPixels[outIndex++]=outsideGreen;  
+		outPixels[outIndex]=outsideBlue;  
+		return;
+	}
+	var dx=x-h;
 	var dy=y-k;	
 	//  the various vertical positions, getting the correct row numbers of pixels
 	var j0=k;

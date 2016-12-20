@@ -3,12 +3,6 @@
 // collection of small functions used in different places
 //=================================================================
 
-// override default mouse actions, especially important for the mouse wheel
-function stopEventPropagationAndDefaultAction(event) {
-	event.stopPropagation();
-	event.preventDefault();   
-}
-
 // return a (smaller) multiple of four of any integer
 function makeMultipleOf4(i){
 	return i-i%4;
@@ -282,7 +276,6 @@ var outputPixels;
 var referenceData;
 var referencePixels;
 
-
 function getCanvases(){
 	referenceCanvas=document.getElementById("referenceCanvas");	
 	referenceImage=referenceCanvas.getContext("2d");
@@ -290,6 +283,12 @@ function getCanvases(){
 	outputImage=outputCanvas.getContext("2d");
 	orientationCanvas=document.getElementById("orientationCanvas");	
 	orientationImage=orientationCanvas.getContext("2d");
+}
+
+// override default mouse actions, especially important for the mouse wheel
+function stopEventPropagationAndDefaultAction(event) {
+	event.stopPropagation();
+	event.preventDefault();   
 }
 
 // the mouse is only on one canvas at a time
@@ -396,3 +395,198 @@ function outputCanvasAddEventListeners(){
 		outputCanvas.addEventListener("wheel",outputMouseWheelHandler,true);	
 }
 
+// the reference canvas interactions
+//==========================================================================
+// maximum size of reference image
+var referenceSize=300;
+//  derived dimensions for the reference canvas
+var referenceWidth;
+var referenceHeight;
+//  ratio of input image to reference image
+var scaleInputToReference;
+//  center for sampling on reference canvas
+var referenceCenterX;
+var referenceCenterY;
+
+// the wheel changes the scale: map to input image pixels, a larger scale zooms out
+var scaleOutputToInput=1;
+var changeScaleFactor=1.1;
+
+function setupReference(){
+	// set up dimensions of the reference image
+	// the reference canvas has the same width/height ratio as the input image
+	//   the larger dimension is equal to the referenceSize
+	var inputSize=Math.max(inputWidth,inputHeight);
+	if (inputWidth>inputHeight){
+		referenceWidth=referenceSize;
+		referenceHeight=Math.round(referenceWidth*inputHeight/inputWidth);
+	}
+	else {
+		referenceHeight=referenceSize;
+		referenceWidth=Math.round(referenceHeight*inputWidth/inputHeight);
+	}
+	referenceCanvas.width=referenceWidth;
+	referenceCanvas.height=referenceHeight;
+	// put center of readings to image center
+	referenceCenterX=referenceWidth/2;
+	referenceCenterY=referenceHeight/2;
+	// get scale of mapping from input image to the reference image
+	scaleInputToReference=referenceWidth/inputWidth;
+}
+
+// put pixels on reference canvas
+function putPixelsOnReferenceCanvas(){
+	referenceImage.putImageData(referenceData, 0, 0);
+}
+
+// fade-out all pixels by setting alpha
+function setAlphaReferenceImagePixels(alpha){
+	var theEnd=referencePixels.length;
+	for (var i=3;i<theEnd;i+=4){
+		referencePixels[i]=alpha;
+	}
+}
+
+function referenceMouseDownHandler(event){
+	mouseDownHandler(event,referenceCanvas);
+	return false;
+}
+
+function referenceMouseMoveHandler(event){
+	stopEventPropagationAndDefaultAction(event);
+	if (mousePressed){
+		setMousePosition(event,referenceCanvas);
+		referenceCenterX+=mouseX-lastMouseX;
+		referenceCenterX=Math.max(0,Math.min(referenceCenterX,referenceWidth));
+		referenceCenterY+=mouseY-lastMouseY;
+		referenceCenterY=Math.max(0,Math.min(referenceCenterY,referenceHeight));
+		setLastMousePosition();
+		drawing();
+	}
+	return false;
+}
+
+//  change the scaling with the mouse wheel
+function referenceMouseWheelHandler(event){
+	stopEventPropagationAndDefaultAction(event);
+	if (event.deltaY>0){
+		scaleOutputToInput*=changeScaleFactor;
+	}
+	else {
+		scaleOutputToInput/=changeScaleFactor;
+	}
+	drawing();
+	return false;
+}
+
+function referenceCanvasAddEventListeners(){
+		referenceCanvas.addEventListener("mousedown",referenceMouseDownHandler,true);
+		referenceCanvas.addEventListener("mouseup",mouseUpHandler,true);
+		referenceCanvas.addEventListener("mousemove",referenceMouseMoveHandler,true);
+		referenceCanvas.addEventListener("mouseout",mouseUpHandler,true);
+		referenceCanvas.addEventListener("wheel",referenceMouseWheelHandler,true);	
+}
+
+// orientation canvas and its interactions
+//=========================================================
+//  orientation canvas is square and gives the orientation angle of sampling
+var orientationSize;
+var angle;
+var cosAngle;
+var sinAngle;
+
+var changeAngle=0.05;
+var mouseAngle=0;
+var lastMouseAngle=0;
+
+function setAngle(newAngle){
+	angle=newAngle;
+	cosAngle=Math.cos(angle);
+	sinAngle=Math.sin(angle);
+}
+
+// setup the orientation canvas dimensions and transformation matrix
+//  zero is at center und unit is radius (half the size)
+function setupOrientationCanvas(size){
+	orientationSize=size;
+	orientationCanvas.width=size;
+	orientationCanvas.height=size;
+	orientationImage.scale(orientationSize/2-1,orientationSize/2-1);
+	orientationImage.translate(1,1);
+	setAngle(0);
+	drawOrientation();
+}
+
+// we use transformed coordinates
+function drawOrientation(){
+	var arrowWidth=0.2;
+	orientationImage.fillStyle="White";	
+	orientationImage.beginPath();
+	orientationImage.arc(0,0,1,0,2*Math.PI,1);	
+	orientationImage.fill();
+	orientationImage.fillStyle="Brown";	
+	orientationImage.beginPath();
+	orientationImage.moveTo(cosAngle,sinAngle);
+	orientationImage.lineTo(arrowWidth*sinAngle,-arrowWidth*cosAngle);
+	orientationImage.lineTo(-arrowWidth*cosAngle,-arrowWidth*sinAngle);
+	orientationImage.lineTo(-arrowWidth*sinAngle,arrowWidth*cosAngle);
+	orientationImage.fill();
+}
+
+function isMouseOnDisc(){
+	var radius=orientationSize/2-1;
+	return ((mouseX-radius)*(mouseX-radius)+(mouseY-radius)*(mouseY-radius))<radius*radius;
+}
+
+
+function orientationMouseDownHandler(event){
+	//stopEventPropagationAndDefaultAction(event);
+	setMousePosition(event,orientationCanvas);
+	if (isMouseOnDisc()){
+		mousePressed=true;
+		lastMouseAngle=Math.atan2(mouseY-orientationSize/2,mouseX-orientationSize/2);;
+	}
+	return false;
+}
+
+function orientationMouseMoveHandler(event){
+	//stopEventPropagationAndDefaultAction(event);
+	setMousePosition(event,orientationCanvas);
+	if (mousePressed){
+		if (isMouseOnDisc()){
+			mouseAngle=Math.atan2(mouseY-orientationSize/2,mouseX-orientationSize/2);
+			setAngle(angle+mouseAngle-lastMouseAngle);
+			lastMouseAngle=mouseAngle;
+			drawOrientation();
+			drawing();
+		}
+		else {    // out of disc
+			mousePressed=false;	
+		}
+	}
+	return false;
+}
+
+function orientationMouseWheelHandler(event){
+	setMousePosition(event,orientationCanvas);
+	if (isMouseOnDisc()){
+		stopEventPropagationAndDefaultAction(event);
+		if (event.deltaY>0){
+			setAngle(angle+changeAngle);
+		}
+		else {
+			setAngle(angle-changeAngle);
+		}
+		drawOrientation();
+		drawing();
+	}
+	return false;
+}
+
+function orientationCanvasAddEventListeners(){
+		orientationCanvas.addEventListener("mousedown",orientationMouseDownHandler,true);
+		orientationCanvas.addEventListener("mouseup",mouseUpHandler,true);
+		orientationCanvas.addEventListener("mousemove",orientationMouseMoveHandler,true);
+		orientationCanvas.addEventListener("mouseout",mouseUpHandler,true);
+		orientationCanvas.addEventListener("wheel",orientationMouseWheelHandler,true);	
+}

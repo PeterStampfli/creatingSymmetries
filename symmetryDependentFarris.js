@@ -6,8 +6,8 @@
 function setPatchDimensions(){
 	patchWidth=periodWidth/2;
 	patchHeight=periodHeight/2;
-	patchWidth=periodWidth;
-	patchHeight=periodHeight;
+	//patchWidth=periodWidth;
+	//patchHeight=periodHeight;
 }
 
 //for debugging: show the basic patch on output as red lines
@@ -34,13 +34,12 @@ function trivialMapTable(){
 	var locPatchHeight=patchHeight;
 	var locPatchWidth2=patchWidth/2;
 	var locPatchHeight2=patchHeight/2;
-	var patchScale=initialInputPatchWidth/locPatchWidth;
 	var index=0;
 	var i,j;
 	for (j=0;j<locPatchHeight;j++){
 		for (i=0;i<locPatchWidth;i++){
-			mapXTab[index]=(i-locPatchWidth2)*patchScale;
-			mapYTab[index++]=(j-locPatchHeight2)*patchScale;		
+			mapXTab[index]=i-locPatchWidth2;
+			mapYTab[index++]=j-locPatchHeight2;		
 		}
 	}	
 }
@@ -48,6 +47,13 @@ function trivialMapTable(){
 function setupMapTables(){
 	trivialMapTable();
 }
+
+// check if outside pixels are interpolated
+var interpolationOutside=false;
+// the replacement color for outside pixels
+var outsideRed=0;
+var outsideGreen=0;
+var outsideBlue=200;
 
 // presetting special symmetries, fixing the height to width ratio of the unit cell
 function setSymmetries(){
@@ -64,8 +70,8 @@ function makeSymmetriesFarris(){
 		drawPixelLine(0,patchWidth-1,j);
 	}
 	// the symmetries inside the unit cell
-	//verticalMirror(periodHeight/2);
-	//horizontalMirror(periodWidth);
-		threeFoldRotational();
+	verticalMirror(periodHeight/2);
+	horizontalMirror(periodWidth);
+		//threeFoldRotational();
 
 }
