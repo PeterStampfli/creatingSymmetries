@@ -536,100 +536,97 @@ var angle;
 var cosAngle;
 var sinAngle;
 
-var changeAngle=0.05;
-var mouseAngle=0;
-var lastMouseAngle=0;
+var changeAngle = 0.05;
+var mouseAngle = 0;
+var lastMouseAngle = 0;
 
-function setAngle(newAngle){
-	angle=newAngle;
-	cosAngle=Math.cos(angle);
-	sinAngle=Math.sin(angle);
+function setAngle(newAngle) {
+    angle = newAngle;
+    cosAngle = Math.cos(angle);
+    sinAngle = Math.sin(angle);
 }
 
 // setup the orientation canvas dimensions and transformation matrix
 //  zero is at center und unit is radius (half the size)
-function setupOrientationCanvas(size){
-	orientationSize=size;
-	orientationCanvas.width=size;
-	orientationCanvas.height=size;
-	orientationImage.scale(orientationSize/2-1,orientationSize/2-1);
-	orientationImage.translate(1,1);
-	setAngle(0);
-	drawOrientation();
+function setupOrientationCanvas(size) {
+    orientationSize = size;
+    orientationCanvas.width = size;
+    orientationCanvas.height = size;
+    orientationImage.scale(orientationSize / 2 - 1, orientationSize / 2 - 1);
+    orientationImage.translate(1, 1);
+    setAngle(0);
+    drawOrientation();
 }
 
 // we use transformed coordinates
-function drawOrientation(){
-	var arrowWidth=0.2;
-	orientationImage.fillStyle="White";	
-	orientationImage.beginPath();
-	orientationImage.arc(0,0,1,0,2*Math.PI,1);	
-	orientationImage.fill();
-	orientationImage.fillStyle="Brown";	
-	orientationImage.beginPath();
-	orientationImage.moveTo(cosAngle,sinAngle);
-	orientationImage.lineTo(arrowWidth*sinAngle,-arrowWidth*cosAngle);
-	orientationImage.lineTo(-arrowWidth*cosAngle,-arrowWidth*sinAngle);
-	orientationImage.lineTo(-arrowWidth*sinAngle,arrowWidth*cosAngle);
-	orientationImage.fill();
+function drawOrientation() {
+    var arrowWidth = 0.2;
+    orientationImage.fillStyle = "White";
+    orientationImage.beginPath();
+    orientationImage.arc(0, 0, 1, 0, 2 * Math.PI, 1);
+    orientationImage.fill();
+    orientationImage.fillStyle = "Brown";
+    orientationImage.beginPath();
+    orientationImage.moveTo(cosAngle, sinAngle);
+    orientationImage.lineTo(arrowWidth * sinAngle, -arrowWidth * cosAngle);
+    orientationImage.lineTo(-arrowWidth * cosAngle, -arrowWidth * sinAngle);
+    orientationImage.lineTo(-arrowWidth * sinAngle, arrowWidth * cosAngle);
+    orientationImage.fill();
 }
 
-function isMouseOnDisc(){
-	var radius=orientationSize/2-1;
-	return ((mouseX-radius)*(mouseX-radius)+(mouseY-radius)*(mouseY-radius))<radius*radius;
+function isMouseOnDisc() {
+    var radius = orientationSize / 2 - 1;
+    return ((mouseX - radius) * (mouseX - radius) + (mouseY - radius) * (mouseY - radius)) < radius * radius;
 }
 
-
-function orientationMouseDownHandler(event){
-	//stopEventPropagationAndDefaultAction(event);
-	setMousePosition(event,orientationCanvas);
-	if (isMouseOnDisc()){
-		mousePressed=true;
-		lastMouseAngle=Math.atan2(mouseY-orientationSize/2,mouseX-orientationSize/2);;
-	}
-	return false;
+function orientationMouseDownHandler(event) {
+    //stopEventPropagationAndDefaultAction(event);
+    setMousePosition(event, orientationCanvas);
+    if (isMouseOnDisc()) {
+        mousePressed = true;
+        lastMouseAngle = Math.atan2(mouseY - orientationSize / 2, mouseX - orientationSize / 2);;
+    }
+    return false;
 }
 
-function orientationMouseMoveHandler(event){
-	//stopEventPropagationAndDefaultAction(event);
-	setMousePosition(event,orientationCanvas);
-	if (mousePressed){
-		if (isMouseOnDisc()){
-			mouseAngle=Math.atan2(mouseY-orientationSize/2,mouseX-orientationSize/2);
-			setAngle(angle+mouseAngle-lastMouseAngle);
-			lastMouseAngle=mouseAngle;
-			drawOrientation();
-			drawing();
-		}
-		else {    // out of disc
-			mousePressed=false;	
-		}
-	}
-	return false;
+function orientationMouseMoveHandler(event) {
+    //stopEventPropagationAndDefaultAction(event);
+    setMousePosition(event, orientationCanvas);
+    if (mousePressed) {
+        if (isMouseOnDisc()) {
+            mouseAngle = Math.atan2(mouseY - orientationSize / 2, mouseX - orientationSize / 2);
+            setAngle(angle + mouseAngle - lastMouseAngle);
+            lastMouseAngle = mouseAngle;
+            drawOrientation();
+            drawing();
+        } else { // out of disc
+            mousePressed = false;
+        }
+    }
+    return false;
 }
 
-function orientationMouseWheelHandler(event){
-	setMousePosition(event,orientationCanvas);
-	if (isMouseOnDisc()){
-		stopEventPropagationAndDefaultAction(event);
-		if (event.deltaY>0){
-			setAngle(angle+changeAngle);
-		}
-		else {
-			setAngle(angle-changeAngle);
-		}
-		drawOrientation();
-		drawing();
-	}
-	return false;
+function orientationMouseWheelHandler(event) {
+    setMousePosition(event, orientationCanvas);
+    if (isMouseOnDisc()) {
+        stopEventPropagationAndDefaultAction(event);
+        if (event.deltaY > 0) {
+            setAngle(angle + changeAngle);
+        } else {
+            setAngle(angle - changeAngle);
+        }
+        drawOrientation();
+        drawing();
+    }
+    return false;
 }
 
-function orientationCanvasAddEventListeners(){
-		orientationCanvas.addEventListener("mousedown",orientationMouseDownHandler,true);
-		orientationCanvas.addEventListener("mouseup",mouseUpHandler,true);
-		orientationCanvas.addEventListener("mousemove",orientationMouseMoveHandler,true);
-		orientationCanvas.addEventListener("mouseout",mouseUpHandler,true);
-		orientationCanvas.addEventListener("wheel",orientationMouseWheelHandler,true);	
+function orientationCanvasAddEventListeners() {
+    orientationCanvas.addEventListener("mousedown", orientationMouseDownHandler, true);
+    orientationCanvas.addEventListener("mouseup", mouseUpHandler, true);
+    orientationCanvas.addEventListener("mousemove", orientationMouseMoveHandler, true);
+    orientationCanvas.addEventListener("mouseout", mouseUpHandler, true);
+    orientationCanvas.addEventListener("wheel", orientationMouseWheelHandler, true);
 }
 
 /*   ppp    iii    x    x   
@@ -643,39 +640,38 @@ function orientationCanvasAddEventListeners(){
 //  outputData contains exactly one periodic cell
 //  the images are offset by outputOffsetX and outputOffsetY
 //  note that putImageData has different API than drawImage
-function putPixelsPeriodicallyOnCanvas(){
-	var copyWidth;
-	var copyHeight;
-	var targetX;
-	var targetY;
-	var sourceX;
-	var sourceY;
-	for (var cornerY=outputOffsetY-periodHeight;cornerY<outputHeight;cornerY+=periodHeight){
-		if (cornerY<0){
-			sourceY=-cornerY;
-			targetY=cornerY;            // strange, actually difference between source corner and intended
-			copyHeight=outputOffsetY;
-		}
-		else {
-			sourceY=0;
-			targetY=cornerY;
-			copyHeight=Math.min(outputHeight-cornerY,periodHeight);
-		}
-		for (var cornerX=outputOffsetX-periodWidth;cornerX<outputWidth;cornerX+=periodWidth){
-			if (cornerX<0){
-				sourceX=-cornerX;
-				targetX=cornerX;
-				copyWidth=outputOffsetX;			
-			}
-			else {			
-				sourceX=0;
-				targetX=cornerX;
-				copyWidth=Math.min(outputWidth-cornerX,periodWidth);
-			}
-			outputImage.putImageData(outputData, 
-			                         targetX, targetY,sourceX,sourceY,copyWidth,copyHeight);
-		}
-	}
+
+function putPixelsPeriodicallyOnCanvas() {
+    var copyWidth;
+    var copyHeight;
+    var targetX;
+    var targetY;
+    var sourceX;
+    var sourceY;
+    for (var cornerY = outputOffsetY - periodHeight; cornerY < outputHeight; cornerY += periodHeight) {
+        if (cornerY < 0) {
+            sourceY = -cornerY;
+            targetY = cornerY; // strange, actually difference between source corner and intended
+            copyHeight = outputOffsetY;
+        } else {
+            sourceY = 0;
+            targetY = cornerY;
+            copyHeight = Math.min(outputHeight - cornerY, periodHeight);
+        }
+        for (var cornerX = outputOffsetX - periodWidth; cornerX < outputWidth; cornerX += periodWidth) {
+            if (cornerX < 0) {
+                sourceX = -cornerX;
+                targetX = cornerX;
+                copyWidth = outputOffsetX;
+            } else {
+                sourceX = 0;
+                targetX = cornerX;
+                copyWidth = Math.min(outputWidth - cornerX, periodWidth);
+            }
+            outputImage.putImageData(outputData,
+                targetX, targetY, sourceX, sourceY, copyWidth, copyHeight);
+        }
+    }
 }
 
 /* functions for copying pixels from inData to outData image data object
@@ -693,235 +689,232 @@ function putPixelsPeriodicallyOnCanvas(){
  */ 
  
 // quality dependent pixel interpolation
-var copyInterpolation=copyPixNearest;
+var copyInterpolation = copyPixNearest;
 
-function setInterpolation(string){
-	switch (string){
-		case "nearest": copyInterpolation=copyPixNearest;
-				   break;
-		case "linear": copyInterpolation=copyPixLinear;
-				   break;
-		case "cubic": copyInterpolation=copyPixCubic;
-				   break;		
-	}	
-	drawing();
+function setInterpolation(string) {
+    switch (string) {
+    case "nearest":
+        copyInterpolation = copyPixNearest;
+        break;
+    case "linear":
+        copyInterpolation = copyPixLinear;
+        break;
+    case "cubic":
+        copyInterpolation = copyPixCubic;
+        break;
+    }
+    drawing();
 }
 
 // nearest neighbor
-function copyPixNearest(x,y,outData,outIndex,inData){
-	// local variables for fast access
-	var outPixels=outData.data;
-	var inPixels=inData.data;
-	var inWidth=inData.width;
-	var inHeight=inData.height;
-	//  catch the case that the point is outside, we use there a solid color
-	// with a small safety margin
-	if ((x<-1)||(y<-1)||(x>inWidth)||(y>inHeight)){
-		outPixels[outIndex++]=outsideRed;  
-		outPixels[outIndex++]=outsideGreen;  
-		outPixels[outIndex]=outsideBlue;  
-		return;
-	}
-	//  rounded coordinates
-	h=Math.round(x);
-	k=Math.round(y);
-	var h=Math.max(0,Math.min(inWidth-1,h));
-	var k=Math.max(0,Math.min(inHeight-1,k));
-	var inIndex=4*(inWidth*k+h);
-	outPixels[outIndex++]=inPixels[inIndex++];   //red
-	outPixels[outIndex++]=inPixels[inIndex++];   // green
-	outPixels[outIndex]=inPixels[inIndex];       // blue, no alpha
+function copyPixNearest(x, y, outData, outIndex, inData) {
+    // local variables for fast access
+    var outPixels = outData.data;
+    var inPixels = inData.data;
+    var inWidth = inData.width;
+    var inHeight = inData.height;
+    //  catch the case that the point is outside, we use there a solid color
+    // with a small safety margin
+    if ((x < -1) || (y < -1) || (x > inWidth) || (y > inHeight)) {
+        outPixels[outIndex++] = outsideRed;
+        outPixels[outIndex++] = outsideGreen;
+        outPixels[outIndex] = outsideBlue;
+        return;
+    }
+    //  rounded coordinates
+    h = Math.round(x);
+    k = Math.round(y);
+    var h = Math.max(0, Math.min(inWidth - 1, h));
+    var k = Math.max(0, Math.min(inHeight - 1, k));
+    var inIndex = 4 * (inWidth * k + h);
+    outPixels[outIndex++] = inPixels[inIndex++]; //red
+    outPixels[outIndex++] = inPixels[inIndex++]; // green
+    outPixels[outIndex] = inPixels[inIndex]; // blue, no alpha
 }
 
 //  linear interpolation
-function copyPixLinear(x,y,outData,outIndex,inData){
-	// local variables for fast access
-	var outPixels=outData.data;
-	var inPixels=inData.data;
-	var inWidth=inData.width;
-	var inHeight=inData.height;
-	//  catch the case that the point is outside, we use there a solid color
-	// with a small safety margin
-	if ((x<-1)||(y<-1)||(x>inWidth)||(y>inHeight)){
-		outPixels[outIndex++]=outsideRed;  
-		outPixels[outIndex++]=outsideGreen;  
-		outPixels[outIndex]=outsideBlue;  
-		return;
-	}
-	//  coordinates of base pixel
-	var h=Math.floor(x);
-	var k=Math.floor(y);
-	var dx=x-h;
-	var dy=y-k;
-	var h0,h1,k0,k1;
-	var i00,i01,i10,i11;
-	var f00,f01,f10,f11;	
-	if (k<0){   // out of the bottom
-		k0=0;
-		k1=0;
-	}
-	else if (k>=inHeight-1){   // out of top
-		k0=4*inWidth*(inHeight-1);
-		k1=k0;
-	}
-	else {
-		k0=4*inWidth*k;
-		k1=k0+4*inWidth;
-	}
-	if (h<0){	// out left
-		h0=0;
-		h1=0;
-	}
-	else if (h>=inWidth-1){    // out right
-		h0=4*(inWidth-1);
-		h1=h0;
-	}
-	else {
-		h0=4*h;
-		h1=h0+4;
-	}
-	i00=h0+k0;
-	i01=h0+k1;
-	i10=h1+k0;
-	i11=h1+k1;
-	// now all index points are inside
-	// same calculation for all cases
-	f00=(1-dx)*(1-dy);
-	f01=(1-dx)*dy;
-	f10=dx*(1-dy);
-	f11=dy*dx;
-	outPixels[outIndex++]=Math.round(f00*inPixels[i00++]+f10*inPixels[i10++]+f01*inPixels[i01++]+f11*inPixels[i11++]);
-	outPixels[outIndex++]=Math.round(f00*inPixels[i00++]+f10*inPixels[i10++]+f01*inPixels[i01++]+f11*inPixels[i11++]);
-	outPixels[outIndex]=Math.round(f00*inPixels[i00]+f10*inPixels[i10]+f01*inPixels[i01]+f11*inPixels[i11]);		
+function copyPixLinear(x, y, outData, outIndex, inData) {
+    // local variables for fast access
+    var outPixels = outData.data;
+    var inPixels = inData.data;
+    var inWidth = inData.width;
+    var inHeight = inData.height;
+    //  catch the case that the point is outside, we use there a solid color
+    // with a small safety margin
+    if ((x < -1) || (y < -1) || (x > inWidth) || (y > inHeight)) {
+        outPixels[outIndex++] = outsideRed;
+        outPixels[outIndex++] = outsideGreen;
+        outPixels[outIndex] = outsideBlue;
+        return;
+    }
+    //  coordinates of base pixel
+    var h = Math.floor(x);
+    var k = Math.floor(y);
+    var dx = x - h;
+    var dy = y - k;
+    var h0, h1, k0, k1;
+    var i00, i01, i10, i11;
+    var f00, f01, f10, f11;
+    if (k < 0) { // out of the bottom
+        k0 = 0;
+        k1 = 0;
+    } else if (k >= inHeight - 1) { // out of top
+        k0 = 4 * inWidth * (inHeight - 1);
+        k1 = k0;
+    } else {
+        k0 = 4 * inWidth * k;
+        k1 = k0 + 4 * inWidth;
+    }
+    if (h < 0) { // out left
+        h0 = 0;
+        h1 = 0;
+    } else if (h >= inWidth - 1) { // out right
+        h0 = 4 * (inWidth - 1);
+        h1 = h0;
+    } else {
+        h0 = 4 * h;
+        h1 = h0 + 4;
+    }
+    i00 = h0 + k0;
+    i01 = h0 + k1;
+    i10 = h1 + k0;
+    i11 = h1 + k1;
+    // now all index points are inside
+    // same calculation for all cases
+    f00 = (1 - dx) * (1 - dy);
+    f01 = (1 - dx) * dy;
+    f10 = dx * (1 - dy);
+    f11 = dy * dx;
+    outPixels[outIndex++] = Math.round(f00 * inPixels[i00++] + f10 * inPixels[i10++] + f01 * inPixels[i01++] + f11 * inPixels[i11++]);
+    outPixels[outIndex++] = Math.round(f00 * inPixels[i00++] + f10 * inPixels[i10++] + f01 * inPixels[i01++] + f11 * inPixels[i11++]);
+    outPixels[outIndex] = Math.round(f00 * inPixels[i00] + f10 * inPixels[i10] + f01 * inPixels[i01] + f11 * inPixels[i11]);
 }
 
 //  the kernel function for cubic interpolation
-function mitchellNetrovalli(x){   // Mitchell-Netrovali, B=C=0.333333, 0<x<2
-	if (x<1){
-		return (1.16666*x-2)*x*x+0.888888;
-	}
-	return ((2-0.388888*x)*x-3.33333)*x+1.777777;				
+function mitchellNetrovalli(x) { // Mitchell-Netrovali, B=C=0.333333, 0<x<2
+    if (x < 1) {
+        return (1.16666 * x - 2) * x * x + 0.888888;
+    }
+    return ((2 - 0.388888 * x) * x - 3.33333) * x + 1.777777;
 }
 
 //  cubic interpolation
-function copyPixCubic(x,y,outData,outIndex,inData){	
-	// local variables for fast access
-	var outPixels=outData.data;
-	var inPixels=inData.data;
-	var inWidth=inData.width;
-	var inHeight=inData.height;
-	//  catch the case that the point is outside, we use there a solid color
-	// with a small safety margin
-	if ((x<-1)||(y<-1)||(x>inWidth)||(y>inHeight)){
-		outPixels[outIndex++]=outsideRed;  
-		outPixels[outIndex++]=outsideGreen;  
-		outPixels[outIndex]=outsideBlue;  
-		return;
-	}
-	//  coordinates of base pixel
-	var h=Math.floor(x);
-	var k=Math.floor(y);
-	var dx=x-h;
-	var dy=y-k;	
-	//  the various vertical positions, getting the correct row numbers of pixels
-	var j0=k;
-	var jm=j0-1;
-	var j1=j0+1;
-	var j2=j0+2;
-	// too low
-	if (jm<0){
-		jm=0;
-		j0=0;
-		j1=Math.max(0,j1);
-		j2=Math.max(0,j2);
-	}
-	else if (j2>=inHeight){   // to high
-		j2=inHeight-1;
-		j1=inHeight-1;
-		j0=Math.min(j1,inHeight-1);
-		jm=Math.min(j1,inHeight-1);
-	}
-	//  transforming pixelrow numbers to indices of the input image data
-	jm*=4*inWidth;
-	j0*=4*inWidth;
-	j1*=4*inWidth;
-	j2*=4*inWidth;
-	// the various horizontal positions (column numbers of pixels)
-	var i0=h;
-	var im=i0-1;
-	var i1=i0+1;
-	var i2=i0+2;
-	// too low
-	if (im<0){
-		im=0;
-		i0=0;
-		i1=Math.max(0,i1);
-		i2=Math.max(0,i2);
-	}
-	else if (i2>=inWidth) {    // too high
-		i2=inWidth-1;
-		i1=inWidth-1;
-		i0=Math.min(i0,inWidth-1);
-		im=Math.min(im,inWidth-1);
-	}
-	//  transforming column numbers to indices to input image data
-	im*=4;
-	i0*=4;
-	i1*=4;
-	i2*=4;
-	// combined indices, for different heights at same x-position
-	var indexM,index0,index1,index2;
-	// the factorized weight function
-	var kernel=mitchellNetrovalli;
-	// y (vertical position) dependent values
-	var kym=kernel(1+dy);
-	var ky0=kernel(dy);
-	var ky1=kernel(1-dy);
-	var ky2=kernel(2-dy);
-	// x (horizontal position) dependent values, sweeping in x-direction
-	var kx;
-	// color summation in parts
-	var red,green,blue;
-	// the first column
-	indexM=jm+im;
-	index0=j0+im;
-	index1=j1+im;
-	index2=j2+im;
-	kx=kernel(1+dx);
-	red=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
-	green=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
-	blue=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
-	// the second column, just at the left of (x,y)
-	indexM=jm+i0;
-	index0=j0+i0;
-	index1=j1+i0;
-	index2=j2+i0;
-	kx=kernel(dx);
-	red+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
-	green+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
-	blue+=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
-	//  the third column, just at the right of (x,y)
-	indexM=jm+i1;
-	index0=j0+i1;
-	index1=j1+i1;
-	index2=j2+i1;
-	kx=kernel(1-dx);
-	red+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
-	green+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
-	blue+=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
-	// the forth column
-	indexM=jm+i2;
-	index0=j0+i2;
-	index1=j1+i2;
-	index2=j2+i2;
-	kx=kernel(2-dx);
-	red+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
-	green+=kx*(kym*inPixels[indexM++]+ky0*inPixels[index0++]+ky1*inPixels[index1++]+ky2*inPixels[index2++]);
-	blue+=kx*(kym*inPixels[indexM]+ky0*inPixels[index0]+ky1*inPixels[index1]+ky2*inPixels[index2]);
-	// beware of negative values
-	outPixels[outIndex++]=Math.max(0,Math.round(red));
-	outPixels[outIndex++]=Math.max(0,Math.round(green));
-	outPixels[outIndex]=Math.max(0,Math.round(blue));
+function copyPixCubic(x, y, outData, outIndex, inData) {
+    // local variables for fast access
+    var outPixels = outData.data;
+    var inPixels = inData.data;
+    var inWidth = inData.width;
+    var inHeight = inData.height;
+    //  catch the case that the point is outside, we use there a solid color
+    // with a small safety margin
+    if ((x < -1) || (y < -1) || (x > inWidth) || (y > inHeight)) {
+        outPixels[outIndex++] = outsideRed;
+        outPixels[outIndex++] = outsideGreen;
+        outPixels[outIndex] = outsideBlue;
+        return;
+    }
+    //  coordinates of base pixel
+    var h = Math.floor(x);
+    var k = Math.floor(y);
+    var dx = x - h;
+    var dy = y - k;
+    //  the various vertical positions, getting the correct row numbers of pixels
+    var j0 = k;
+    var jm = j0 - 1;
+    var j1 = j0 + 1;
+    var j2 = j0 + 2;
+    // too low
+    if (jm < 0) {
+        jm = 0;
+        j0 = 0;
+        j1 = Math.max(0, j1);
+        j2 = Math.max(0, j2);
+    } else if (j2 >= inHeight) { // to high
+        j2 = inHeight - 1;
+        j1 = inHeight - 1;
+        j0 = Math.min(j1, inHeight - 1);
+        jm = Math.min(j1, inHeight - 1);
+    }
+    //  transforming pixelrow numbers to indices of the input image data
+    jm *= 4 * inWidth;
+    j0 *= 4 * inWidth;
+    j1 *= 4 * inWidth;
+    j2 *= 4 * inWidth;
+    // the various horizontal positions (column numbers of pixels)
+    var i0 = h;
+    var im = i0 - 1;
+    var i1 = i0 + 1;
+    var i2 = i0 + 2;
+    // too low
+    if (im < 0) {
+        im = 0;
+        i0 = 0;
+        i1 = Math.max(0, i1);
+        i2 = Math.max(0, i2);
+    } else if (i2 >= inWidth) { // too high
+        i2 = inWidth - 1;
+        i1 = inWidth - 1;
+        i0 = Math.min(i0, inWidth - 1);
+        im = Math.min(im, inWidth - 1);
+    }
+    //  transforming column numbers to indices to input image data
+    im *= 4;
+    i0 *= 4;
+    i1 *= 4;
+    i2 *= 4;
+    // combined indices, for different heights at same x-position
+    var indexM, index0, index1, index2;
+    // the factorized weight function
+    var kernel = mitchellNetrovalli;
+    // y (vertical position) dependent values
+    var kym = kernel(1 + dy);
+    var ky0 = kernel(dy);
+    var ky1 = kernel(1 - dy);
+    var ky2 = kernel(2 - dy);
+    // x (horizontal position) dependent values, sweeping in x-direction
+    var kx;
+    // color summation in parts
+    var red, green, blue;
+    // the first column
+    indexM = jm + im;
+    index0 = j0 + im;
+    index1 = j1 + im;
+    index2 = j2 + im;
+    kx = kernel(1 + dx);
+    red = kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    green = kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    blue = kx * (kym * inPixels[indexM] + ky0 * inPixels[index0] + ky1 * inPixels[index1] + ky2 * inPixels[index2]);
+    // the second column, just at the left of (x,y)
+    indexM = jm + i0;
+    index0 = j0 + i0;
+    index1 = j1 + i0;
+    index2 = j2 + i0;
+    kx = kernel(dx);
+    red += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    green += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    blue += kx * (kym * inPixels[indexM] + ky0 * inPixels[index0] + ky1 * inPixels[index1] + ky2 * inPixels[index2]);
+    //  the third column, just at the right of (x,y)
+    indexM = jm + i1;
+    index0 = j0 + i1;
+    index1 = j1 + i1;
+    index2 = j2 + i1;
+    kx = kernel(1 - dx);
+    red += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    green += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    blue += kx * (kym * inPixels[indexM] + ky0 * inPixels[index0] + ky1 * inPixels[index1] + ky2 * inPixels[index2]);
+    // the forth column
+    indexM = jm + i2;
+    index0 = j0 + i2;
+    index1 = j1 + i2;
+    index2 = j2 + i2;
+    kx = kernel(2 - dx);
+    red += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    green += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    blue += kx * (kym * inPixels[indexM] + ky0 * inPixels[index0] + ky1 * inPixels[index1] + ky2 * inPixels[index2]);
+    // beware of negative values
+    outPixels[outIndex++] = Math.max(0, Math.round(red));
+    outPixels[outIndex++] = Math.max(0, Math.round(green));
+    outPixels[outIndex] = Math.max(0, Math.round(blue));
 }
 
 // copy lines of pixels on the output image data object, only the RGB part
@@ -931,8 +924,8 @@ function copyPixCubic(x,y,outData,outIndex,inData){
 
 // get a simple pixel index from indices (i,j) to pixels in the unit cell, using the width of the unit cell
 //  this is the index to the red component of the pixel, green,blue and alpha follow
-function index(i,j){
-	return 4*(Math.round(i)+periodWidth*Math.round(j));
+function index(i, j) {
+    return 4 * (Math.round(i) + periodWidth * Math.round(j));
 }
 
 //  going from left to right along a horizontal line
@@ -941,66 +934,64 @@ function index(i,j){
 //  takes pixel from a horizontal or vertical line, starting at (sourceI,sourceJ), 
 //  making steps (sourceStepI,sourceStepJ) with components -1,0,1
 //===================================================================================
-function copyPixels(targetI,targetEndI,targetJ,
-					sourceI,sourceJ,sourceStepI,sourceStepJ){
-	var target=index(targetI,targetJ);
-	var targetEnd=index(targetEndI,targetJ);        
-	var source=index(sourceI,sourceJ);
-	var sourceStep=index(sourceStepI,sourceStepJ)-2;  // combined step, with compensation for pixel subcomponents 
-	while (target<=targetEnd) {  // do complete pixels ...
-		outputPixels[target++]=outputPixels[source++];
-		outputPixels[target++]=outputPixels[source++];
-		outputPixels[target]=outputPixels[source];
-		target+=2;                                       // ... skip blu,alpha, go to next pixel at right
-		source+=sourceStep;                             // walk through the source
-	}
+
+function copyPixels(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceStepI, sourceStepJ) {
+    var target = index(targetI, targetJ);
+    var targetEnd = index(targetEndI, targetJ);
+    var source = index(sourceI, sourceJ);
+    var sourceStep = index(sourceStepI, sourceStepJ) - 2; // combined step, with compensation for pixel subcomponents 
+    while (target <= targetEnd) { // do complete pixels ...
+        outputPixels[target++] = outputPixels[source++];
+        outputPixels[target++] = outputPixels[source++];
+        outputPixels[target] = outputPixels[source];
+        target += 2; // ... skip blu,alpha, go to next pixel at right
+        source += sourceStep; // walk through the source
+    }
 }
 
 // same as copyPixels(), but now targetEndI<targetI, decreasing x-values
 // and thus going from the right to the left
-function copyPixelsRightToLeft(targetI,targetEndI,targetJ,
-					sourceI,sourceJ,sourceStepI,sourceStepJ){
-	var target=index(targetI,targetJ);
-	var targetEnd=index(targetEndI,targetJ);       
-	var source=index(sourceI,sourceJ);
-	var sourceStep=index(sourceStepI,sourceStepJ)-2;  // combined step, with compensation for pixel subcomponents 
-	while (target>=targetEnd) {  // do complete pixels ...
-		outputPixels[target++]=outputPixels[source++];
-		outputPixels[target++]=outputPixels[source++];
-		outputPixels[target]=outputPixels[source];
-		target-=6;                                       // ... skip red,green, go to next pixel at left
-		source+=sourceStep;                             // walk through the source
-	}
+function copyPixelsRightToLeft(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceStepI, sourceStepJ) {
+    var target = index(targetI, targetJ);
+    var targetEnd = index(targetEndI, targetJ);
+    var source = index(sourceI, sourceJ);
+    var sourceStep = index(sourceStepI, sourceStepJ) - 2; // combined step, with compensation for pixel subcomponents 
+    while (target >= targetEnd) { // do complete pixels ...
+        outputPixels[target++] = outputPixels[source++];
+        outputPixels[target++] = outputPixels[source++];
+        outputPixels[target] = outputPixels[source];
+        target -= 6; // ... skip red,green, go to next pixel at left
+        source += sourceStep; // walk through the source
+    }
 }
 
 // same as copyPixels(), drawing a horizontal line of pixels
 // but now (sourceStepI,sourceStepJ) has to be a unit vector of any direction
 // we use interpolation to get the color of the source pixel with float coordinates
-function copyPixelSkewed(targetI,targetEndI,targetJ,
-					sourceI,sourceJ,sourceStepI,sourceStepJ){
-	var target=index(targetI,targetJ);
-	var targetEnd=index(targetEndI,targetJ);        
-	while (target<=targetEnd) {  
-		copyPixLinear(sourceI,sourceJ,outputData,target,outputData);
-		target+=4;
-		sourceI+=sourceStepI;
-		sourceJ+=sourceStepJ;
-	}	
+
+function copyPixelSkewed(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceStepI, sourceStepJ) {
+    var target = index(targetI, targetJ);
+    var targetEnd = index(targetEndI, targetJ);
+    while (target <= targetEnd) {
+        copyPixLinear(sourceI, sourceJ, outputData, target, outputData);
+        target += 4;
+        sourceI += sourceStepI;
+        sourceJ += sourceStepJ;
+    }
 }
 
 // same as copyPixelsSkewed(), but now targetEndI<targetI, decreasing x-values
 // and thus going from the right to the left
-function copyPixelSkewedRightToLeft(targetI,targetEndI,targetJ,
-					sourceI,sourceJ,sourceStepI,sourceStepJ){
-	var target=index(targetI,targetJ);
-	var targetEnd=index(targetEndI,targetJ);        // all pixel components
-	while (target>=targetEnd) {  
-		copyPixLinear(sourceI,sourceJ,outputData,target,outputData);
-		target-=4;
-		sourceI+=sourceStepI;
-		sourceJ+=sourceStepJ;
-	}	
-}				
+function copyPixelSkewedRightToLeft(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceStepI, sourceStepJ) {
+    var target = index(targetI, targetJ);
+    var targetEnd = index(targetEndI, targetJ); // all pixel components
+    while (target >= targetEnd) {
+        copyPixLinear(sourceI, sourceJ, outputData, target, outputData);
+        target -= 4;
+        sourceI += sourceStepI;
+        sourceJ += sourceStepJ;
+    }
+}
 
 // and now the special symmetries, that can be done with integer pixel coordinates
 // going horizontally or vertically
@@ -1033,8 +1024,7 @@ function rhombicCopy(){
 //  reasonable values are periodicLength or periodicLength/2
 function horizontalMirror(length){
 	for (var fromJ=0;fromJ<periodHeight/2;fromJ++){
-		copyPixels(0,length-1,periodHeight-fromJ-1,
-					0,fromJ,1,0);
+		copyPixels(0,length-1,periodHeight-fromJ-1,0,fromJ,1,0);
 	}
 }
 
@@ -1044,8 +1034,7 @@ function horizontalMirror(length){
 function verticalMirror(length){
 	var periodWidth2=periodWidth/2;
 	for (var fromJ=0;fromJ<length;fromJ++){
-		copyPixels(periodWidth2,periodWidth-1,fromJ,
-					periodWidth2-1,fromJ,-1,0);
+		copyPixels(periodWidth2,periodWidth-1,fromJ,periodWidth2-1,fromJ,-1,0);
 	}
 }
 
@@ -1054,8 +1043,7 @@ function verticalMirror(length){
 function quarterTurn(){
 	var period2=Math.min(periodWidth,periodHeight)/2;
 	for (var j=0;j<period2;j++){
-		copyPixels(0,period2-1,j+period2,
-					period2-1-j,0,0,1);
+		copyPixels(0,period2-1,j+period2,period2-1-j,0,0,1);
 	}
 }
 
@@ -1064,8 +1052,7 @@ function quarterTurn(){
 function halfTurn(){
 	var periodWidth2=periodWidth/2;
 	for (var j=0;j<periodHeight;j++){
-		copyPixels(periodWidth2,periodWidth-1,j,
-					periodWidth2-1,periodWidth-1-j,-1,0);
+		copyPixels(periodWidth2,periodWidth-1,j,periodWidth2-1,periodWidth-1-j,-1,0);
 	}
 }
 
@@ -1074,8 +1061,7 @@ function halfTurn(){
 //  reasonable values are length=period/2 typically (length=period ???)
 function upDiagonalMirror(length){
 	for (var j=0;j<length;j++){
-		copyPixels(0,j-1,j,
-					j,0,0,1);	
+		copyPixels(0,j-1,j,j,0,0,1);	
 	}
 }
 
@@ -1084,8 +1070,7 @@ function upDiagonalMirror(length){
 // reasonable value length=perioWidth/2
 function downDiagonalMirror(length){
 	for (var j=0;j<length;j++){
-		copyPixels(length-1-j,length-1,j,
-					length-1-j,j,0,-1);	
+		copyPixels(length-1-j,length-1,j,length-1-j,j,0,-1);	
 	}
 }
 
