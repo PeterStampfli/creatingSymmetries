@@ -1001,77 +1001,78 @@ function copyPixelSkewedRightToLeft(targetI, targetEndI, targetJ, sourceI, sourc
 
 //  copy a rectangular piece, same orientation, to another place inside the unit cell
 //  target rectangle should not overlap the source rectangle
-function copyRectangle(targetI,targetJ,sourceI,sourceJ,width,height){
-	var targetEndJ=targetJ+height;
-	var targetEndI=targetI+width-1;
-	while (targetJ<targetEndJ){
-		copyPixels(targetI,targetEndI,targetJ,sourceI,sourceJ,1,0);
-		targetJ++;
-		sourceJ++;
-	}
+
+function copyRectangle(targetI, targetJ, sourceI, sourceJ, width, height) {
+    var targetEndJ = targetJ + height;
+    var targetEndI = targetI + width - 1;
+    while (targetJ < targetEndJ) {
+        copyPixels(targetI, targetEndI, targetJ, sourceI, sourceJ, 1, 0);
+        targetJ++;
+        sourceJ++;
+    }
 }
 
 // copying the two quarters of the left half of the unit cell crosswise to the right
 //  as needed for rhombic or hexagonal symmetry
-function rhombicCopy(){
-	copyRectangle(periodWidth/2,0,0,periodHeight/2,periodWidth/2,periodHeight/2);
-	copyRectangle(periodWidth/2,periodHeight/2,0,0,periodWidth/2,periodHeight/2);
+function rhombicCopy() {
+    copyRectangle(periodWidth / 2, 0, 0, periodHeight / 2, periodWidth / 2, periodHeight / 2);
+    copyRectangle(periodWidth / 2, periodHeight / 2, 0, 0, periodWidth / 2, periodHeight / 2);
 }
 
 
 // mirrorsymmetry at the horizontal axis at periodicHeight/2 
 // copies the lower half onto the upper half with variable length (number of pixels)
 //  reasonable values are periodicLength or periodicLength/2
-function horizontalMirror(length){
-	for (var fromJ=0;fromJ<periodHeight/2;fromJ++){
-		copyPixels(0,length-1,periodHeight-fromJ-1,0,fromJ,1,0);
-	}
+function horizontalMirror(length) {
+    for (var fromJ = 0; fromJ < periodHeight / 2; fromJ++) {
+        copyPixels(0, length - 1, periodHeight - fromJ - 1, 0, fromJ, 1, 0);
+    }
 }
 
 // mirror symmetry in the unit cell at a vertical axis lying at periodicWidth/2
 //  copies the left half onto the right half, with variable length (number of pixels)
 //  reasonable values are periodicLength and periodicLength/2
-function verticalMirror(length){
-	var periodWidth2=periodWidth/2;
-	for (var fromJ=0;fromJ<length;fromJ++){
-		copyPixels(periodWidth2,periodWidth-1,fromJ,periodWidth2-1,fromJ,-1,0);
-	}
+function verticalMirror(length) {
+    var periodWidth2 = periodWidth / 2;
+    for (var fromJ = 0; fromJ < length; fromJ++) {
+        copyPixels(periodWidth2, periodWidth - 1, fromJ, periodWidth2 - 1, fromJ, -1, 0);
+    }
 }
 
 // quarter turn rotational symmetry around center of unit cell (periodWidth/2,periodHeight/2)
 // turns (numericall) lower left quarter 90 degrees clockwise to the upper left quarter, which is overwritten
-function quarterTurn(){
-	var period2=Math.min(periodWidth,periodHeight)/2;
-	for (var j=0;j<period2;j++){
-		copyPixels(0,period2-1,j+period2,period2-1-j,0,0,1);
-	}
+function quarterTurn() {
+    var period2 = Math.min(periodWidth, periodHeight) / 2;
+    for (var j = 0; j < period2; j++) {
+        copyPixels(0, period2 - 1, j + period2, period2 - 1 - j, 0, 0, 1);
+    }
 }
 
 // half turn rotational symmetry around center of unit cell (periodWidth/2,periodHeight/2)
 // turns left half 180 degrees to the right half, which is overwritten
-function halfTurn(){
-	var periodWidth2=periodWidth/2;
-	for (var j=0;j<periodHeight;j++){
-		copyPixels(periodWidth2,periodWidth-1,j,periodWidth2-1,periodWidth-1-j,-1,0);
-	}
+function halfTurn() {
+    var periodWidth2 = periodWidth / 2;
+    for (var j = 0; j < periodHeight; j++) {
+        copyPixels(periodWidth2, periodWidth - 1, j, periodWidth2 - 1, periodWidth - 1 - j, -1, 0);
+    }
 }
 
 //  mirrorsymmetry at the upwards going diagonal x=y
 //  takes the lower sector (j<i) and overwrites the upper (j>i)
 //  reasonable values are length=period/2 typically (length=period ???)
-function upDiagonalMirror(length){
-	for (var j=0;j<length;j++){
-		copyPixels(0,j-1,j,j,0,0,1);	
-	}
+function upDiagonalMirror(length) {
+    for (var j = 0; j < length; j++) {
+        copyPixels(0, j - 1, j, j, 0, 0, 1);
+    }
 }
 
 // mirrorsymmetry at the down going diagonal x+y=length-1
 // takes the lower sector x+y<length-1 and overwrites x+y>length-1 (x<length,y<length)
 // reasonable value length=perioWidth/2
-function downDiagonalMirror(length){
-	for (var j=0;j<length;j++){
-		copyPixels(length-1-j,length-1,j,length-1-j,j,0,-1);	
-	}
+function downDiagonalMirror(length) {
+    for (var j = 0; j < length; j++) {
+        copyPixels(length - 1 - j, length - 1, j, length - 1 - j, j, 0, -1);
+    }
 }
 
 // six- and threefold rotational symmetry require "skewed" copies
@@ -1080,72 +1081,74 @@ function downDiagonalMirror(length){
 // sixFold rotational symmetry
 // using the image in the triangle with corners (0,0), (periodWidth/3,0) and (periodWidth/6,periodHeight/2)
 // to cover the entire unit cell with rotated images (multiples of 60 degrees)
-function sixFoldRotational(){	
-	var j;
-	// the upper half triangle at the left border
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewed(0,0.3333*periodWidth*(0.5-j/periodHeight),periodHeight/2+j,
-					0.5*periodWidth*(0.5-j/periodHeight),0.5*(periodHeight/2-1-j),-0.5,1.5*periodHeight/periodWidth);		
-	}
-	// the lower half-triangle at the left border
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewed(0,0.3333*periodWidth*j/periodHeight,j,
-					0.5*j*periodWidth/periodHeight,0.5*j,0.5,-1.5*periodHeight/periodWidth)	
-	}
-	// the right half of the upper equilateral triangle 
-	//  
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewed(0.16666*periodWidth,0.3333*periodWidth*(0.5+j/periodHeight),periodHeight/2+j,
-					periodWidth*(0.3333-0.5*j/periodHeight),0.5*j,0.5,1.5*periodHeight/periodWidth);		
-	}
-	// the left half of the upper equilateral triangle 
-	//  
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewedRightToLeft(0.16666*periodWidth,0.3333*periodWidth*(0.5-j/periodHeight),periodHeight/2+j,
-					periodWidth*(0.3333-0.5*j/periodHeight),0.5*j,-0.5,-1.5*periodHeight/periodWidth);	
-	}
-	// local inversion symmetry at (periodWidth/4,periodHeight/4), left to right
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelsRightToLeft(periodWidth/2-1,0.3333*periodWidth*(1-j/periodHeight),j,
-					               0,periodHeight/2-1-j,1,0);
-	}
-	// local inversion symmetry at (periodWidth/4,periodHeight*3/4), left to right
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelsRightToLeft(periodWidth/2-1,0.3333*periodWidth*(0.5+j/periodHeight),periodHeight/2+j,
-					          0,periodHeight-1-j,1,0);
-	}
-	rhombicCopy();
+
+function sixFoldRotational() {
+    var j;
+    // the upper half triangle at the left border
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelSkewed(0, 0.3333 * periodWidth * (0.5 - j / periodHeight), periodHeight / 2 + j,
+            0.5 * periodWidth * (0.5 - j / periodHeight), 0.5 * (periodHeight / 2 - 1 - j), -0.5, 1.5 * periodHeight / periodWidth);
+    }
+    // the lower half-triangle at the left border
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelSkewed(0, 0.3333 * periodWidth * j / periodHeight, j,
+            0.5 * j * periodWidth / periodHeight, 0.5 * j, 0.5, -1.5 * periodHeight / periodWidth)
+    }
+    // the right half of the upper equilateral triangle 
+    //  
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelSkewed(0.16666 * periodWidth, 0.3333 * periodWidth * (0.5 + j / periodHeight), periodHeight / 2 + j,
+            periodWidth * (0.3333 - 0.5 * j / periodHeight), 0.5 * j, 0.5, 1.5 * periodHeight / periodWidth);
+    }
+    // the left half of the upper equilateral triangle 
+    //  
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelSkewedRightToLeft(0.16666 * periodWidth, 0.3333 * periodWidth * (0.5 - j / periodHeight), periodHeight / 2 + j,
+            periodWidth * (0.3333 - 0.5 * j / periodHeight), 0.5 * j, -0.5, -1.5 * periodHeight / periodWidth);
+    }
+    // local inversion symmetry at (periodWidth/4,periodHeight/4), left to right
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelsRightToLeft(periodWidth / 2 - 1, 0.3333 * periodWidth * (1 - j / periodHeight), j,
+            0, periodHeight / 2 - 1 - j, 1, 0);
+    }
+    // local inversion symmetry at (periodWidth/4,periodHeight*3/4), left to right
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelsRightToLeft(periodWidth / 2 - 1, 0.3333 * periodWidth * (0.5 + j / periodHeight), periodHeight / 2 + j,
+            0, periodHeight - 1 - j, 1, 0);
+    }
+    rhombicCopy();
 }
 
 // threeFold rotational symmetry
 // using the image in the rhomb with corners (periodWidth/2,periodHeight/2), (periodWidth/3,periodHeight-1),
 //   (periodWidth/6,periodHeight/2) and (periodWidth/3,0)
 // covers the entire unit cell with rotated copies (multiples of 120 degrees)
-function threeFoldRotational(){
-	var j;
-	//lower left trapeze
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewed(0,0.3333*periodWidth*(1-j/periodHeight),j,
-		                0.5*periodWidth-0.5*j/periodHeight*periodWidth,0.5*periodHeight-0.5*j,-0.5,1.5*periodHeight/periodWidth);
-	}
-	// upper left trapeze
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewed(0,0.3333*periodWidth*(0.5+j/periodHeight),periodHeight/2+j,
-		                0.25*periodWidth+0.5*j/periodHeight*periodWidth,0.75*periodHeight-0.5*j,-0.5,-1.5*periodHeight/periodWidth);
-	}
-		// lower right triangle
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewedRightToLeft(periodWidth/2-1,0.3333*periodWidth*(1+j/periodHeight),j,
-					0.5*periodWidth*(0.5+j/periodHeight),0.75*periodHeight-0.5*j,0.5,1.5*periodHeight/periodWidth);
 
-	}
-	// upper right triangle
-	for (j=0;j<periodHeight/2;j++){
-		copyPixelSkewedRightToLeft(periodWidth/2-1,periodWidth/2-1-0.3333*j*periodWidth/periodHeight,periodHeight/2+j,
-					0.5*periodWidth-0.5*j/periodHeight*periodWidth,0.5*periodHeight-0.5*j,0.5,-1.5*periodHeight/periodWidth);
+function threeFoldRotational() {
+    var j;
+    //lower left trapeze
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelSkewed(0, 0.3333 * periodWidth * (1 - j / periodHeight), j,
+            0.5 * periodWidth - 0.5 * j / periodHeight * periodWidth, 0.5 * periodHeight - 0.5 * j, -0.5, 1.5 * periodHeight / periodWidth);
+    }
+    // upper left trapeze
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelSkewed(0, 0.3333 * periodWidth * (0.5 + j / periodHeight), periodHeight / 2 + j,
+            0.25 * periodWidth + 0.5 * j / periodHeight * periodWidth, 0.75 * periodHeight - 0.5 * j, -0.5, -1.5 * periodHeight / periodWidth);
+    }
+    // lower right triangle
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelSkewedRightToLeft(periodWidth / 2 - 1, 0.3333 * periodWidth * (1 + j / periodHeight), j,
+            0.5 * periodWidth * (0.5 + j / periodHeight), 0.75 * periodHeight - 0.5 * j, 0.5, 1.5 * periodHeight / periodWidth);
 
-	}
-	rhombicCopy();
+    }
+    // upper right triangle
+    for (j = 0; j < periodHeight / 2; j++) {
+        copyPixelSkewedRightToLeft(periodWidth / 2 - 1, periodWidth / 2 - 1 - 0.3333 * j * periodWidth / periodHeight, periodHeight / 2 + j,
+            0.5 * periodWidth - 0.5 * j / periodHeight * periodWidth, 0.5 * periodHeight - 0.5 * j, 0.5, -1.5 * periodHeight / periodWidth);
+
+    }
+    rhombicCopy();
 }
 
 // making the symmetric image, using the general method of F. Farris
@@ -1158,51 +1161,51 @@ function threeFoldRotational(){
 // the line starts at (fromI,j) and goes upwards to (toI,j)  (all INTEGERS)
 // addressing pixels in the periodic unit cell AND points in the (mapXTab[...],mapYTab[...])
 
-function drawPixelLine(fromI,toI,j){
-	//  reference image, local variables
-	var locReferencePixels=referencePixels;
-	var locReferenceWidth=referenceWidth;
-	var locReferenceHeight=referenceHeight;
-	var locScaleInputToReference=scaleInputToReference;
-	// local reference to the mapping table
-	var locMapXTab=mapXTab;
-	var locMapYTab=mapYTab;
-	// translation: center of sampling as defined by the mouse on the reference image
-	var centerX=referenceCenterX/scaleInputToReference;
-	var centerY=referenceCenterY/scaleInputToReference;
-	//  scaling and rotation: transformation matrix elements
-	var scaleCos=scaleOutputToInput*cosAngle;
-	var scaleSin=scaleOutputToInput*sinAngle;
-	//  sampling coordinates (input image)
-	var x,y,newX;
-	//  integer coordinates in the reference image
-	var h,k;
-	//  index to the output image pixel, start
-	var outputIndex=index(fromI,j);
-	//  the end value
-	var outputEnd=index(toI,j);
-	//  index to the mapping function table
-	var mapIndex=fromI+mapWidth*j;
-	while (outputIndex<=outputEnd){
-		// some mapping from (i,j) to (x,y) stored in a map table !!!
-		x=locMapXTab[mapIndex];
-		y=locMapYTab[mapIndex];
-		mapIndex++;
-		// translation, rotation and scaling
-		newX=scaleCos*x-scaleSin*y+centerX;
-		y=scaleSin*x+scaleCos*y+centerY;
-		x=newX;
-		//  get the interpolated input pixel color components, write on output pixels
-		copyInterpolation(x,y,outputData,outputIndex,inputData);
-		outputIndex+=4;  	
-		// mark the reference image pixel, make it fully opaque
-		h=Math.round(locScaleInputToReference*x);
-		k=Math.round(locScaleInputToReference*y);
-		// but check if we are on the reference canvas
-		if ((h>=0)&&(h<locReferenceWidth)&&(k>=0)&&(k<locReferenceHeight)){
-			locReferencePixels[4*(locReferenceWidth*k+h)+3]=255;
-		}
-	}
+function drawPixelLine(fromI, toI, j) {
+    //  reference image, local variables
+    var locReferencePixels = referencePixels;
+    var locReferenceWidth = referenceWidth;
+    var locReferenceHeight = referenceHeight;
+    var locScaleInputToReference = scaleInputToReference;
+    // local reference to the mapping table
+    var locMapXTab = mapXTab;
+    var locMapYTab = mapYTab;
+    // translation: center of sampling as defined by the mouse on the reference image
+    var centerX = referenceCenterX / scaleInputToReference;
+    var centerY = referenceCenterY / scaleInputToReference;
+    //  scaling and rotation: transformation matrix elements
+    var scaleCos = scaleOutputToInput * cosAngle;
+    var scaleSin = scaleOutputToInput * sinAngle;
+    //  sampling coordinates (input image)
+    var x, y, newX;
+    //  integer coordinates in the reference image
+    var h, k;
+    //  index to the output image pixel, start
+    var outputIndex = index(fromI, j);
+    //  the end value
+    var outputEnd = index(toI, j);
+    //  index to the mapping function table
+    var mapIndex = fromI + mapWidth * j;
+    while (outputIndex <= outputEnd) {
+        // some mapping from (i,j) to (x,y) stored in a map table !!!
+        x = locMapXTab[mapIndex];
+        y = locMapYTab[mapIndex];
+        mapIndex++;
+        // translation, rotation and scaling
+        newX = scaleCos * x - scaleSin * y + centerX;
+        y = scaleSin * x + scaleCos * y + centerY;
+        x = newX;
+        //  get the interpolated input pixel color components, write on output pixels
+        copyInterpolation(x, y, outputData, outputIndex, inputData);
+        outputIndex += 4;
+        // mark the reference image pixel, make it fully opaque
+        h = Math.round(locScaleInputToReference * x);
+        k = Math.round(locScaleInputToReference * y);
+        // but check if we are on the reference canvas
+        if ((h >= 0) && (h < locReferenceWidth) && (k >= 0) && (k < locReferenceHeight)) {
+            locReferencePixels[4 * (locReferenceWidth * k + h) + 3] = 255;
+        }
+    }
 }
 
 //  make the symmetries, draw the full output image and reference image
@@ -1227,67 +1230,66 @@ function drawing(){
 //=============================================================================
 // setting symmetry dependent map dimensions as function of period dimensions
 // =====================================================================
-function setMapDimensions(){
-	mapWidth=periodWidth/2;
-	mapHeight=periodHeight/2;
-	mapWidth=periodWidth;
-	mapHeight=periodHeight;
+function setMapDimensions() {
+    mapWidth = periodWidth / 2;
+    mapHeight = periodHeight / 2;
+    mapWidth = periodWidth;
+    mapHeight = periodHeight;
 }
 
 //for debugging: show the basic map on output as red lines
 //================================================================
-function showHintPatch(){
-	if (hintPatch&&inputLoaded){
-		outputImage.strokeStyle="Red";	
-		outputImage.strokeRect(outputOffsetX,outputOffsetY,mapWidth,mapHeight);
-	}
+function showHintPatch() {
+    if (hintPatch && inputLoaded) {
+        outputImage.strokeStyle = "Red";
+        outputImage.strokeRect(outputOffsetX, outputOffsetY, mapWidth, mapHeight);
+    }
 }
 
 //  trivial map for simple maping
 // ========================================================================
-function trivialMapTables(){
-	var locmapWidth=mapWidth;
-	var locmapHeight=mapHeight;
-	var locmapWidth2=mapWidth/2;
-	var locmapHeight2=mapHeight/2;
-	var index=0;
-	var i,j;
-	for (j=0;j<locmapHeight;j++){
-		for (i=0;i<locmapWidth;i++){
-			mapXTab[index]=i-locmapWidth2;
-			mapYTab[index++]=j-locmapHeight2;		
-		}
-	}	
+function trivialMapTables() {
+    var locmapWidth = mapWidth;
+    var locmapHeight = mapHeight;
+    var locmapWidth2 = mapWidth / 2;
+    var locmapHeight2 = mapHeight / 2;
+    var index = 0;
+    var i, j;
+    for (j = 0; j < locmapHeight; j++) {
+        for (i = 0; i < locmapWidth; i++) {
+            mapXTab[index] = i - locmapWidth2;
+            mapYTab[index++] = j - locmapHeight2;
+        }
+    }
 }
 
-function setupMapTables(){
-	trivialMapTables();
+function setupMapTables() {
+    trivialMapTables();
 }
 
 // the replacement color for outside pixels
-var outsideRed=0;
-var outsideGreen=0;
-var outsideBlue=200;
+var outsideRed = 0;
+var outsideGreen = 0;
+var outsideBlue = 200;
 
 // presetting special symmetries, fixing the height to width ratio of the unit cell
-function setSymmetries(){
-	squareSymmetry=false;
-	hexagonSymmetry=true;
+function setSymmetries() {
+    squareSymmetry = false;
+    hexagonSymmetry = true;
 }
 
 // draw the unit cell on output image
 // the shape of the basic map and symmetries in unit cell depend on symmetry of the image
 //=================================================================================
-function makeSymmetriesFarris(){
-	// draw the basic map, using the mapping in the map tables 
-	for (var j=0;j<mapHeight;j++){
-		drawPixelLine(0,mapWidth-1,j);
-	}
-	// the symmetries inside the unit cell
-	//verticalMirror(periodHeight/2);
-	//horizontalMirror(periodWidth);
-		//threeFoldRotational();
-		sixFoldRotational();
+function makeSymmetriesFarris() {
+    // draw the basic map, using the mapping in the map tables 
+    for (var j = 0; j < mapHeight; j++) {
+        drawPixelLine(0, mapWidth - 1, j);
+    }
+    // the symmetries inside the unit cell
+    //verticalMirror(periodHeight/2);
+    //horizontalMirror(periodWidth);
+    //threeFoldRotational();
+    sixFoldRotational();
 
 }
-
