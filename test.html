@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<head>
+	<title>Test</title>
+</head>
+<body>
+	<h1>
+		Test - check the console !
+	</h1>
+</body>
+<script type="text/javascript">
+	
+/*
+class: Vector
+*/
+function Vector() {
+    this.x = 0;
+    this.y = 0;
+}
+
+//  create a new vector without "new"
+function vector() {
+    return new Vector();
+}
+
+// this Vector=this Vector * that Vector
+Vector.prototype.mult = function (that) {
+    var h = that.x * this.x - that.y * this.y;
+    this.y = that.y * this.x + that.x * this.y;
+    this.x = h;
+};
+
+// this Vector=that1 Vector*that2 Vector
+Vector.prototype.prod = function (that1, that2) {
+    this.x = that1.x * that2.x - that1.y * that2.y;
+    this.y = that1.x * that2.y + that1.y * that2.x;
+}
+
+// this vector=this Vector* complex conjugate of that Vector
+Vector.prototype.multConj = function (that) {
+    var h = that.x * this.x + that.y * this.y;
+    this.y = that.x * this.y - that.y * this.x;
+    this.x = h;
+};
+
+// this Vector=that1 Vector*complex conjugate of that2 Vector
+Vector.prototype.prodConj = function (that1, that2) {
+    this.x = that1.x * that2.x + that1.y * that2.y;
+    this.y = that.x * this.y - that.y * this.x;
+}
+
+// this vector= this vector / that vector
+Vector.prototype.div = function (that) {
+        var d = 1.0 / (that.x * that.x + that.y * that.y + 0.0000001);
+        var h = d * (that.x * this.x + that.y * this.y);
+        this.y = d * (that.x * this.y - that.y * this.x);
+        this.x = h;
+    }
+
+// this vector= that1 vector / that2 vector
+Vector.prototype.quotient = function (that1, that2) {
+    var d = 1.0 / (that.x * that.x + that.y * that.y + 0.0000001);
+    this.x = d * (that1.x * that2.x + that2.y * that2.y);
+    this.y = d * (that1.x * that2.y - that1.y * that2.x);
+}
+
+// this vector= this vector / conjugate of that vector
+Vector.prototype.div = function (that) {
+        var d = 1.0 / (that.x * that.x + that.y * that.y + 0.0000001);
+        var h = d * (that.x * this.x - that.y * this.y);
+        this.y = d * (that.x * this.y + that.y * this.x);
+        this.x = h;
+    }
+
+// this vector= that1 vector / conjugate of that2 vector
+Vector.prototype.quotient = function (that1, that2) {
+    var d = 1.0 / (that.x * that.x + that.y * that.y + 0.0000001);
+    this.x = d * (that1.x * that2.x - that2.y * that2.y);
+    this.y = d * (that1.x * that2.y + that1.y * that2.x);
+}
+
+
+
+Vector.prototype.toString = function () {
+    return "(" + this.x + "," + this.y + ")";
+}
+console.log(vector().toString());
+
+</script>
