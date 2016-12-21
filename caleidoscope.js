@@ -24,7 +24,17 @@ window.onload = function () {
     updateOutputDimensions(512, 512);
     updatePeriod(400, 400);
     drawing();
-}
+};
+
+//=================================================================================
+//  globals, called from html
+//=============================================================================
+window['startLoadImage'] = startLoadImage;
+window['setWidth'] = setWidth;
+window['setHeight'] = setHeight;
+window['setPeriodWidth'] = setPeriodWidth;
+window['setPeriodHeight'] = setPeriodHeight;
+window['setInterpolation'] =setInterpolation;
 
 // collection of small functions used in different places
 //=================================================================
@@ -255,25 +265,25 @@ function updateOutputDimensions(newWidth, newHeight) {
 
 //  choose output image width and height, limit periods
 function setWidth(data) {
-    updateOutputDimensions(parseInt(data), outputHeight);
+    updateOutputDimensions(parseInt(data,10), outputHeight);
     updatePeriod(periodWidth, periodHeight); // limit the period
     drawing();
 }
 
 function setHeight(data) {
-    updateOutputDimensions(outputWidth, parseInt(data));
+    updateOutputDimensions(outputWidth, parseInt(data,10));
     updatePeriod(periodWidth, periodHeight); // limit the period
     drawing();
 }
 
 // choose width and height of periodic unit cell
 function setPeriodWidth(data) {
-    updatePeriod(parseInt(data), periodHeight);
+    updatePeriod(parseInt(data,10), periodHeight);
     drawing();
 }
 
 function setPeriodHeight(data) {
-    updatePeriod(periodWidth, parseInt(data));
+    updatePeriod(periodWidth, parseInt(data,10));
     drawing();
 }
 //  the download buttons
@@ -282,26 +292,27 @@ var imageFilename = 'theImage.jpg';
 var htmlFilename = 'caleidoscope.html';
 var cssFilename = 'caleidoscope.css';
 // using a minified js file for the actual html page -> download the unminified js file
-var jsDownloadname = 'caleidoscope.js';
-var jsFilename = 'caleidoscope.js';
+var jsDownloadname = 'caleidoscope.js';                              // the download gets THIS name
+var jsFilename = 'caleidoscope.js';                                     // actually, this file is taken and downloaded
 
 function activateDownloadButtons() {
-    function addDownload(button, downloadname, filename) {
-        button.addEventListener('click', function () {
-            this.href = filename;
-            this.download = filename;
+    function addDownload(buttonName, downloadname, filename) {
+        	var theButton=document.getElementById(buttonName);
+        	theButton.addEventListener('click', function () {
+            	theButton.href = filename;
+            	theButton.download = downloadname;
         }, false);
     }
     var downloadImageButton = document.getElementById('downloadImageButton');
     //  for image downloading, using jpeg image format, default quality=0.92
     downloadImageButton.addEventListener('click', function () {
         //  use correct data format and filename
-        this.href = outputCanvas.toDataURL("image/jpeg"); // this needs to be done at the time of the click
-        this.download = imageFilename;
+        downloadImageButton.href = outputCanvas.toDataURL("image/jpeg"); // the data URL is made at the time of the click
+        downloadImageButton.download = imageFilename;
     }, false);
-    addDownload(document.getElementById('downloadHTMLButton'), htmlFilename, htmlFilename);
-    addDownload(document.getElementById('downloadCSSButton'), cssFilename, cssFilename);
-    addDownload(document.getElementById('downloadJSButton'), jsDownloadname, jsFilename);
+    addDownload('downloadHTMLButton', htmlFilename, htmlFilename);
+    addDownload('downloadCSSButton', cssFilename, cssFilename);
+    addDownload('downloadJSButton', jsDownloadname, jsFilename);
 }
 //  the canvases and their interaction
 //============================================================================
@@ -452,14 +463,13 @@ var referenceCenterX;
 var referenceCenterY;
 
 // the wheel changes the scale: map to input image pixels, a larger scale zooms out
-var scaleOutputToInput = 1;
+var scaleOutputToInput;
 var changeScaleFactor = 1.1;
 
 function setupReference() {
     // set up dimensions of the reference image
     // the reference canvas has the same width/height ratio as the input image
     //   the larger dimension is equal to the referenceSize
-    var inputSize = Math.max(inputWidth, inputHeight);
     if (inputWidth > inputHeight) {
         referenceWidth = referenceSize;
         referenceHeight = Math.round(referenceWidth * inputHeight / inputWidth);
@@ -584,7 +594,7 @@ function orientationMouseDownHandler(event) {
     setMousePosition(event, orientationCanvas);
     if (isMouseOnDisc()) {
         mousePressed = true;
-        lastMouseAngle = Math.atan2(mouseY - orientationSize / 2, mouseX - orientationSize / 2);;
+        lastMouseAngle = Math.atan2(mouseY - orientationSize / 2, mouseX - orientationSize / 2);
     }
     return false;
 }
@@ -1092,7 +1102,7 @@ function sixFoldRotational() {
     // the lower half-triangle at the left border
     for (j = 0; j < periodHeight / 2; j++) {
         copyPixelSkewed(0, 0.3333 * periodWidth * j / periodHeight, j,
-            0.5 * j * periodWidth / periodHeight, 0.5 * j, 0.5, -1.5 * periodHeight / periodWidth)
+            0.5 * j * periodWidth / periodHeight, 0.5 * j, 0.5, -1.5 * periodHeight / periodWidth);
     }
     // the right half of the upper equilateral triangle 
     //  
@@ -1266,6 +1276,9 @@ function trivialMapTables() {
 function setupMapTables() {
     trivialMapTables();
 }
+
+// initial mapping scale
+scaleOutputToInput = 1
 
 // the replacement color for outside pixels
 var outsideRed = 0;
