@@ -1,45 +1,43 @@
 "use strict";
 
 
-// setting symmetry dependent patch dimensions as function of period dimensions
+// setting symmetry dependent map dimensions as function of period dimensions
 // =====================================================================
-function setPatchDimensions(){
-	patchWidth=periodWidth/2;
-	patchHeight=periodHeight/2;
-	patchWidth=periodWidth;
-	patchHeight=periodHeight;
+function setMapDimensions(){
+	mapWidth=periodWidth/2;
+	mapHeight=periodHeight/2;
+	mapWidth=periodWidth;
+	mapHeight=periodHeight;
 }
 
-//for debugging: show the basic patch on output as red lines
+//for debugging: show the basic map on output as red lines
 //================================================================
 function showHintPatch(){
 	if (hintPatch&&inputLoaded){
 		outputImage.strokeStyle="Red";	
-		outputImage.strokeRect(outputOffsetX,outputOffsetY,patchWidth,patchHeight);
+		outputImage.strokeRect(outputOffsetX,outputOffsetY,mapWidth,mapHeight);
 	}
 }
 
 
 
-// the table for the mapping function
-var mapXTab=[];
-var mapYTab=[];
-
-//  a "symmetric" map for the primitive patch !!!
+//  a "symmetric" map for the primitive map !!!
 // ========================================================================
-//  trivial map for simple patching
+//  trivial map for simple maping
+
+
 
 function trivialMapTable(){
-	var locPatchWidth=patchWidth;
-	var locPatchHeight=patchHeight;
-	var locPatchWidth2=patchWidth/2;
-	var locPatchHeight2=patchHeight/2;
+	var locmapWidth=mapWidth;
+	var locmapHeight=mapHeight;
+	var locmapWidth2=mapWidth/2;
+	var locmapHeight2=mapHeight/2;
 	var index=0;
 	var i,j;
-	for (j=0;j<locPatchHeight;j++){
-		for (i=0;i<locPatchWidth;i++){
-			mapXTab[index]=i-locPatchWidth2;
-			mapYTab[index++]=j-locPatchHeight2;		
+	for (j=0;j<locmapHeight;j++){
+		for (i=0;i<locmapWidth;i++){
+			mapXTab[index]=i-locmapWidth2;
+			mapYTab[index++]=j-locmapHeight2;		
 		}
 	}	
 }
@@ -48,8 +46,6 @@ function setupMapTables(){
 	trivialMapTable();
 }
 
-// check if outside pixels are interpolated
-var interpolationOutside=true;
 // the replacement color for outside pixels
 var outsideRed=0;
 var outsideGreen=0;
@@ -62,18 +58,18 @@ function setSymmetries(){
 }
 
 // draw the unit cell on output image
-// the shape of the basic patch and symmetries in unit cell depend on symmetry of the image
+// the shape of the basic map and symmetries in unit cell depend on symmetry of the image
 //=================================================================================
 function makeSymmetriesFarris(){
-	// draw the basic patch, using the mapping in the map tables 
-	for (var j=0;j<patchHeight;j++){
-		drawPixelLine(0,patchWidth-1,j);
+	// draw the basic map, using the mapping in the map tables 
+	for (var j=0;j<mapHeight;j++){
+		drawPixelLine(0,mapWidth-1,j);
 	}
 	// the symmetries inside the unit cell
 	//verticalMirror(periodHeight/2);
 	//horizontalMirror(periodWidth);
-		threeFoldRotational();
-		//sixFoldRotational();
+		//threeFoldRotational();
+		sixFoldRotational();
 
 }
 

@@ -133,16 +133,19 @@ function getChoosers(){
 var outputWidth;
 var	outputHeight;
 	
-// periods/size of periodic cell
+// dimensions of the periodic unit cell
 var periodWidth;
 var	periodHeight;
 //  their quarters
 var periodWidth4;
 var periodHeight4;
 
-var patchWidth;
-var patchHeight;
-
+// the table for the mapping function 
+var mapXTab=[];
+var mapYTab=[];
+//  with dimensions (part of the periodic unit cell)
+var mapWidth;
+var mapHeight;
 
 // set a new period width and height, limited to output dimensions
 // force multiple of 4, fix ratio between width and height for special symmetries
@@ -189,14 +192,14 @@ function updatePeriod(newWidth,newHeight){
 		periodHeight=makeMultipleOf4(periodHeight);
 		periodWidthChooser.value=periodWidth.toString();
 		periodHeightChooser.value=periodHeight.toString();
-		setPatchDimensions();
-		setupSinTable(sinXTab,periodWidth);
-		setupSinTable(sinYTab,periodHeight);
-		mapXTab.length=patchWidth*patchHeight;
-		mapYTab.length=patchWidth*patchHeight;
-		setupMapTables();	
 		periodWidth4=periodWidth/4;
 		periodHeight4=periodHeight/4;
+		setupSinTable(sinXTab,periodWidth);
+		setupSinTable(sinYTab,periodHeight);
+		setMapDimensions();
+		mapXTab.length=mapWidth*mapHeight;
+		mapYTab.length=mapWidth*mapHeight;
+		setupMapTables();	
 		// output canvas, get data of unit cell	
 		outputData = outputImage.getImageData(0,0,periodWidth,periodHeight);
 		outputPixels = outputData.data;
@@ -432,6 +435,7 @@ function outputMouseWheelHandler(event){
 	updatePeriod(factor*periodWidth,factor*periodHeight);
 	outputOffsetX*=factor;
 	outputOffsetY*=factor;
+	scaleOutputToInput/=factor;
 	limitOffset();
 	drawing();
 	return false;
@@ -679,16 +683,17 @@ function copyPixNearest(x,y,outData,outIndex,inData){
 	var inPixels=inData.data;
 	var inWidth=inData.width;
 	var inHeight=inData.height;
-	//  rounded coordinates
-	h=Math.round(x);
-	k=Math.round(y);
-	//  catch the case that the point is outside and we use there a solid color
-	if (!interpolationOutside&&((h<0)||(k<0)||(h>=inWidth)||(k>=inHeight))){
+	//  catch the case that the point is outside, we use there a solid color
+	// with a small safety margin
+	if ((x<-1)||(y<-1)||(x>inWidth)||(y>inHeight)){
 		outPixels[outIndex++]=outsideRed;  
 		outPixels[outIndex++]=outsideGreen;  
 		outPixels[outIndex]=outsideBlue;  
 		return;
 	}
+	//  rounded coordinates
+	h=Math.round(x);
+	k=Math.round(y);
 	var h=Math.max(0,Math.min(inWidth-1,h));
 	var k=Math.max(0,Math.min(inHeight-1,k));
 	var inIndex=4*(inWidth*k+h);
@@ -704,16 +709,17 @@ function copyPixLinear(x,y,outData,outIndex,inData){
 	var inPixels=inData.data;
 	var inWidth=inData.width;
 	var inHeight=inData.height;
-	//  coordinates of base pixel
-	var h=Math.floor(x);
-	var k=Math.floor(y);
-	//  catch the case that the point is outside and we use there a solid color
-	if (!interpolationOutside&&((h<0)||(k<0)||(h>=inWidth-1)||(k>=inHeight-1))){
+	//  catch the case that the point is outside, we use there a solid color
+	// with a small safety margin
+	if ((x<-1)||(y<-1)||(x>inWidth)||(y>inHeight)){
 		outPixels[outIndex++]=outsideRed;  
 		outPixels[outIndex++]=outsideGreen;  
 		outPixels[outIndex]=outsideBlue;  
 		return;
 	}
+	//  coordinates of base pixel
+	var h=Math.floor(x);
+	var k=Math.floor(y);
 	var dx=x-h;
 	var dy=y-k;
 	var h0,h1,k0,k1;
@@ -773,16 +779,17 @@ function copyPixCubic(x,y,outData,outIndex,inData){
 	var inPixels=inData.data;
 	var inWidth=inData.width;
 	var inHeight=inData.height;
-	//  coordinates of base pixel
-	var h=Math.floor(x);
-	var k=Math.floor(y);
-	//  catch the case that the point is outside and we use there a solid color
-	if (!interpolationOutside&&((h<0)||(k<0)||(h>=inWidth-1)||(k>=inHeight-1))){
+	//  catch the case that the point is outside, we use there a solid color
+	// with a small safety margin
+	if ((x<-1)||(y<-1)||(x>inWidth)||(y>inHeight)){
 		outPixels[outIndex++]=outsideRed;  
 		outPixels[outIndex++]=outsideGreen;  
 		outPixels[outIndex]=outsideBlue;  
 		return;
 	}
+	//  coordinates of base pixel
+	var h=Math.floor(x);
+	var k=Math.floor(y);
 	var dx=x-h;
 	var dy=y-k;	
 	//  the various vertical positions, getting the correct row numbers of pixels
@@ -1057,7 +1064,6 @@ function downDiagonalMirror(length){
 // sixFold rotational symmetry
 // using the image in the triangle with corners (0,0), (periodWidth/3,0) and (periodWidth/6,periodHeight/2)
 // to cover the entire unit cell with rotated images (multiples of 60 degrees)
-// YOU NEED TO SET: interpolationOutside=true;
 function sixFoldRotational(){	
 	var j;
 	// the upper half triangle at the left border
@@ -1125,3 +1131,80 @@ function threeFoldRotational(){
 	}
 	rhombicCopy();
 }
+
+// making the symmetric image, using the general method of F. Farris
+// a mapping table defines the map between output image coordinates and sampled input image pixels
+// together with an interactively defined additional translation, rotation and scaling
+//================================================================================================
+
+// drawing a line of pixels on the output image using sampled input image pixels
+//================================================================================
+// the line starts at (fromI,j) and goes upwards to (toI,j)  (all INTEGERS)
+// addressing pixels in the periodic unit cell AND points in the (mapXTab[...],mapYTab[...])
+
+function drawPixelLine(fromI,toI,j){
+	//  reference image, local variables
+	var locReferencePixels=referencePixels;
+	var locReferenceWidth=referenceWidth;
+	var locReferenceHeight=referenceHeight;
+	var locScaleInputToReference=scaleInputToReference;
+	// local reference to the mapping table
+	var locMapXTab=mapXTab;
+	var locMapYTab=mapYTab;
+	// translation: center of sampling as defined by the mouse on the reference image
+	var centerX=referenceCenterX/scaleInputToReference;
+	var centerY=referenceCenterY/scaleInputToReference;
+	//  scaling and rotation: transformation matrix elements
+	var scaleCos=scaleOutputToInput*cosAngle;
+	var scaleSin=scaleOutputToInput*sinAngle;
+	//  sampling coordinates (input image)
+	var x,y,newX;
+	//  integer coordinates in the reference image
+	var h,k;
+	//  index to the output image pixel, start
+	var outputIndex=index(fromI,j);
+	//  the end value
+	var outputEnd=index(toI,j);
+	//  index to the mapping function table
+	var mapIndex=fromI+mapWidth*j;
+	while (outputIndex<=outputEnd){
+		// some mapping from (i,j) to (x,y) stored in a map table !!!
+		x=locMapXTab[mapIndex];
+		y=locMapYTab[mapIndex];
+		mapIndex++;
+		// translation, rotation and scaling
+		newX=scaleCos*x-scaleSin*y+centerX;
+		y=scaleSin*x+scaleCos*y+centerY;
+		x=newX;
+		//  get the interpolated input pixel color components, write on output pixels
+		copyInterpolation(x,y,outputData,outputIndex,inputData);
+		outputIndex+=4;  	
+		// mark the reference image pixel, make it fully opaque
+		h=Math.round(locScaleInputToReference*x);
+		k=Math.round(locScaleInputToReference*y);
+		// but check if we are on the reference canvas
+		if ((h>=0)&&(h<locReferenceWidth)&&(k>=0)&&(k<locReferenceHeight)){
+			locReferencePixels[4*(locReferenceWidth*k+h)+3]=255;
+		}
+	}
+}
+
+//  make the symmetries, draw the full output image and reference image
+//==========================================================
+function drawing(){
+	if (!inputLoaded){						// no input means nothing to do
+		return;
+	}
+	// white out: make the reference image semitransparent
+	setAlphaReferenceImagePixels(128);
+	// make the symmetries on the output image
+	makeSymmetriesFarris();
+	// put the symmetric image on the output canvas
+	putPixelsPeriodicallyOnCanvas();
+	// put the reference image
+	putPixelsOnReferenceCanvas();
+	// hint for debugging
+	showHintPatch();
+}
+
+
