@@ -4,81 +4,80 @@
 //==============================================================================
 
 //  switching on and off the hint for the patch
-var hintPatch=false;
+var hintPatch = false;
 
 // using special symmetries
 var squareSymmetry;
 var hexagonSymmetry;
 
-window.onload=function(){
-	hintPatch=true;
-	setSymmetries();
-	connectNewInputImage();
-	getCanvases();
-	getChoosers();
-	referenceCanvasAddEventListeners();
-	outputCanvasAddEventListeners();
-	setupOrientationCanvas(200);
-	orientationCanvasAddEventListeners();
-	activateDownloadButtons();
-	updateOutputDimensions(512,512);
-	updatePeriod(400,400);
-	drawing();
+window.onload = function () {
+    hintPatch = true;
+    setSymmetries();
+    connectNewInputImage();
+    getCanvases();
+    getChoosers();
+    referenceCanvasAddEventListeners();
+    outputCanvasAddEventListeners();
+    setupOrientationCanvas(200);
+    orientationCanvasAddEventListeners();
+    activateDownloadButtons();
+    updateOutputDimensions(512, 512);
+    updatePeriod(400, 400);
+    drawing();
 }
 
 // collection of small functions used in different places
 //=================================================================
 
 // return a (smaller) integer multiple of four of any number
-function makeMultipleOf4(i){
-	i=Math.floor(i);
-	return i-i%4;
+function makeMultipleOf4(i) {
+    i = Math.floor(i);
+    return i - i % 4;
 }
 
 // accelerated trigonometric functions for the mapping functions:
 // tables for the sine and cosine functions
-var sinXTab=[];
-var sinYTab=[];
+var sinXTab = [];
+var sinYTab = [];
 
 // making the tables, depending on the period lengths of the unit cell
 // we need a full period to make lookup as simple as possible for higher frequencies
-function setupSinTable(sinTab,length){
-	var factor=2*Math.PI/length;
-	var length4=length/4;
-	var length2=length/2;
-	var i;
-	var sinus;
-	sinTab.length=length;
-	sinTab[0]=0;
-	sinTab[length2]=0;
-	for (i=1;i<=length4;i++){
-		sinus=Math.sin(factor*i);
-		sinTab[i]=sinus;
-		sinTab[length2-i]=sinus;
-		sinTab[length2+i]=-sinus;
-		sinTab[length-i]=-sinus;	
-	}	
+function setupSinTable(sinTab, length) {
+    var factor = 2 * Math.PI / length;
+    var length4 = length / 4;
+    var length2 = length / 2;
+    var i;
+    var sinus;
+    sinTab.length = length;
+    sinTab[0] = 0;
+    sinTab[length2] = 0;
+    for (i = 1; i <= length4; i++) {
+        sinus = Math.sin(factor * i);
+        sinTab[i] = sinus;
+        sinTab[length2 - i] = sinus;
+        sinTab[length2 + i] = -sinus;
+        sinTab[length - i] = -sinus;
+    }
 }
-
 // the sin and cos functions, periodic on the unit lattice dimensions,
 //  for any integer multiple of the side length of a pixel
 //====================================================
 //  horizontal
-function sinX(i){
-	return sinXTab[i%periodWidth];
+function sinX(i) {
+    return sinXTab[i % periodWidth];
 }
 
-function cosX(i){
-	return sinXTab[(i+periodWidth4)%periodWidth];
+function cosX(i) {
+    return sinXTab[(i + periodWidth4) % periodWidth];
 }
 
 // vertical
-function sinY(i){
-	return sinYTab[i%periodHeight];
+function sinY(i) {
+    return sinYTab[i % periodHeight];
 }
 
-function cosY(i){
-	return sinYTab[(i+periodHeight4)%periodHeight];
+function cosY(i) {
+    return sinYTab[(i + periodHeight4) % periodHeight];
 }
 
 /*
@@ -95,7 +94,7 @@ function cosY(i){
 
 //  choose and load the input image file
 //=================================================
-var inputLoaded=false;
+var inputLoaded = false;
 var inputWidth;
 var inputHeight;
 var inputImage;
@@ -105,79 +104,79 @@ var inputData;
 var inputPixels;
 
 // first load the image data file in a file reader
-var imageReader=new FileReader();
-function startLoadImage(files){
-	imageReader.readAsDataURL(files[0]);
+var imageReader = new FileReader();
+
+function startLoadImage(files) {
+    imageReader.readAsDataURL(files[0]);
 }
 
 // connect the inputImage to the file reader and to subsequent processing
-function connectNewInputImage(){
-	inputImage=new Image();
-	 // load the new image from the file reader data
-	imageReader.onload=function(imageReaderResult){ 
-							inputImage.src=imageReader.result;
-						};
-	// then use the image
-	inputImage.onload=useNewInputImage;
+function connectNewInputImage() {
+    inputImage = new Image();
+    // load the new image from the file reader data
+    imageReader.onload = function (imageReaderResult) {
+        inputImage.src = imageReader.result;
+    };
+    // then use the image
+    inputImage.onload = useNewInputImage;
 }
 
-function useNewInputImage() {  
-	var offScreenCanvas;
-	var offScreenCanvasImage;
-	// data of the loaded image
-	inputLoaded=true;
-	inputWidth=inputImage.width;
-	inputHeight=inputImage.height;
-	// we use an off-screen canvas to get the data of the input image
-	offScreenCanvas=document.createElement("canvas");
-	offScreenCanvas.width=inputWidth;
-	offScreenCanvas.height=inputHeight;
-	offScreenCanvasImage=offScreenCanvas.getContext("2d");
-	offScreenCanvasImage.drawImage(inputImage,0,0);	
-	// set the dimensions of the reference canvas and draw image on it
-	setupReference();
-	// reference image: draw the entire input image and get the pixels
-	referenceImage.drawImage(inputImage,0,0,inputWidth,inputHeight,
-											  0,0,referenceWidth,referenceHeight);
-	// free image for garbage collection
-	connectNewInputImage();
-	referenceData = referenceImage.getImageData(0,0,referenceWidth,referenceHeight);
-	referencePixels = referenceData.data;
-	inputData=offScreenCanvasImage.getImageData(0,0,inputWidth,inputHeight);
-	inputPixels=inputData.data;	
-	drawing();
+function useNewInputImage() {
+    var offScreenCanvas;
+    var offScreenCanvasImage;
+    // data of the loaded image
+    inputLoaded = true;
+    inputWidth = inputImage.width;
+    inputHeight = inputImage.height;
+    // we use an off-screen canvas to get the data of the input image
+    offScreenCanvas = document.createElement("canvas");
+    offScreenCanvas.width = inputWidth;
+    offScreenCanvas.height = inputHeight;
+    offScreenCanvasImage = offScreenCanvas.getContext("2d");
+    offScreenCanvasImage.drawImage(inputImage, 0, 0);
+    // set the dimensions of the reference canvas and draw image on it
+    setupReference();
+    // reference image: draw the entire input image and get the pixels
+    referenceImage.drawImage(inputImage, 0, 0, inputWidth, inputHeight,
+        0, 0, referenceWidth, referenceHeight);
+    // free image for garbage collection
+    connectNewInputImage();
+    referenceData = referenceImage.getImageData(0, 0, referenceWidth, referenceHeight);
+    referencePixels = referenceData.data;
+    inputData = offScreenCanvasImage.getImageData(0, 0, inputWidth, inputHeight);
+    inputPixels = inputData.data;
+    drawing();
 }
 
 // choosing output image sizes and lengths of the periodic unit cell
 //===============================================================
-
 // connect the choosers
 var outputWidthChooser;
 var outputHeightChooser;
 var periodWidthChooser;
 var periodHeightChooser;
 
-function getChoosers(){
-	outputWidthChooser=document.getElementById('outputWidthChooser');
-	outputHeightChooser=document.getElementById('outputHeightChooser');
-	periodWidthChooser=document.getElementById('periodWidthChooser');
-	periodHeightChooser=document.getElementById('periodHeightChooser');
+function getChoosers() {
+    outputWidthChooser = document.getElementById('outputWidthChooser');
+    outputHeightChooser = document.getElementById('outputHeightChooser');
+    periodWidthChooser = document.getElementById('periodWidthChooser');
+    periodHeightChooser = document.getElementById('periodHeightChooser');
 }
 
 // size for generated image
 var outputWidth;
-var	outputHeight;
-	
+var outputHeight;
+
 // dimensions of the periodic unit cell
 var periodWidth;
-var	periodHeight;
+var periodHeight;
 //  their quarters
 var periodWidth4;
 var periodHeight4;
 
 // the table for the mapping function 
-var mapXTab=[];
-var mapYTab=[];
+var mapXTab = [];
+var mapYTab = [];
 //  with dimensions (part of the periodic unit cell)
 var mapWidth;
 var mapHeight;
@@ -185,132 +184,125 @@ var mapHeight;
 // set a new period width and height, limited to output dimensions
 // force multiple of 4, fix ratio between width and height for special symmetries
 // get output pixels of the periodic unit cell
-function updatePeriod(newWidth,newHeight){
-	if ((newWidth!=periodWidth)||(newHeight!=periodHeight)||(newWidth>outputWidth)||(newHeight>outputHeight)){
-		// fix ratio between width and height for special symmetries
-		if (periodWidth!=newWidth){    // the width has changed, adjust the height?
-			periodWidth=newWidth;
-			if (squareSymmetry){
-				periodHeight=newWidth;
-			}
-			else if (hexagonSymmetry){
-				periodHeight=0.5774*newWidth;
-			}
-			else {
-				periodHeight=newHeight;
-			}
-		}
-		else {                       // the height has changed, adjust the width?
-			periodHeight=newHeight;
-			if (squareSymmetry){
-				periodWidth=newHeight;
-			}
-			else if (hexagonSymmetry){
-				periodWidth=1.732*newHeight;
-			}
-			else {
-				periodWidth=newWidth;
-			}
-		}
-		//limit the periodWidth, keeping width/height ratio
-		if (periodWidth>outputWidth){
-			periodHeight=periodHeight*outputWidth/periodWidth;
-			periodWidth=outputWidth;
-		}
-		//limit the periodHeight, keeping width/height ratio
-		if (periodHeight>outputHeight){
-			periodWidth=periodWidth*outputHeight/periodHeight;
-			periodHeight=outputHeight;
-		}
-		// make integer multiples of 4
-		periodWidth=makeMultipleOf4(periodWidth);
-		periodHeight=makeMultipleOf4(periodHeight);
-		periodWidthChooser.value=periodWidth.toString();
-		periodHeightChooser.value=periodHeight.toString();
-		periodWidth4=periodWidth/4;
-		periodHeight4=periodHeight/4;
-		setupSinTable(sinXTab,periodWidth);
-		setupSinTable(sinYTab,periodHeight);
-		setMapDimensions();
-		mapXTab.length=mapWidth*mapHeight;
-		mapYTab.length=mapWidth*mapHeight;
-		setupMapTables();	
-		// output canvas, get data of unit cell	
-		outputData = outputImage.getImageData(0,0,periodWidth,periodHeight);
-		outputPixels = outputData.data;
-	}
+function updatePeriod(newWidth, newHeight) {
+    if ((newWidth != periodWidth) || (newHeight != periodHeight) || (newWidth > outputWidth) || (newHeight > outputHeight)) {
+        // fix ratio between width and height for special symmetries
+        if (periodWidth != newWidth) { // the width has changed, adjust the height?
+            periodWidth = newWidth;
+            if (squareSymmetry) {
+                periodHeight = newWidth;
+            } else if (hexagonSymmetry) {
+                periodHeight = 0.5774 * newWidth;
+            } else {
+                periodHeight = newHeight;
+            }
+        } else { // the height has changed, adjust the width?
+            periodHeight = newHeight;
+            if (squareSymmetry) {
+                periodWidth = newHeight;
+            } else if (hexagonSymmetry) {
+                periodWidth = 1.732 * newHeight;
+            } else {
+                periodWidth = newWidth;
+            }
+        }
+        //limit the periodWidth, keeping width/height ratio
+        if (periodWidth > outputWidth) {
+            periodHeight = periodHeight * outputWidth / periodWidth;
+            periodWidth = outputWidth;
+        }
+        //limit the periodHeight, keeping width/height ratio
+        if (periodHeight > outputHeight) {
+            periodWidth = periodWidth * outputHeight / periodHeight;
+            periodHeight = outputHeight;
+        }
+        // make integer multiples of 4
+        periodWidth = makeMultipleOf4(periodWidth);
+        periodHeight = makeMultipleOf4(periodHeight);
+        periodWidthChooser.value = periodWidth.toString();
+        periodHeightChooser.value = periodHeight.toString();
+        periodWidth4 = periodWidth / 4;
+        periodHeight4 = periodHeight / 4;
+        setupSinTable(sinXTab, periodWidth);
+        setupSinTable(sinYTab, periodHeight);
+        setMapDimensions();
+        mapXTab.length = mapWidth * mapHeight;
+        mapYTab.length = mapWidth * mapHeight;
+        setupMapTables();
+        // output canvas, get data of unit cell	
+        outputData = outputImage.getImageData(0, 0, periodWidth, periodHeight);
+        outputPixels = outputData.data;
+    }
 }
-
 // set a new output width and height, forces it to be a multiple of 4
 // makes a blue screen as output image
 // does NOT limit the period dimensions (avoid tangle, responsability of callers)
-function updateOutputDimensions(newWidth,newHeight){
-	newWidth=makeMultipleOf4(Math.round(newWidth));
-	newHeight=makeMultipleOf4(Math.round(newHeight));
-	if ((newWidth!=outputWidth)||(newHeight!=outputHeight)){
-		outputWidthChooser.value=newWidth.toString();
-		outputHeightChooser.value=newHeight.toString();
-		outputWidth=newWidth;
-		outputHeight=newHeight;
-		outputCanvas.width=outputWidth;
-		outputCanvas.height=outputHeight;
-		// make the canvas opaque, blue screen of nothing if there is no input image
-		outputImage.fillStyle="Blue";	
-		outputImage.fillRect(0,0,outputWidth,outputHeight);
-	}
+function updateOutputDimensions(newWidth, newHeight) {
+    newWidth = makeMultipleOf4(Math.round(newWidth));
+    newHeight = makeMultipleOf4(Math.round(newHeight));
+    if ((newWidth != outputWidth) || (newHeight != outputHeight)) {
+        outputWidthChooser.value = newWidth.toString();
+        outputHeightChooser.value = newHeight.toString();
+        outputWidth = newWidth;
+        outputHeight = newHeight;
+        outputCanvas.width = outputWidth;
+        outputCanvas.height = outputHeight;
+        // make the canvas opaque, blue screen of nothing if there is no input image
+        outputImage.fillStyle = "Blue";
+        outputImage.fillRect(0, 0, outputWidth, outputHeight);
+    }
 }
 
 //  choose output image width and height, limit periods
-function setWidth(data){
-	updateOutputDimensions(parseInt(data),outputHeight);
-	updatePeriod(periodWidth,periodHeight);   // limit the period
-	drawing();
+function setWidth(data) {
+    updateOutputDimensions(parseInt(data), outputHeight);
+    updatePeriod(periodWidth, periodHeight); // limit the period
+    drawing();
 }
-function setHeight(data){
-	updateOutputDimensions(outputWidth,parseInt(data));
-	updatePeriod(periodWidth,periodHeight);   // limit the period
-	drawing();
+
+function setHeight(data) {
+    updateOutputDimensions(outputWidth, parseInt(data));
+    updatePeriod(periodWidth, periodHeight); // limit the period
+    drawing();
 }
 
 // choose width and height of periodic unit cell
-function setPeriodWidth(data){
-	updatePeriod(parseInt(data),periodHeight);
-	drawing();
-}
-function setPeriodHeight(data){
-	updatePeriod(periodWidth,parseInt(data));
-	drawing();
+function setPeriodWidth(data) {
+    updatePeriod(parseInt(data), periodHeight);
+    drawing();
 }
 
+function setPeriodHeight(data) {
+    updatePeriod(periodWidth, parseInt(data));
+    drawing();
+}
 //  the download buttons
 //=========================================================================
-
-var imageFilename='theImage.jpg';
-var htmlFilename='caleidoscope.html';
-var cssFilename='caleidoscope.css';
+var imageFilename = 'theImage.jpg';
+var htmlFilename = 'caleidoscope.html';
+var cssFilename = 'caleidoscope.css';
 // using a minified js file for the actual html page -> download the unminified js file
-var jsDownloadname='caleidoscope.js';
-var jsFilename='caleidoscope.js';
+var jsDownloadname = 'caleidoscope.js';
+var jsFilename = 'caleidoscope.js';
 
-function activateDownloadButtons(){
-	function addDownload(button,downloadname,filename){
-		button.addEventListener('click', function() {
-			this.href = filename;
-			this.download = filename;
-		}, false);
-	}
-	var downloadImageButton=document.getElementById('downloadImageButton');
-	//  for image downloading, using jpeg image format, default quality=0.92
-	downloadImageButton.addEventListener('click', function() {
-		//  use correct data format and filename
-		this.href = outputCanvas.toDataURL("image/jpeg");  // this needs to be done at the time of the click
-		this.download = imageFilename;
-	}, false);
-	addDownload(document.getElementById('downloadHTMLButton'),htmlFilename,htmlFilename);
-	addDownload(document.getElementById('downloadCSSButton'),cssFilename,cssFilename);
-	addDownload(document.getElementById('downloadJSButton'),jsDownloadname,jsFilename);
+function activateDownloadButtons() {
+    function addDownload(button, downloadname, filename) {
+        button.addEventListener('click', function () {
+            this.href = filename;
+            this.download = filename;
+        }, false);
+    }
+    var downloadImageButton = document.getElementById('downloadImageButton');
+    //  for image downloading, using jpeg image format, default quality=0.92
+    downloadImageButton.addEventListener('click', function () {
+        //  use correct data format and filename
+        this.href = outputCanvas.toDataURL("image/jpeg"); // this needs to be done at the time of the click
+        this.download = imageFilename;
+    }, false);
+    addDownload(document.getElementById('downloadHTMLButton'), htmlFilename, htmlFilename);
+    addDownload(document.getElementById('downloadCSSButton'), cssFilename, cssFilename);
+    addDownload(document.getElementById('downloadJSButton'), jsDownloadname, jsFilename);
 }
-
 //  the canvases and their interaction
 //============================================================================
 var outputCanvas;
@@ -327,130 +319,129 @@ var outputPixels;
 var referenceData;
 var referencePixels;
 
-function getCanvases(){
-	referenceCanvas=document.getElementById("referenceCanvas");	
-	referenceImage=referenceCanvas.getContext("2d");
-	outputCanvas=document.getElementById("outputCanvas");	
-	outputImage=outputCanvas.getContext("2d");
-	orientationCanvas=document.getElementById("orientationCanvas");	
-	orientationImage=orientationCanvas.getContext("2d");
+function getCanvases() {
+    referenceCanvas = document.getElementById("referenceCanvas");
+    referenceImage = referenceCanvas.getContext("2d");
+    outputCanvas = document.getElementById("outputCanvas");
+    outputImage = outputCanvas.getContext("2d");
+    orientationCanvas = document.getElementById("orientationCanvas");
+    orientationImage = orientationCanvas.getContext("2d");
 }
 
 // override default mouse actions, especially important for the mouse wheel
 function stopEventPropagationAndDefaultAction(event) {
-	event.stopPropagation();
-	event.preventDefault();   
+    event.stopPropagation();
+    event.preventDefault();
 }
 
 // the mouse is only on one canvas at a time
 // current mouse data, with respect to the current canvas
-var mousePressed=false;
+var mousePressed = false;
 var mouseX;
 var mouseY;
 var lastMouseX;
 var lastMouseY;
 
 //  set the mouse position from current event
-function setMousePosition(event,theCanvas){
-	mouseX=event.pageX-theCanvas.offsetLeft;
-	mouseY=event.pageY-theCanvas.offsetTop;
+function setMousePosition(event, theCanvas) {
+    mouseX = event.pageX - theCanvas.offsetLeft;
+    mouseY = event.pageY - theCanvas.offsetTop;
 }
 
 //  set the last mouse position from current mouse position
-function setLastMousePosition(){
-	lastMouseX=mouseX;
-	lastMouseY=mouseY;
+function setLastMousePosition() {
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
 }
 
 // for all canvases: mouse down start interaction and sets last mouse position
-function mouseDownHandler(event,theCanvas){
-	stopEventPropagationAndDefaultAction(event);
-	mousePressed=true;
-	setMousePosition(event,theCanvas);
-	setLastMousePosition();
+function mouseDownHandler(event, theCanvas) {
+    stopEventPropagationAndDefaultAction(event);
+    mousePressed = true;
+    setMousePosition(event, theCanvas);
+    setLastMousePosition();
 }
 
 // for all canvases: mouse up or mouse out stops mouse interaction
-function mouseUpHandler(event){
-	stopEventPropagationAndDefaultAction(event);
-	mousePressed=false;	
-	return false;
+function mouseUpHandler(event) {
+    stopEventPropagationAndDefaultAction(event);
+    mousePressed = false;
+    return false;
 }
-
 // the output canvas interactions
 //=================================================
 
 // control the offset of the output
-var outputOffsetX=0;
-var outputOffsetY=0;
+var outputOffsetX = 0;
+var outputOffsetY = 0;
 
 // and change its size
-var changeSize=1.1;
+var changeSize = 1.1;
 
 // limit offset the upper left corner of the first fully visible unit cell
-function limitOffset(){
-	if (outputOffsetX<0) {
-		outputOffsetX+=periodWidth;
-	}
-	if (outputOffsetX>=periodWidth) {
-		outputOffsetX-=periodWidth;
-	}
-	if (outputOffsetY<0) {
-		outputOffsetY+=periodHeight;
-	}
-	if (outputOffsetY>=periodHeight) {
-		outputOffsetY-=periodHeight;
-	}
+function limitOffset() {
+    if (outputOffsetX < 0) {
+        outputOffsetX += periodWidth;
+    }
+    if (outputOffsetX >= periodWidth) {
+        outputOffsetX -= periodWidth;
+    }
+    if (outputOffsetY < 0) {
+        outputOffsetY += periodHeight;
+    }
+    if (outputOffsetY >= periodHeight) {
+        outputOffsetY -= periodHeight;
+    }
 }
 
-function outputMouseDownHandler(event){
-	mouseDownHandler(event,outputCanvas);
-	return false;
+function outputMouseDownHandler(event) {
+    mouseDownHandler(event, outputCanvas);
+    return false;
 }
 
-function outputMouseMoveHandler(event){
-	stopEventPropagationAndDefaultAction(event);
-	if (mousePressed){
-		setMousePosition(event,outputCanvas);
-		outputOffsetX+=mouseX-lastMouseX;
-		outputOffsetY+=mouseY-lastMouseY;
-		limitOffset();
-		setLastMousePosition();
-		// we don't need a full redraw
-		putPixelsPeriodicallyOnCanvas();
-		// hint for debugging
-		showHintPatch();
-	}
-	return false;
+function outputMouseMoveHandler(event) {
+    stopEventPropagationAndDefaultAction(event);
+    if (mousePressed) {
+        setMousePosition(event, outputCanvas);
+        outputOffsetX += mouseX - lastMouseX;
+        outputOffsetY += mouseY - lastMouseY;
+        limitOffset();
+        setLastMousePosition();
+        // we don't need a full redraw
+        putPixelsPeriodicallyOnCanvas();
+        // hint for debugging
+        showHintPatch();
+    }
+    return false;
 }
 
-function outputMouseWheelHandler(event){
-	stopEventPropagationAndDefaultAction(event);
-	var factor=event.deltaY>0?changeSize:1/changeSize;
-	updateOutputDimensions(factor*outputWidth,factor*outputHeight);
-	updatePeriod(factor*periodWidth,factor*periodHeight);
-	outputOffsetX*=factor;
-	outputOffsetY*=factor;
-	scaleOutputToInput/=factor;
-	limitOffset();
-	drawing();
-	return false;
+function outputMouseWheelHandler(event) {
+    stopEventPropagationAndDefaultAction(event);
+    var factor = event.deltaY > 0 ? changeSize : 1 / changeSize;
+    updateOutputDimensions(factor * outputWidth, factor * outputHeight);
+    updatePeriod(factor * periodWidth, factor * periodHeight);
+    outputOffsetX *= factor;
+    outputOffsetY *= factor;
+    scaleOutputToInput /= factor;
+    limitOffset();
+    drawing();
+    return false;
 }
 
 // listeners for useCapture, acting in bottom down capturing phase
 //  they should return false to stop event propagation ...
-function outputCanvasAddEventListeners(){
-		outputCanvas.addEventListener("mousedown",outputMouseDownHandler,true);
-		outputCanvas.addEventListener("mouseup",mouseUpHandler,true);
-		outputCanvas.addEventListener("mousemove",outputMouseMoveHandler,true);
-		outputCanvas.addEventListener("mouseout",mouseUpHandler,true);
-		outputCanvas.addEventListener("wheel",outputMouseWheelHandler,true);	
+function outputCanvasAddEventListeners() {
+    outputCanvas.addEventListener("mousedown", outputMouseDownHandler, true);
+    outputCanvas.addEventListener("mouseup", mouseUpHandler, true);
+    outputCanvas.addEventListener("mousemove", outputMouseMoveHandler, true);
+    outputCanvas.addEventListener("mouseout", mouseUpHandler, true);
+    outputCanvas.addEventListener("wheel", outputMouseWheelHandler, true);
 }
 
 // the reference canvas interactions
 //==========================================================================
 // maximum size of reference image
-var referenceSize=300;
+var referenceSize = 300;
 //  derived dimensions for the reference canvas
 var referenceWidth;
 var referenceHeight;
@@ -461,82 +452,80 @@ var referenceCenterX;
 var referenceCenterY;
 
 // the wheel changes the scale: map to input image pixels, a larger scale zooms out
-var scaleOutputToInput=1;
-var changeScaleFactor=1.1;
+var scaleOutputToInput = 1;
+var changeScaleFactor = 1.1;
 
-function setupReference(){
-	// set up dimensions of the reference image
-	// the reference canvas has the same width/height ratio as the input image
-	//   the larger dimension is equal to the referenceSize
-	var inputSize=Math.max(inputWidth,inputHeight);
-	if (inputWidth>inputHeight){
-		referenceWidth=referenceSize;
-		referenceHeight=Math.round(referenceWidth*inputHeight/inputWidth);
-	}
-	else {
-		referenceHeight=referenceSize;
-		referenceWidth=Math.round(referenceHeight*inputWidth/inputHeight);
-	}
-	referenceCanvas.width=referenceWidth;
-	referenceCanvas.height=referenceHeight;
-	// put center of readings to image center
-	referenceCenterX=referenceWidth/2;
-	referenceCenterY=referenceHeight/2;
-	// get scale of mapping from input image to the reference image
-	scaleInputToReference=referenceWidth/inputWidth;
+function setupReference() {
+    // set up dimensions of the reference image
+    // the reference canvas has the same width/height ratio as the input image
+    //   the larger dimension is equal to the referenceSize
+    var inputSize = Math.max(inputWidth, inputHeight);
+    if (inputWidth > inputHeight) {
+        referenceWidth = referenceSize;
+        referenceHeight = Math.round(referenceWidth * inputHeight / inputWidth);
+    } else {
+        referenceHeight = referenceSize;
+        referenceWidth = Math.round(referenceHeight * inputWidth / inputHeight);
+    }
+    referenceCanvas.width = referenceWidth;
+    referenceCanvas.height = referenceHeight;
+    // put center of readings to image center
+    referenceCenterX = referenceWidth / 2;
+    referenceCenterY = referenceHeight / 2;
+    // get scale of mapping from input image to the reference image
+    scaleInputToReference = referenceWidth / inputWidth;
 }
 
 // put pixels on reference canvas
-function putPixelsOnReferenceCanvas(){
-	referenceImage.putImageData(referenceData, 0, 0);
+function putPixelsOnReferenceCanvas() {
+    referenceImage.putImageData(referenceData, 0, 0);
 }
 
 // fade-out all pixels by setting alpha
-function setAlphaReferenceImagePixels(alpha){
-	var theEnd=referencePixels.length;
-	for (var i=3;i<theEnd;i+=4){
-		referencePixels[i]=alpha;
-	}
+function setAlphaReferenceImagePixels(alpha) {
+    var theEnd = referencePixels.length;
+    for (var i = 3; i < theEnd; i += 4) {
+        referencePixels[i] = alpha;
+    }
 }
 
-function referenceMouseDownHandler(event){
-	mouseDownHandler(event,referenceCanvas);
-	return false;
+function referenceMouseDownHandler(event) {
+    mouseDownHandler(event, referenceCanvas);
+    return false;
 }
 
-function referenceMouseMoveHandler(event){
-	stopEventPropagationAndDefaultAction(event);
-	if (mousePressed){
-		setMousePosition(event,referenceCanvas);
-		referenceCenterX+=mouseX-lastMouseX;
-		referenceCenterX=Math.max(0,Math.min(referenceCenterX,referenceWidth));
-		referenceCenterY+=mouseY-lastMouseY;
-		referenceCenterY=Math.max(0,Math.min(referenceCenterY,referenceHeight));
-		setLastMousePosition();
-		drawing();
-	}
-	return false;
+function referenceMouseMoveHandler(event) {
+    stopEventPropagationAndDefaultAction(event);
+    if (mousePressed) {
+        setMousePosition(event, referenceCanvas);
+        referenceCenterX += mouseX - lastMouseX;
+        referenceCenterX = Math.max(0, Math.min(referenceCenterX, referenceWidth));
+        referenceCenterY += mouseY - lastMouseY;
+        referenceCenterY = Math.max(0, Math.min(referenceCenterY, referenceHeight));
+        setLastMousePosition();
+        drawing();
+    }
+    return false;
 }
 
 //  change the scaling with the mouse wheel
-function referenceMouseWheelHandler(event){
-	stopEventPropagationAndDefaultAction(event);
-	if (event.deltaY>0){
-		scaleOutputToInput*=changeScaleFactor;
-	}
-	else {
-		scaleOutputToInput/=changeScaleFactor;
-	}
-	drawing();
-	return false;
+function referenceMouseWheelHandler(event) {
+    stopEventPropagationAndDefaultAction(event);
+    if (event.deltaY > 0) {
+        scaleOutputToInput *= changeScaleFactor;
+    } else {
+        scaleOutputToInput /= changeScaleFactor;
+    }
+    drawing();
+    return false;
 }
 
-function referenceCanvasAddEventListeners(){
-		referenceCanvas.addEventListener("mousedown",referenceMouseDownHandler,true);
-		referenceCanvas.addEventListener("mouseup",mouseUpHandler,true);
-		referenceCanvas.addEventListener("mousemove",referenceMouseMoveHandler,true);
-		referenceCanvas.addEventListener("mouseout",mouseUpHandler,true);
-		referenceCanvas.addEventListener("wheel",referenceMouseWheelHandler,true);	
+function referenceCanvasAddEventListeners() {
+    referenceCanvas.addEventListener("mousedown", referenceMouseDownHandler, true);
+    referenceCanvas.addEventListener("mouseup", mouseUpHandler, true);
+    referenceCanvas.addEventListener("mousemove", referenceMouseMoveHandler, true);
+    referenceCanvas.addEventListener("mouseout", mouseUpHandler, true);
+    referenceCanvas.addEventListener("wheel", referenceMouseWheelHandler, true);
 }
 
 // orientation canvas and its interactions
