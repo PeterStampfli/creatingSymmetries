@@ -1,5 +1,31 @@
 "use strict";
 
+//  the startup function
+//==============================================================================
+
+//  switching on and off the hint for the patch
+var hintPatch=false;
+
+// using special symmetries
+var squareSymmetry;
+var hexagonSymmetry;
+
+window.onload=function(){
+	hintPatch=true;
+	setSymmetries();
+	connectNewInputImage();
+	getCanvases();
+	getChoosers();
+	referenceCanvasAddEventListeners();
+	outputCanvasAddEventListeners();
+	setupOrientationCanvas(200);
+	orientationCanvasAddEventListeners();
+	activateDownloadButtons();
+	updateOutputDimensions(512,512);
+	updatePeriod(400,400);
+	drawing();
+}
+
 // collection of small functions used in different places
 //=================================================================
 
@@ -55,6 +81,15 @@ function cosY(i){
 	return sinYTab[(i+periodHeight4)%periodHeight];
 }
 
+/*
+  u   u    sss     eeee   rrrr        iii     aaa
+  u   u   s   s    e      r   r        i     a   a
+  u   u   s        e      r   r        i     a   a
+  u   u    sss     eee    rrrr         i     aaaaa
+  u   u       s    e      r  r         i     a   a
+  u   u       s    e      r   r        i     a   a
+   uuu    ssss     eeee   r   r       iii    a   a
+*/
 // User interaction, in sequence of the html code
 //====================================================
 
@@ -368,45 +403,6 @@ function limitOffset(){
 	}
 }
 
-//  put the pixels of the ImageData object outputData periodically on the output canvas
-//  outputData contains exactly one periodic cell
-//  the images are offset by outputOffsetX and outputOffsetY
-//  note that putImageData has different API than drawImage
-function putPixelsPeriodicallyOnCanvas(){
-	var copyWidth;
-	var copyHeight;
-	var targetX;
-	var targetY;
-	var sourceX;
-	var sourceY;
-	for (var cornerY=outputOffsetY-periodHeight;cornerY<outputHeight;cornerY+=periodHeight){
-		if (cornerY<0){
-			sourceY=-cornerY;
-			targetY=cornerY;            // strange, actually difference between source corner and intended
-			copyHeight=outputOffsetY;
-		}
-		else {
-			sourceY=0;
-			targetY=cornerY;
-			copyHeight=Math.min(outputHeight-cornerY,periodHeight);
-		}
-		for (var cornerX=outputOffsetX-periodWidth;cornerX<outputWidth;cornerX+=periodWidth){
-			if (cornerX<0){
-				sourceX=-cornerX;
-				targetX=cornerX;
-				copyWidth=outputOffsetX;			
-			}
-			else {			
-				sourceX=0;
-				targetX=cornerX;
-				copyWidth=Math.min(outputWidth-cornerX,periodWidth);
-			}
-			outputImage.putImageData(outputData, 
-			                         targetX, targetY,sourceX,sourceY,copyWidth,copyHeight);
-		}
-	}
-}
-
 function outputMouseDownHandler(event){
 	mouseDownHandler(event,outputCanvas);
 	return false;
@@ -645,6 +641,52 @@ function orientationCanvasAddEventListeners(){
 		orientationCanvas.addEventListener("mousemove",orientationMouseMoveHandler,true);
 		orientationCanvas.addEventListener("mouseout",mouseUpHandler,true);
 		orientationCanvas.addEventListener("wheel",orientationMouseWheelHandler,true);	
+}
+
+/*   ppp    iii    x    x   
+     p  p    i      x  x
+     p  p    i       xx
+     ppp     i       xx
+     p       i      x  x
+     p      iii    x    x
+ */  
+//  put the pixels of the ImageData object outputData periodically on the output canvas
+//  outputData contains exactly one periodic cell
+//  the images are offset by outputOffsetX and outputOffsetY
+//  note that putImageData has different API than drawImage
+function putPixelsPeriodicallyOnCanvas(){
+	var copyWidth;
+	var copyHeight;
+	var targetX;
+	var targetY;
+	var sourceX;
+	var sourceY;
+	for (var cornerY=outputOffsetY-periodHeight;cornerY<outputHeight;cornerY+=periodHeight){
+		if (cornerY<0){
+			sourceY=-cornerY;
+			targetY=cornerY;            // strange, actually difference between source corner and intended
+			copyHeight=outputOffsetY;
+		}
+		else {
+			sourceY=0;
+			targetY=cornerY;
+			copyHeight=Math.min(outputHeight-cornerY,periodHeight);
+		}
+		for (var cornerX=outputOffsetX-periodWidth;cornerX<outputWidth;cornerX+=periodWidth){
+			if (cornerX<0){
+				sourceX=-cornerX;
+				targetX=cornerX;
+				copyWidth=outputOffsetX;			
+			}
+			else {			
+				sourceX=0;
+				targetX=cornerX;
+				copyWidth=Math.min(outputWidth-cornerX,periodWidth);
+			}
+			outputImage.putImageData(outputData, 
+			                         targetX, targetY,sourceX,sourceY,copyWidth,copyHeight);
+		}
+	}
 }
 
 /* functions for copying pixels from inData to outData image data object
@@ -1207,4 +1249,71 @@ function drawing(){
 	showHintPatch();
 }
 
+// symmetry dependent
+//=============================================================================
+// setting symmetry dependent map dimensions as function of period dimensions
+// =====================================================================
+function setMapDimensions(){
+	mapWidth=periodWidth/2;
+	mapHeight=periodHeight/2;
+	mapWidth=periodWidth;
+	mapHeight=periodHeight;
+}
+
+//for debugging: show the basic map on output as red lines
+//================================================================
+function showHintPatch(){
+	if (hintPatch&&inputLoaded){
+		outputImage.strokeStyle="Red";	
+		outputImage.strokeRect(outputOffsetX,outputOffsetY,mapWidth,mapHeight);
+	}
+}
+
+//  trivial map for simple maping
+// ========================================================================
+function trivialMapTables(){
+	var locmapWidth=mapWidth;
+	var locmapHeight=mapHeight;
+	var locmapWidth2=mapWidth/2;
+	var locmapHeight2=mapHeight/2;
+	var index=0;
+	var i,j;
+	for (j=0;j<locmapHeight;j++){
+		for (i=0;i<locmapWidth;i++){
+			mapXTab[index]=i-locmapWidth2;
+			mapYTab[index++]=j-locmapHeight2;		
+		}
+	}	
+}
+
+function setupMapTables(){
+	trivialMapTables();
+}
+
+// the replacement color for outside pixels
+var outsideRed=0;
+var outsideGreen=0;
+var outsideBlue=200;
+
+// presetting special symmetries, fixing the height to width ratio of the unit cell
+function setSymmetries(){
+	squareSymmetry=false;
+	hexagonSymmetry=true;
+}
+
+// draw the unit cell on output image
+// the shape of the basic map and symmetries in unit cell depend on symmetry of the image
+//=================================================================================
+function makeSymmetriesFarris(){
+	// draw the basic map, using the mapping in the map tables 
+	for (var j=0;j<mapHeight;j++){
+		drawPixelLine(0,mapWidth-1,j);
+	}
+	// the symmetries inside the unit cell
+	//verticalMirror(periodHeight/2);
+	//horizontalMirror(periodWidth);
+		//threeFoldRotational();
+		sixFoldRotational();
+
+}
 
