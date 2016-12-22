@@ -142,8 +142,9 @@ function rosetteMapTables() {
         	zBase.mult(zBase);
         	zBase.mult(zBase);
         	zBase2.quotient(r,zBase);
-        	zBase.re+=zBase2.re;
-        	zBase.im+=zBase2.im;
+    //    	zBase.re+=zBase2.re;
+     //   	zBase.im+=zBase2.im;
+     zBase.addProd(zBase,zBase);
         	//  scale to typical input size
             mapXTab[index] = inputSize*zBase.re;
             mapYTab[index++] = inputSize*zBase.im;

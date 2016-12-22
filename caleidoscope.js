@@ -684,7 +684,7 @@ function putPixelsPeriodicallyOnCanvas() {
     }
 }
 
-/* functions for getting interpolated pixels from inData
+/* functions for getting interpolated pixels from an image data object (inData)
  *==============================================================================
  * 
  * inData and outData are ImageData objects
@@ -699,7 +699,7 @@ function putPixelsPeriodicallyOnCanvas() {
  */ 
  
 // quality dependent pixel interpolation
-var copyInterpolation = copyPixNearest;
+var pixelInterpolation = pixelInterpolationNearest;
 // the colors of the pixel, for fast manipulation, and for color symmetries
 var pixelRed;
 var pixelGreen;
@@ -708,20 +708,20 @@ var pixelBlue;
 function setInterpolation(string) {
     switch (string) {
     case "nearest":
-        copyInterpolation = copyPixNearest;
+        pixelInterpolation = pixelInterpolationNearest;
         break;
     case "linear":
-        copyInterpolation = copyPixLinear;
+        pixelInterpolation = pixelInterpolationLinear;
         break;
     case "cubic":
-        copyInterpolation = copyPixCubic;
+        pixelInterpolation = pixelInterpolationCubic;
         break;
     }
     drawing();
 }
 
 // nearest neighbor
-function copyPixNearest(x, y, inData) {
+function pixelInterpolationNearest(x, y, inData) {
     // local variables for fast access
     var inPixels = inData.data;
     var inWidth = inData.width;
@@ -746,7 +746,7 @@ function copyPixNearest(x, y, inData) {
 }
 
 //  linear interpolation
-function copyPixLinear(x, y, inData) {
+function pixelInterpolationLinear(x, y, inData) {
     // local variables for fast access
     var inPixels = inData.data;
     var inWidth = inData.width;
@@ -811,7 +811,7 @@ function mitchellNetrovalli(x) { // Mitchell-Netrovali, B=C=0.333333, 0<x<2
 }
 
 //  cubic interpolation
-function copyPixCubic(x, y, inData) {
+function pixelInterpolationCubic(x, y, inData) {
     // local variables for fast access
     var inPixels = inData.data;
     var inWidth = inData.width;
@@ -984,7 +984,7 @@ function copyPixelSkewed(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceS
     var target = index(targetI, targetJ);
     var targetEnd = index(targetEndI, targetJ);
     while (target <= targetEnd) {
-        copyPixLinear(sourceI, sourceJ, outputData);
+        pixelInterpolationLinear(sourceI, sourceJ, outputData);
         outputPixels[target++]=pixelRed;
         outputPixels[target++]=pixelGreen;
         outputPixels[target]=pixelBlue;
@@ -1000,7 +1000,7 @@ function copyPixelSkewedRightToLeft(targetI, targetEndI, targetJ, sourceI, sourc
     var target = index(targetI, targetJ);
     var targetEnd = index(targetEndI, targetJ); // all pixel components
     while (target >= targetEnd) {
-        copyPixLinear(sourceI, sourceJ, outputData);
+        pixelInterpolationLinear(sourceI, sourceJ, outputData);
         outputPixels[target++]=pixelRed;
         outputPixels[target++]=pixelGreen;
         outputPixels[target]=pixelBlue;
@@ -1213,7 +1213,7 @@ function drawPixelLine(fromI, toI, j) {
         y = scaleSin * x + scaleCos * y + centerY;
         x = newX;
         //  get the interpolated input pixel color components, write on output pixels
-        copyInterpolation(x, y, inputData);
+        pixelInterpolation(x, y, inputData);
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;
