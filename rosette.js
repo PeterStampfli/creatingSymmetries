@@ -11,18 +11,16 @@ var squareSymmetry;
 var hexagonSymmetry;
 
 window.onload = function () {
-    hintPatch = true;
+    hintPatch = false;
     setSymmetries();
     connectNewInputImage();
     getCanvases();
     getChoosers();
     referenceCanvasAddEventListeners();
-    outputCanvasAddEventListeners();
     setupOrientationCanvas(200);
     orientationCanvasAddEventListeners();
     activateDownloadButtons();
-    updateOutputDimensions(512, 512);
-    updatePeriod(400, 400);
+    updateOutputDimensions(512);
     drawing();
 };
 
@@ -31,9 +29,6 @@ window.onload = function () {
 //=============================================================================
 window['startLoadImage'] = startLoadImage;
 window['setWidth'] = setWidth;
-window['setHeight'] = setHeight;
-window['setPeriodWidth'] = setPeriodWidth;
-window['setPeriodHeight'] = setPeriodHeight;
 window['setInterpolation'] =setInterpolation;
 
 // collection of small functions used in different places
@@ -162,15 +157,9 @@ function useNewInputImage() {
 //===============================================================
 // connect the choosers
 var outputWidthChooser;
-var outputHeightChooser;
-var periodWidthChooser;
-var periodHeightChooser;
 
 function getChoosers() {
     outputWidthChooser = document.getElementById('outputWidthChooser');
-    outputHeightChooser = document.getElementById('outputHeightChooser');
-    periodWidthChooser = document.getElementById('periodWidthChooser');
-    periodHeightChooser = document.getElementById('periodHeightChooser');
 }
 
 // size for generated image
@@ -194,43 +183,11 @@ var mapHeight;
 // set a new period width and height, limited to output dimensions
 // force multiple of 4, fix ratio between width and height for special symmetries
 // get output pixels of the periodic unit cell
-function updatePeriod(newWidth, newHeight) {
-    if ((newWidth != periodWidth) || (newHeight != periodHeight) || (newWidth > outputWidth) || (newHeight > outputHeight)) {
-        // fix ratio between width and height for special symmetries
-        if (periodWidth != newWidth) { // the width has changed, adjust the height?
-            periodWidth = newWidth;
-            if (squareSymmetry) {
-                periodHeight = newWidth;
-            } else if (hexagonSymmetry) {
-                periodHeight = 0.5774 * newWidth;
-            } else {
-                periodHeight = newHeight;
-            }
-        } else { // the height has changed, adjust the width?
-            periodHeight = newHeight;
-            if (squareSymmetry) {
-                periodWidth = newHeight;
-            } else if (hexagonSymmetry) {
-                periodWidth = 1.732 * newHeight;
-            } else {
-                periodWidth = newWidth;
-            }
-        }
-        //limit the periodWidth, keeping width/height ratio
-        if (periodWidth > outputWidth) {
-            periodHeight = periodHeight * outputWidth / periodWidth;
-            periodWidth = outputWidth;
-        }
-        //limit the periodHeight, keeping width/height ratio
-        if (periodHeight > outputHeight) {
-            periodWidth = periodWidth * outputHeight / periodHeight;
-            periodHeight = outputHeight;
-        }
+function updatePeriod() {
+        
         // make integer multiples of 4
-        periodWidth = makeMultipleOf4(periodWidth);
-        periodHeight = makeMultipleOf4(periodHeight);
-        periodWidthChooser.value = periodWidth.toString();
-        periodHeightChooser.value = periodHeight.toString();
+        periodWidth = outputWidth;
+        periodHeight = outputWidth;
         periodWidth4 = periodWidth / 4;
         periodHeight4 = periodHeight / 4;
         setupSinTable(sinXTab, periodWidth);
@@ -242,50 +199,33 @@ function updatePeriod(newWidth, newHeight) {
         // output canvas, get data of unit cell	
         outputData = outputImage.getImageData(0, 0, periodWidth, periodHeight);
         outputPixels = outputData.data;
-    }
 }
+
 // set a new output width and height, forces it to be a multiple of 4
 // makes a blue screen as output image
 // does NOT limit the period dimensions (avoid tangle, responsability of callers)
-function updateOutputDimensions(newWidth, newHeight) {
+function updateOutputDimensions(newWidth) {
     newWidth = makeMultipleOf4(Math.round(newWidth));
-    newHeight = makeMultipleOf4(Math.round(newHeight));
-    if ((newWidth != outputWidth) || (newHeight != outputHeight)) {
+    if (newWidth != outputWidth) {
         outputWidthChooser.value = newWidth.toString();
-        outputHeightChooser.value = newHeight.toString();
         outputWidth = newWidth;
-        outputHeight = newHeight;
+        outputHeight = newWidth;
         outputCanvas.width = outputWidth;
         outputCanvas.height = outputHeight;
         // make the canvas opaque, blue screen of nothing if there is no input image
         outputImage.fillStyle = "Blue";
         outputImage.fillRect(0, 0, outputWidth, outputHeight);
+        updatePeriod(); 
     }
 }
 
 //  choose output image width and height, limit periods
 function setWidth(data) {
-    updateOutputDimensions(parseInt(data,10), outputHeight);
-    updatePeriod(periodWidth, periodHeight); // limit the period
+    updateOutputDimensions(parseInt(data,10));
     drawing();
 }
 
-function setHeight(data) {
-    updateOutputDimensions(outputWidth, parseInt(data,10));
-    updatePeriod(periodWidth, periodHeight); // limit the period
-    drawing();
-}
 
-// choose width and height of periodic unit cell
-function setPeriodWidth(data) {
-    updatePeriod(parseInt(data,10), periodHeight);
-    drawing();
-}
-
-function setPeriodHeight(data) {
-    updatePeriod(periodWidth, parseInt(data,10));
-    drawing();
-}
 //  the download buttons
 //=========================================================================
 var imageFilename = 'theImage.jpg';
@@ -389,65 +329,6 @@ var outputOffsetY = 0;
 // and change its size
 var changeSize = 1.1;
 
-// limit offset the upper left corner of the first fully visible unit cell
-function limitOffset() {
-    if (outputOffsetX < 0) {
-        outputOffsetX += periodWidth;
-    }
-    if (outputOffsetX >= periodWidth) {
-        outputOffsetX -= periodWidth;
-    }
-    if (outputOffsetY < 0) {
-        outputOffsetY += periodHeight;
-    }
-    if (outputOffsetY >= periodHeight) {
-        outputOffsetY -= periodHeight;
-    }
-}
-
-function outputMouseDownHandler(event) {
-    mouseDownHandler(event, outputCanvas);
-    return false;
-}
-
-function outputMouseMoveHandler(event) {
-    stopEventPropagationAndDefaultAction(event);
-    if (mousePressed) {
-        setMousePosition(event, outputCanvas);
-        outputOffsetX += mouseX - lastMouseX;
-        outputOffsetY += mouseY - lastMouseY;
-        limitOffset();
-        setLastMousePosition();
-        // we don't need a full redraw
-        putPixelsPeriodicallyOnCanvas();
-        // hint for debugging
-        showHintPatch();
-    }
-    return false;
-}
-
-function outputMouseWheelHandler(event) {
-    stopEventPropagationAndDefaultAction(event);
-    var factor = event.deltaY > 0 ? changeSize : 1 / changeSize;
-    updateOutputDimensions(factor * outputWidth, factor * outputHeight);
-    updatePeriod(factor * periodWidth, factor * periodHeight);
-    outputOffsetX *= factor;
-    outputOffsetY *= factor;
-    scaleOutputToInput /= factor;
-    limitOffset();
-    drawing();
-    return false;
-}
-
-// listeners for useCapture, acting in bottom down capturing phase
-//  they should return false to stop event propagation ...
-function outputCanvasAddEventListeners() {
-    outputCanvas.addEventListener("mousedown", outputMouseDownHandler, true);
-    outputCanvas.addEventListener("mouseup", mouseUpHandler, true);
-    outputCanvas.addEventListener("mousemove", outputMouseMoveHandler, true);
-    outputCanvas.addEventListener("mouseout", mouseUpHandler, true);
-    outputCanvas.addEventListener("wheel", outputMouseWheelHandler, true);
-}
 
 // the reference canvas interactions
 //==========================================================================
@@ -684,7 +565,7 @@ function putPixelsPeriodicallyOnCanvas() {
     }
 }
 
-/* functions for getting interpolated pixels from inData
+/* functions for copying pixels from inData to outData image data object
  *==============================================================================
  * 
  * inData and outData are ImageData objects
@@ -700,10 +581,6 @@ function putPixelsPeriodicallyOnCanvas() {
  
 // quality dependent pixel interpolation
 var copyInterpolation = copyPixNearest;
-// the colors of the pixel, for fast manipulation, and for color symmetries
-var pixelRed;
-var pixelGreen;
-var pixelBlue;
 
 function setInterpolation(string) {
     switch (string) {
@@ -721,17 +598,18 @@ function setInterpolation(string) {
 }
 
 // nearest neighbor
-function copyPixNearest(x, y, inData) {
+function copyPixNearest(x, y, outData, outIndex, inData) {
     // local variables for fast access
+    var outPixels = outData.data;
     var inPixels = inData.data;
     var inWidth = inData.width;
     var inHeight = inData.height;
     //  catch the case that the point is outside, we use there a solid color
     // with a small safety margin
     if ((x < -1) || (y < -1) || (x > inWidth) || (y > inHeight)) {
-        pixelRed = outsideRed;
-        pixelGreen = outsideGreen;
-        pixelBlue = outsideBlue;
+        outPixels[outIndex++] = outsideRed;
+        outPixels[outIndex++] = outsideGreen;
+        outPixels[outIndex] = outsideBlue;
         return;
     }
     //  rounded coordinates
@@ -740,23 +618,24 @@ function copyPixNearest(x, y, inData) {
     var h = Math.max(0, Math.min(inWidth - 1, h));
     var k = Math.max(0, Math.min(inHeight - 1, k));
     var inIndex = 4 * (inWidth * k + h);
-    pixelRed = inPixels[inIndex++]; //red
-    pixelGreen = inPixels[inIndex++]; // green
-    pixelBlue = inPixels[inIndex]; // blue, no alpha
+    outPixels[outIndex++] = inPixels[inIndex++]; //red
+    outPixels[outIndex++] = inPixels[inIndex++]; // green
+    outPixels[outIndex] = inPixels[inIndex]; // blue, no alpha
 }
 
 //  linear interpolation
-function copyPixLinear(x, y, inData) {
+function copyPixLinear(x, y, outData, outIndex, inData) {
     // local variables for fast access
+    var outPixels = outData.data;
     var inPixels = inData.data;
     var inWidth = inData.width;
     var inHeight = inData.height;
     //  catch the case that the point is outside, we use there a solid color
     // with a small safety margin
     if ((x < -1) || (y < -1) || (x > inWidth) || (y > inHeight)) {
-        pixelRed = outsideRed;
-        pixelGreen = outsideGreen;
-        pixelBlue = outsideBlue;
+        outPixels[outIndex++] = outsideRed;
+        outPixels[outIndex++] = outsideGreen;
+        outPixels[outIndex] = outsideBlue;
         return;
     }
     //  coordinates of base pixel
@@ -797,9 +676,9 @@ function copyPixLinear(x, y, inData) {
     f01 = (1 - dx) * dy;
     f10 = dx * (1 - dy);
     f11 = dy * dx;
-    pixelRed = Math.round(f00 * inPixels[i00++] + f10 * inPixels[i10++] + f01 * inPixels[i01++] + f11 * inPixels[i11++]);
-    pixelGreen = Math.round(f00 * inPixels[i00++] + f10 * inPixels[i10++] + f01 * inPixels[i01++] + f11 * inPixels[i11++]);
-    pixelBlue = Math.round(f00 * inPixels[i00] + f10 * inPixels[i10] + f01 * inPixels[i01] + f11 * inPixels[i11]);
+    outPixels[outIndex++] = Math.round(f00 * inPixels[i00++] + f10 * inPixels[i10++] + f01 * inPixels[i01++] + f11 * inPixels[i11++]);
+    outPixels[outIndex++] = Math.round(f00 * inPixels[i00++] + f10 * inPixels[i10++] + f01 * inPixels[i01++] + f11 * inPixels[i11++]);
+    outPixels[outIndex] = Math.round(f00 * inPixels[i00] + f10 * inPixels[i10] + f01 * inPixels[i01] + f11 * inPixels[i11]);
 }
 
 //  the kernel function for cubic interpolation
@@ -811,17 +690,18 @@ function mitchellNetrovalli(x) { // Mitchell-Netrovali, B=C=0.333333, 0<x<2
 }
 
 //  cubic interpolation
-function copyPixCubic(x, y, inData) {
+function copyPixCubic(x, y, outData, outIndex, inData) {
     // local variables for fast access
+    var outPixels = outData.data;
     var inPixels = inData.data;
     var inWidth = inData.width;
     var inHeight = inData.height;
     //  catch the case that the point is outside, we use there a solid color
     // with a small safety margin
     if ((x < -1) || (y < -1) || (x > inWidth) || (y > inHeight)) {
-        pixelRed = outsideRed;
-        pixelGreen = outsideGreen;
-        pixelBlue = outsideBlue;
+        outPixels[outIndex++] = outsideRed;
+        outPixels[outIndex++] = outsideGreen;
+        outPixels[outIndex] = outsideBlue;
         return;
     }
     //  coordinates of base pixel
@@ -923,9 +803,9 @@ function copyPixCubic(x, y, inData) {
     green += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
     blue += kx * (kym * inPixels[indexM] + ky0 * inPixels[index0] + ky1 * inPixels[index1] + ky2 * inPixels[index2]);
     // beware of negative values
-    pixelRed = Math.max(0, Math.round(red));
-    pixelGreen = Math.max(0, Math.round(green));
-    pixelBlue = Math.max(0, Math.round(blue));
+    outPixels[outIndex++] = Math.max(0, Math.round(red));
+    outPixels[outIndex++] = Math.max(0, Math.round(green));
+    outPixels[outIndex] = Math.max(0, Math.round(blue));
 }
 
 // copy lines of pixels on the output image data object, only the RGB part
@@ -984,11 +864,8 @@ function copyPixelSkewed(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceS
     var target = index(targetI, targetJ);
     var targetEnd = index(targetEndI, targetJ);
     while (target <= targetEnd) {
-        copyPixLinear(sourceI, sourceJ, outputData);
-        outputPixels[target++]=pixelRed;
-        outputPixels[target++]=pixelGreen;
-        outputPixels[target]=pixelBlue;
-        target += 2;
+        copyPixLinear(sourceI, sourceJ, outputData, target, outputData);
+        target += 4;
         sourceI += sourceStepI;
         sourceJ += sourceStepJ;
     }
@@ -1000,11 +877,8 @@ function copyPixelSkewedRightToLeft(targetI, targetEndI, targetJ, sourceI, sourc
     var target = index(targetI, targetJ);
     var targetEnd = index(targetEndI, targetJ); // all pixel components
     while (target >= targetEnd) {
-        copyPixLinear(sourceI, sourceJ, outputData);
-        outputPixels[target++]=pixelRed;
-        outputPixels[target++]=pixelGreen;
-        outputPixels[target]=pixelBlue;
-        target -= 6;
+        copyPixLinear(sourceI, sourceJ, outputData, target, outputData);
+        target -= 4;
         sourceI += sourceStepI;
         sourceJ += sourceStepJ;
     }
@@ -1213,11 +1087,8 @@ function drawPixelLine(fromI, toI, j) {
         y = scaleSin * x + scaleCos * y + centerY;
         x = newX;
         //  get the interpolated input pixel color components, write on output pixels
-        copyInterpolation(x, y, inputData);
-        outputPixels[outputIndex++]=pixelRed;
-        outputPixels[outputIndex++]=pixelGreen;
-        outputPixels[outputIndex]=pixelBlue;
-        outputIndex += 2;
+        copyInterpolation(x, y, outputData, outputIndex, inputData);
+        outputIndex += 4;
         // mark the reference image pixel, make it fully opaque
         h = Math.round(locScaleInputToReference * x);
         k = Math.round(locScaleInputToReference * y);
@@ -1284,7 +1155,7 @@ function trivialMapTables() {
 }
 
 function setupMapTables() {
-    trivialMapTables();
+    rosetteMapTables();
 }
 
 // initial mapping scale
@@ -1313,6 +1184,6 @@ function makeSymmetriesFarris() {
     //verticalMirror(periodHeight/2);
     //horizontalMirror(periodWidth);
     //threeFoldRotational();
-    sixFoldRotational();
+   // sixFoldRotational();
 
 }

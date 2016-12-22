@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<head>
+	<title>Rosette</title>
+</head>
+<link rel="stylesheet" type="text/css" href="caleidoscope.css">
+<body>
+	<noscript>
+		<h1 style="background-color:white">
+			Please allow execution of javascript !
+			<br>
+			(Else nothing happens.)
+		</h1>
+	</noscript>
+		<p>
+			Choose the input image file:
+			<input type="file" accept="image/*" id="imageInput" 
+				onchange="startLoadImage(this.files)">
+		</p>
+		<p>
+			Choose the size of the generated image: 
+			<input type="text" class="numbers" id="outputWidthChooser" maxlength="4" 
+				onchange="setWidth(this.value)"/>
+			.
+		</p>
+		<p>
+			
+			<form action="">
+				Choose image interpolation:
+				<input type="radio" name="interpolation" onclick="setInterpolation('nearest')" checked value="nearest">nearest
+				<input type="radio" name="interpolation" onclick="setInterpolation('linear')" value="linear">linear
+				<input type="radio" name="interpolation" onclick="setInterpolation('cubic')" value="cubic">cubic
+			</form>
+		</p>
+		<h4>
+			To "download" this image 
+			<a id="downloadImageButton" href="">&nbsp click here ! &nbsp</a>
+		</h4>
+	<p>
+		To download the codes of this page click:
+		<a id="downloadHTMLButton" href="">&nbsp here for html &nbsp</a>,
+		<a id="downloadCSSButton" href="">&nbsp here for css &nbsp</a>,
+		<a id="downloadJSButton" href="">&nbsp here for javascript &nbsp</a>.
+	</p>
+		<p style="text-align:center">
+		<canvas id="outputCanvas" moz-opaque></canvas>
+		</p>
+
+	<p style="text-align:center;">
+		<canvas id="referenceCanvas" style="vertical-align: top;"></canvas>
+		<canvas id="orientationCanvas" style="vertical-align: top;";></canvas>
+	</p>
+</body>
+	<script src="rosette.js"></script>
+	<script src="rosetteMap.js"></script>
+</html>
