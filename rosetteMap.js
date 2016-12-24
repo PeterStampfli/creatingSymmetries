@@ -125,29 +125,28 @@ CNumber.prototype.toString = function () {
 function rosetteMapTables() {
     var mapSize = mapWidth;
     var locmapHeight = mapHeight;
-    var radius = mapWidth / 2;
+    var size2 = mapWidth / 2;
     var inputSize=200;
     var index = 0;
     var i, j;
     // create complex numbers
     var zBase=cZero();
     var zBase2=cZero();
-    var r=cZero();
-    r.re=0.1;
+    var r2;
     for (j = 0; j < mapSize; j++) {
         for (i = 0; i < mapSize; i++) {
         	// normalize to be independent of output size
-        	zBase.re=i/radius-1;
-        	zBase.im=j/radius-1;
+        	zBase.re=i/size2-1;
+        	zBase.im=j/size2-1;
+        	r2=zBase.re*zBase.re+zBase.im*zBase.im+1e-40;
         	zBase.mult(zBase);
         	zBase.mult(zBase);
-        	zBase2.quotient(r,zBase);
     //    	zBase.re+=zBase2.re;
      //   	zBase.im+=zBase2.im;
      zBase.addProd(zBase,zBase);
         	//  scale to typical input size
-            mapXTab[index] = inputSize*zBase.re;
-            mapYTab[index++] = inputSize*zBase.im;
+            mapXTab[index] = inputSize*zBase.re/r2;
+            mapYTab[index++] = inputSize*zBase.im/r2;
         }
     }
 }

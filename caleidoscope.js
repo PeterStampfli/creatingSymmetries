@@ -12,10 +12,10 @@ var hexagonSymmetry;
 
 window.onload = function () {
     hintPatch = true;
+    makeInteractions();
     setSymmetries();
     connectNewInputImage();
     getCanvases();
-    getChoosers();
     referenceCanvasAddEventListeners();
     outputCanvasAddEventListeners();
     setupOrientationCanvas(200);
@@ -26,15 +26,6 @@ window.onload = function () {
     drawing();
 };
 
-//=================================================================================
-//  globals, called from html
-//=============================================================================
-window['startLoadImage'] = startLoadImage;
-window['setWidth'] = setWidth;
-window['setHeight'] = setHeight;
-window['setPeriodWidth'] = setPeriodWidth;
-window['setPeriodHeight'] = setPeriodHeight;
-window['setInterpolation'] =setInterpolation;
 
 // collection of small functions used in different places
 //=================================================================
@@ -116,10 +107,6 @@ var inputPixels;
 // first load the image data file in a file reader
 var imageReader = new FileReader();
 
-function startLoadImage(files) {
-    imageReader.readAsDataURL(files[0]);
-}
-
 // connect the inputImage to the file reader and to subsequent processing
 function connectNewInputImage() {
     inputImage = new Image();
@@ -160,18 +147,6 @@ function useNewInputImage() {
 
 // choosing output image sizes and lengths of the periodic unit cell
 //===============================================================
-// connect the choosers
-var outputWidthChooser;
-var outputHeightChooser;
-var periodWidthChooser;
-var periodHeightChooser;
-
-function getChoosers() {
-    outputWidthChooser = document.getElementById('outputWidthChooser');
-    outputHeightChooser = document.getElementById('outputHeightChooser');
-    periodWidthChooser = document.getElementById('periodWidthChooser');
-    periodHeightChooser = document.getElementById('periodHeightChooser');
-}
 
 // size for generated image
 var outputWidth;
@@ -190,6 +165,12 @@ var mapYTab = [];
 //  with dimensions (part of the periodic unit cell)
 var mapWidth;
 var mapHeight;
+
+// the choosers
+var outputWidthChooser;
+var outputHeightChooser;
+var periodWidthChooser;
+var periodHeightChooser;
 
 // set a new period width and height, limited to output dimensions
 // force multiple of 4, fix ratio between width and height for special symmetries
@@ -263,37 +244,9 @@ function updateOutputDimensions(newWidth, newHeight) {
     }
 }
 
-//  choose output image width and height, limit periods
-function setWidth(data) {
-    updateOutputDimensions(parseInt(data,10), outputHeight);
-    updatePeriod(periodWidth, periodHeight); // limit the period
-    drawing();
-}
-
-function setHeight(data) {
-    updateOutputDimensions(outputWidth, parseInt(data,10));
-    updatePeriod(periodWidth, periodHeight); // limit the period
-    drawing();
-}
-
-// choose width and height of periodic unit cell
-function setPeriodWidth(data) {
-    updatePeriod(parseInt(data,10), periodHeight);
-    drawing();
-}
-
-function setPeriodHeight(data) {
-    updatePeriod(periodWidth, parseInt(data,10));
-    drawing();
-}
 //  the download buttons
 //=========================================================================
 var imageFilename = 'theImage.jpg';
-var htmlFilename = 'caleidoscope.html';
-var cssFilename = 'caleidoscope.css';
-// using a minified js file for the actual html page -> download the unminified js file
-var jsDownloadname = 'caleidoscope.js';                              // the download gets THIS name
-var jsFilename = 'caleidoscope.js';                                     // actually, this file is taken and downloaded
 
 function activateDownloadButtons() {
     function addDownload(buttonName, downloadname, filename) {
@@ -310,10 +263,61 @@ function activateDownloadButtons() {
         downloadImageButton.href = outputCanvas.toDataURL("image/jpeg"); // the data URL is made at the time of the click
         downloadImageButton.download = imageFilename;
     }, false);
-    addDownload('downloadHTMLButton', htmlFilename, htmlFilename);
-    addDownload('downloadCSSButton', cssFilename, cssFilename);
-    addDownload('downloadJSButton', jsDownloadname, jsFilename);
+ }
+
+var imageInput;
+
+function startLoadImage() {
+    imageReader.readAsDataURL(imageInput.files[0]);
 }
+
+
+//  choose output image width and height, limit periods
+function setWidth() {
+    updateOutputDimensions(parseInt(outputWidthChooser.value,10), outputHeight);
+    updatePeriod(periodWidth, periodHeight); // limit the period
+    drawing();
+}
+
+function setHeight() {
+    updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
+    updatePeriod(periodWidth, periodHeight); // limit the period
+    drawing();
+}
+
+// choose width and height of periodic unit cell
+function setPeriodWidth(data) {
+    updatePeriod(parseInt(periodWidthChooser.value,10), periodHeight);
+    drawing();
+}
+
+function setPeriodHeight(data) {
+    updatePeriod(periodWidth, parseInt(periodHeightChooser.value,10));
+    drawing();
+}
+// make up interactions with html elements
+function makeInteractions(){
+    imageInput = document.getElementById('imageInput')
+    imageInput.addEventListener('change',startLoadImage,false);
+    outputWidthChooser = document.getElementById('outputWidthChooser');
+    outputWidthChooser.addEventListener('change',setWidth,false);
+    outputHeightChooser = document.getElementById('outputHeightChooser');
+    outputHeightChooser.addEventListener('change',setHeight,false);
+    periodWidthChooser = document.getElementById('periodWidthChooser');
+    periodWidthChooser.addEventListener('change',setPeriodWidth,false);
+    periodHeightChooser = document.getElementById('periodHeightChooser');
+    periodHeightChooser.addEventListener('change',setPeriodHeight,false);
+    var interpolationChoosers;
+    interpolationChoosers=document.getElementsByClassName('interpolation');
+    interpolationChoosers[0].addEventListener('click',function(){pixelInterpolation = pixelInterpolationNearest;
+                                                                 drawing();},false);
+    interpolationChoosers[1].addEventListener('click',function(){pixelInterpolation = pixelInterpolationLinear;
+                                                                 drawing();},false);
+    interpolationChoosers[2].addEventListener('click',function(){pixelInterpolation = pixelInterpolationCubic;
+                                                                 drawing();},false);
+
+}
+
 //  the canvases and their interaction
 //============================================================================
 var outputCanvas;
@@ -704,21 +708,6 @@ var pixelInterpolation = pixelInterpolationNearest;
 var pixelRed;
 var pixelGreen;
 var pixelBlue;
-
-function setInterpolation(string) {
-    switch (string) {
-    case "nearest":
-        pixelInterpolation = pixelInterpolationNearest;
-        break;
-    case "linear":
-        pixelInterpolation = pixelInterpolationLinear;
-        break;
-    case "cubic":
-        pixelInterpolation = pixelInterpolationCubic;
-        break;
-    }
-    drawing();
-}
 
 // nearest neighbor
 function pixelInterpolationNearest(x, y, inData) {

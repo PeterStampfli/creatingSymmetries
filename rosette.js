@@ -12,6 +12,7 @@ var hexagonSymmetry;
 
 window.onload = function () {
     hintPatch = false;
+    connectLoadImage();
     setSymmetries();
     connectNewInputImage();
     getCanvases();
@@ -110,9 +111,14 @@ var inputPixels;
 
 // first load the image data file in a file reader
 var imageReader = new FileReader();
+var imageInput = document.getElementById('imageInput');
 
-function startLoadImage(files) {
-    imageReader.readAsDataURL(files[0]);
+function connectLoadImage(){
+    imageInput.addEventListener('change',startLoadImage,false);
+}
+
+function startLoadImage() {
+    imageReader.readAsDataURL(imageInput.files[0]);
 }
 
 // connect the inputImage to the file reader and to subsequent processing
@@ -229,11 +235,13 @@ function setWidth(data) {
 //  the download buttons
 //=========================================================================
 var imageFilename = 'theImage.jpg';
-var htmlFilename = 'caleidoscope.html';
+var htmlFilename = 'rosette.html';
 var cssFilename = 'caleidoscope.css';
 // using a minified js file for the actual html page -> download the unminified js file
-var jsDownloadname = 'caleidoscope.js';                              // the download gets THIS name
-var jsFilename = 'caleidoscope.js';                                     // actually, this file is taken and downloaded
+var jsDownloadname = 'rosette.js';                              // the download gets THIS name
+var jsFilename = 'rosette.js';                                     // actually, this file is taken and downloaded
+var js2Downloadname = 'rosetteMap.js';                              // the download gets THIS name
+var js2Filename = 'rosetteMap.js';                                     // actually, this file is taken and downloaded
 
 function activateDownloadButtons() {
     function addDownload(buttonName, downloadname, filename) {
@@ -253,6 +261,7 @@ function activateDownloadButtons() {
     addDownload('downloadHTMLButton', htmlFilename, htmlFilename);
     addDownload('downloadCSSButton', cssFilename, cssFilename);
     addDownload('downloadJSButton', jsDownloadname, jsFilename);
+  //  addDownload('downloadJS2Button', js2Downloadname, js2Filename);
 }
 //  the canvases and their interaction
 //============================================================================
