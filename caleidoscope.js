@@ -20,7 +20,6 @@ window.onload = function () {
     outputCanvasAddEventListeners();
     setupOrientationCanvas(200);
     orientationCanvasAddEventListeners();
-    activateDownloadButtons();
     updateOutputDimensions(512, 512);
     updatePeriod(400, 400);
     drawing();
@@ -246,75 +245,56 @@ function updateOutputDimensions(newWidth, newHeight) {
 
 //  the download buttons
 //=========================================================================
-var imageFilename = 'theImage.jpg';
 
-function activateDownloadButtons() {
-    function addDownload(buttonName, downloadname, filename) {
-        	var theButton=document.getElementById(buttonName);
-        	theButton.addEventListener('click', function () {
-            	theButton.href = filename;
-            	theButton.download = downloadname;
-        }, false);
-    }
+// make up interactions with html elements
+function makeInteractions(){
+    var imageInputButton = document.getElementById('imageInput')
+    imageInputButton.addEventListener('change',function(){
+            imageReader.readAsDataURL(imageInputButton.files[0]);
+        },false);
+    // we need the choosers to write back the corrected data
+    outputWidthChooser = document.getElementById('outputWidthChooser');
+    outputWidthChooser.addEventListener('change',function(){
+            updateOutputDimensions(parseInt(outputWidthChooser.value,10), outputHeight);
+            updatePeriod(periodWidth, periodHeight); // limit the period
+            drawing();
+        },false);
+    outputHeightChooser = document.getElementById('outputHeightChooser');
+    outputHeightChooser.addEventListener('change',function(){
+            updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
+            updatePeriod(periodWidth, periodHeight); // limit the period
+            drawing();
+        },false);
+    periodWidthChooser = document.getElementById('periodWidthChooser');
+    periodWidthChooser.addEventListener('change',function(){
+            updatePeriod(parseInt(periodWidthChooser.value,10), periodHeight);
+            drawing();
+        },false);
+    periodHeightChooser = document.getElementById('periodHeightChooser');
+    periodHeightChooser.addEventListener('change',function(){
+            updatePeriod(periodWidth, parseInt(periodHeightChooser.value,10));
+            drawing();
+        },false);
+    var interpolationChoosers=document.getElementsByClassName('interpolation');
+    interpolationChoosers[0].addEventListener('click',function(){
+            pixelInterpolation = pixelInterpolationNearest;
+            drawing();
+        },false);
+    interpolationChoosers[1].addEventListener('click',function(){
+            pixelInterpolation = pixelInterpolationLinear;
+            drawing();
+        },false);
+    interpolationChoosers[2].addEventListener('click',function(){
+            pixelInterpolation = pixelInterpolationCubic;
+            drawing();
+        },false);
     var downloadImageButton = document.getElementById('downloadImageButton');
     //  for image downloading, using jpeg image format, default quality=0.92
     downloadImageButton.addEventListener('click', function () {
-        //  use correct data format and filename
-        downloadImageButton.href = outputCanvas.toDataURL("image/jpeg"); // the data URL is made at the time of the click
-        downloadImageButton.download = imageFilename;
-    }, false);
- }
-
-var imageInput;
-
-function startLoadImage() {
-    imageReader.readAsDataURL(imageInput.files[0]);
-}
-
-
-//  choose output image width and height, limit periods
-function setWidth() {
-    updateOutputDimensions(parseInt(outputWidthChooser.value,10), outputHeight);
-    updatePeriod(periodWidth, periodHeight); // limit the period
-    drawing();
-}
-
-function setHeight() {
-    updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
-    updatePeriod(periodWidth, periodHeight); // limit the period
-    drawing();
-}
-
-// choose width and height of periodic unit cell
-function setPeriodWidth(data) {
-    updatePeriod(parseInt(periodWidthChooser.value,10), periodHeight);
-    drawing();
-}
-
-function setPeriodHeight(data) {
-    updatePeriod(periodWidth, parseInt(periodHeightChooser.value,10));
-    drawing();
-}
-// make up interactions with html elements
-function makeInteractions(){
-    imageInput = document.getElementById('imageInput')
-    imageInput.addEventListener('change',startLoadImage,false);
-    outputWidthChooser = document.getElementById('outputWidthChooser');
-    outputWidthChooser.addEventListener('change',setWidth,false);
-    outputHeightChooser = document.getElementById('outputHeightChooser');
-    outputHeightChooser.addEventListener('change',setHeight,false);
-    periodWidthChooser = document.getElementById('periodWidthChooser');
-    periodWidthChooser.addEventListener('change',setPeriodWidth,false);
-    periodHeightChooser = document.getElementById('periodHeightChooser');
-    periodHeightChooser.addEventListener('change',setPeriodHeight,false);
-    var interpolationChoosers;
-    interpolationChoosers=document.getElementsByClassName('interpolation');
-    interpolationChoosers[0].addEventListener('click',function(){pixelInterpolation = pixelInterpolationNearest;
-                                                                 drawing();},false);
-    interpolationChoosers[1].addEventListener('click',function(){pixelInterpolation = pixelInterpolationLinear;
-                                                                 drawing();},false);
-    interpolationChoosers[2].addEventListener('click',function(){pixelInterpolation = pixelInterpolationCubic;
-                                                                 drawing();},false);
+            //  use correct data format and filename
+            downloadImageButton.href = outputCanvas.toDataURL("image/jpeg"); // the data URL is made at the time of the click
+            downloadImageButton.download = "theImage.jpg";
+        }, false);
 
 }
 
@@ -1167,21 +1147,34 @@ function threeFoldRotational() {
 // the line starts at (fromI,j) and goes upwards to (toI,j)  (all INTEGERS)
 // addressing pixels in the periodic unit cell AND points in the (mapXTab[...],mapYTab[...])
 
+// sampling transformation
+var centerX;
+var centerY;
+var scaleSin;
+var scaleCos;
+// sample input at transformed coordinates
+// result in pixelRed, pixelGreen, pixelBlue
+function sampleInput(x,y){
+    // translation, rotation and scaling
+    var newX = scaleCos * x - scaleSin * y + centerX;
+    y = scaleSin * x + scaleCos * y + centerY;
+    x = newX;
+    //  get the interpolated input pixel color components, write on output pixels
+    pixelInterpolation(x, y, inputData);
+    // mark the reference image pixel, make it fully opaque
+    var h = Math.round(scaleInputToReference * x);
+    var k = Math.round(scaleInputToReference * y);
+    // but check if we are on the reference canvas
+    if ((h >= 0) && (h < referenceWidth) && (k >= 0) && (k < referenceHeight)) {
+        referencePixels[4 * (referenceWidth * k + h) + 3] = 255;
+    }
+}
+
+
 function drawPixelLine(fromI, toI, j) {
-    //  reference image, local variables
-    var locReferencePixels = referencePixels;
-    var locReferenceWidth = referenceWidth;
-    var locReferenceHeight = referenceHeight;
-    var locScaleInputToReference = scaleInputToReference;
     // local reference to the mapping table
     var locMapXTab = mapXTab;
     var locMapYTab = mapYTab;
-    // translation: center of sampling as defined by the mouse on the reference image
-    var centerX = referenceCenterX / scaleInputToReference;
-    var centerY = referenceCenterY / scaleInputToReference;
-    //  scaling and rotation: transformation matrix elements
-    var scaleCos = scaleOutputToInput * cosAngle;
-    var scaleSin = scaleOutputToInput * sinAngle;
     //  sampling coordinates (input image)
     var x, y, newX;
     //  integer coordinates in the reference image
@@ -1197,23 +1190,13 @@ function drawPixelLine(fromI, toI, j) {
         x = locMapXTab[mapIndex];
         y = locMapYTab[mapIndex];
         mapIndex++;
-        // translation, rotation and scaling
-        newX = scaleCos * x - scaleSin * y + centerX;
-        y = scaleSin * x + scaleCos * y + centerY;
-        x = newX;
-        //  get the interpolated input pixel color components, write on output pixels
-        pixelInterpolation(x, y, inputData);
+        //  color symmetry
+        sampleInput(x,y);
+        //
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;
         outputIndex += 2;
-        // mark the reference image pixel, make it fully opaque
-        h = Math.round(locScaleInputToReference * x);
-        k = Math.round(locScaleInputToReference * y);
-        // but check if we are on the reference canvas
-        if ((h >= 0) && (h < locReferenceWidth) && (k >= 0) && (k < locReferenceHeight)) {
-            locReferencePixels[4 * (locReferenceWidth * k + h) + 3] = 255;
-        }
     }
 }
 
@@ -1226,6 +1209,12 @@ function drawing(){
 	// white out: make the reference image semitransparent
 	setAlphaReferenceImagePixels(128);
 	// make the symmetries on the output image
+    // translation: center of sampling as defined by the mouse on the reference image
+    centerX = referenceCenterX / scaleInputToReference;
+    centerY = referenceCenterY / scaleInputToReference;
+    //  scaling and rotation: transformation matrix elements
+    scaleCos = scaleOutputToInput * cosAngle;
+    scaleSin = scaleOutputToInput * sinAngle;
 	makeSymmetriesFarris();
 	// put the symmetric image on the output canvas
 	putPixelsPeriodicallyOnCanvas();
