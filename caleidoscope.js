@@ -12,15 +12,14 @@ var hexagonSymmetry;
 
 window.onload = function () {
     hintPatch = true;
-    makeInteractions();
     setSymmetries();
     connectNewInputImage();
     getCanvases();
     referenceCanvasAddEventListeners();
     outputCanvasAddEventListeners();
     setupOrientationCanvas(200);
-    orientationCanvasAddEventListeners();
-    updateOutputDimensions(512, 512);
+     makeInteractions();
+   updateOutputDimensions(512, 512);
     updatePeriod(400, 400);
     drawing();
 };
@@ -35,50 +34,6 @@ function makeMultipleOf4(i) {
     return i - i % 4;
 }
 
-// accelerated trigonometric functions for the mapping functions:
-// tables for the sine and cosine functions
-var sinXTab = [];
-var sinYTab = [];
-
-// making the tables, depending on the period lengths of the unit cell
-// we need a full period to make lookup as simple as possible for higher frequencies
-function setupSinTable(sinTab, length) {
-    var factor = 2 * Math.PI / length;
-    var length4 = length / 4;
-    var length2 = length / 2;
-    var i;
-    var sinus;
-    sinTab.length = length;
-    sinTab[0] = 0;
-    sinTab[length2] = 0;
-    for (i = 1; i <= length4; i++) {
-        sinus = Math.sin(factor * i);
-        sinTab[i] = sinus;
-        sinTab[length2 - i] = sinus;
-        sinTab[length2 + i] = -sinus;
-        sinTab[length - i] = -sinus;
-    }
-}
-// the sin and cos functions, periodic on the unit lattice dimensions,
-//  for any integer multiple of the side length of a pixel
-//====================================================
-//  horizontal
-function sinX(i) {
-    return sinXTab[i % periodWidth];
-}
-
-function cosX(i) {
-    return sinXTab[(i + periodWidth4) % periodWidth];
-}
-
-// vertical
-function sinY(i) {
-    return sinYTab[i % periodHeight];
-}
-
-function cosY(i) {
-    return sinYTab[(i + periodHeight4) % periodHeight];
-}
 
 /*
   u   u    sss     eeee   rrrr        iii     aaa
@@ -213,8 +168,6 @@ function updatePeriod(newWidth, newHeight) {
         periodHeightChooser.value = periodHeight.toString();
         periodWidth4 = periodWidth / 4;
         periodHeight4 = periodHeight / 4;
-        setupSinTable(sinXTab, periodWidth);
-        setupSinTable(sinYTab, periodHeight);
         setMapDimensions();
         mapXTab.length = mapWidth * mapHeight;
         mapYTab.length = mapWidth * mapHeight;
@@ -302,10 +255,6 @@ function makeInteractions(){
 //============================================================================
 var outputCanvas;
 var outputImage;
-var referenceCanvas;
-var referenceImage;
-var orientationCanvas;
-var orientationImage;
 
 // image and pixel data of output canvas, using only one periodic unit cell
 var outputData;
@@ -315,13 +264,9 @@ var referenceData;
 var referencePixels;
 
 function getCanvases() {
-    referenceCanvas = document.getElementById("referenceCanvas");
-    referenceImage = referenceCanvas.getContext("2d");
     outputCanvas = document.getElementById("outputCanvas");
     outputImage = outputCanvas.getContext("2d");
-    orientationCanvas = document.getElementById("orientationCanvas");
-    orientationImage = orientationCanvas.getContext("2d");
-}
+ }
 
 // override default mouse actions, especially important for the mouse wheel
 function stopEventPropagationAndDefaultAction(event) {
@@ -435,6 +380,8 @@ function outputCanvasAddEventListeners() {
 
 // the reference canvas interactions
 //==========================================================================
+var referenceCanvas;
+var referenceImage;
 // maximum size of reference image
 var referenceSize = 300;
 //  derived dimensions for the reference canvas
@@ -515,6 +462,8 @@ function referenceMouseWheelHandler(event) {
 }
 
 function referenceCanvasAddEventListeners() {
+    referenceCanvas = document.getElementById("referenceCanvas");
+    referenceImage = referenceCanvas.getContext("2d");
     referenceCanvas.addEventListener("mousedown", referenceMouseDownHandler, true);
     referenceCanvas.addEventListener("mouseup", mouseUpHandler, true);
     referenceCanvas.addEventListener("mousemove", referenceMouseMoveHandler, true);
@@ -524,6 +473,8 @@ function referenceCanvasAddEventListeners() {
 
 // orientation canvas and its interactions
 //=========================================================
+var orientationCanvas;
+var orientationImage;
 //  orientation canvas is square and gives the orientation angle of sampling
 var orientationSize;
 var angle;
@@ -538,18 +489,6 @@ function setAngle(newAngle) {
     angle = newAngle;
     cosAngle = Math.cos(angle);
     sinAngle = Math.sin(angle);
-}
-
-// setup the orientation canvas dimensions and transformation matrix
-//  zero is at center und unit is radius (half the size)
-function setupOrientationCanvas(size) {
-    orientationSize = size;
-    orientationCanvas.width = size;
-    orientationCanvas.height = size;
-    orientationImage.scale(orientationSize / 2 - 1, orientationSize / 2 - 1);
-    orientationImage.translate(1, 1);
-    setAngle(0);
-    drawOrientation();
 }
 
 // we use transformed coordinates
@@ -615,12 +554,23 @@ function orientationMouseWheelHandler(event) {
     return false;
 }
 
-function orientationCanvasAddEventListeners() {
+// setup the orientation canvas dimensions and transformation matrix
+//  zero is at center und unit is radius (half the size)
+function setupOrientationCanvas(size) {
+    orientationCanvas = document.getElementById("orientationCanvas");
+    orientationImage = orientationCanvas.getContext("2d");
     orientationCanvas.addEventListener("mousedown", orientationMouseDownHandler, true);
     orientationCanvas.addEventListener("mouseup", mouseUpHandler, true);
     orientationCanvas.addEventListener("mousemove", orientationMouseMoveHandler, true);
     orientationCanvas.addEventListener("mouseout", mouseUpHandler, true);
     orientationCanvas.addEventListener("wheel", orientationMouseWheelHandler, true);
+    orientationSize = size;
+    orientationCanvas.width = size;
+    orientationCanvas.height = size;
+    orientationImage.scale(orientationSize / 2 - 1, orientationSize / 2 - 1);
+    orientationImage.translate(1, 1);
+    setAngle(0);
+    drawOrientation();
 }
 
 /*   ppp    iii    x    x   

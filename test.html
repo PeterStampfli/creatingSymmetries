@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<head>
+	<title>Test</title>
+</head>
+<link rel="stylesheet" type="text/css" href="caleidoscope.css">
+<body>
+	<p> 
+		check the console !
+	</p>
+</body>
+<script>
+function time(){
+	return new Date().getTime();
+}
+
+nCheck=10000000;
+
+x=0;
+dx=6.28/nCheck;
+start=time();
+while(x<6.28){
+	//y=Math.floor(x);
+	//y=Math.floor(x);
+	x+=dx;
+}
+console.log((time()-start)/1000);
+
+function powerOf2(n){
+	result=1;
+	while (n>0){
+		result*=2;
+		n--;
+	}
+	return result;
+}
+console.log(powerOf2(5));
+console.log(-1&(powerOf2(6)-1));
+</script>
+</html>
