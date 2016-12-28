@@ -14,12 +14,11 @@ window.onload = function () {
     hintPatch = true;
     setSymmetries();
     connectNewInputImage();
-    getCanvases();
-    referenceCanvasAddEventListeners();
-    outputCanvasAddEventListeners();
+    setupReferenceCanvas();
+    setupOutputCanvas();
     setupOrientationCanvas(200);
-     makeInteractions();
-   updateOutputDimensions(512, 512);
+    makeInteractions();
+    updateOutputDimensions(512, 512);
     updatePeriod(400, 400);
     drawing();
 };
@@ -86,7 +85,7 @@ function useNewInputImage() {
     offScreenCanvasImage = offScreenCanvas.getContext("2d");
     offScreenCanvasImage.drawImage(inputImage, 0, 0);
     // set the dimensions of the reference canvas and draw image on it
-    setupReference();
+    adjustReference();
     // reference image: draw the entire input image and get the pixels
     referenceImage.drawImage(inputImage, 0, 0, inputWidth, inputHeight,
         0, 0, referenceWidth, referenceHeight);
@@ -253,20 +252,6 @@ function makeInteractions(){
 
 //  the canvases and their interaction
 //============================================================================
-var outputCanvas;
-var outputImage;
-
-// image and pixel data of output canvas, using only one periodic unit cell
-var outputData;
-var outputPixels;
-// image and pixel data of the reference canvas
-var referenceData;
-var referencePixels;
-
-function getCanvases() {
-    outputCanvas = document.getElementById("outputCanvas");
-    outputImage = outputCanvas.getContext("2d");
- }
 
 // override default mouse actions, especially important for the mouse wheel
 function stopEventPropagationAndDefaultAction(event) {
@@ -310,6 +295,12 @@ function mouseUpHandler(event) {
 }
 // the output canvas interactions
 //=================================================
+var outputCanvas;
+var outputImage;
+
+// image and pixel data of output canvas, using only one periodic unit cell
+var outputData;
+var outputPixels;
 
 // control the offset of the output
 var outputOffsetX = 0;
@@ -370,7 +361,9 @@ function outputMouseWheelHandler(event) {
 
 // listeners for useCapture, acting in bottom down capturing phase
 //  they should return false to stop event propagation ...
-function outputCanvasAddEventListeners() {
+function setupOutputCanvas() {
+    outputCanvas = document.getElementById("outputCanvas");
+    outputImage = outputCanvas.getContext("2d");
     outputCanvas.addEventListener("mousedown", outputMouseDownHandler, true);
     outputCanvas.addEventListener("mouseup", mouseUpHandler, true);
     outputCanvas.addEventListener("mousemove", outputMouseMoveHandler, true);
@@ -382,6 +375,9 @@ function outputCanvasAddEventListeners() {
 //==========================================================================
 var referenceCanvas;
 var referenceImage;
+// image and pixel data of the reference canvas
+var referenceData;
+var referencePixels;
 // maximum size of reference image
 var referenceSize = 300;
 //  derived dimensions for the reference canvas
@@ -397,7 +393,7 @@ var referenceCenterY;
 var scaleOutputToInput;
 var changeScaleFactor = 1.1;
 
-function setupReference() {
+function adjustReference() {
     // set up dimensions of the reference image
     // the reference canvas has the same width/height ratio as the input image
     //   the larger dimension is equal to the referenceSize
@@ -461,7 +457,7 @@ function referenceMouseWheelHandler(event) {
     return false;
 }
 
-function referenceCanvasAddEventListeners() {
+function setupReferenceCanvas() {
     referenceCanvas = document.getElementById("referenceCanvas");
     referenceImage = referenceCanvas.getContext("2d");
     referenceCanvas.addEventListener("mousedown", referenceMouseDownHandler, true);
