@@ -17,7 +17,7 @@
 		<a id="downloadImageButton" href="">&nbsp click here ! &nbsp</a>
 	</h4>
 	<p>
-		To download the code of this page click:
+		To download the code of this page click
 		<a download href="ornament.html">&nbsp here &nbsp</a>.
 	</p>
 	<p>
@@ -58,24 +58,87 @@ function drawing(){
 	var tpi=2*Math.PI;
 	var t=0;
 	var dt=tpi/nSteps;
-	var scale=scaleFactor*size/2;
 	canvasImage.beginPath();
-	canvasImage.moveTo(scale*x(0)+size/2,scale*y(0)+size/2);
+	updateZ(0);
+	canvasImage.moveTo(scale*z.re+size/2,scale*z.im+size/2);
 	while (t<=tpi){
 		t+=dt;
-		canvasImage.lineTo(scale*x(t)+size/2,scale*y(t)+size/2);
+		updateZ(t);
+		canvasImage.lineTo(scale*z.re+size/2,scale*z.im+size/2);
 	}
 	canvasImage.stroke();
 }
 
+var z=cZero();
+	
+/*
+class: CNumber
+a class for complex numbers
+*/
+function CNumber(re,im) {
+    this.re = re;
+    this.im = im;
+}
 
-var nSteps=1000;
+//  create a new complex zero without "new"
+function cZero() {
+    return new CNumber(0,0);
+}
+
+//  create a new cNumber without "new"
+function cNumber(re,im) {
+    return new CNumber(re,im);
+}
+
+//  set a complex number equalö to given components
+function set(re,im) {
+	this.re=re;
+	this.im=im;
+    return this;
+}
+
+
+//  multiply a complex number with a phase
+CNumber.prototype.phase=function(phi){
+	var cosPhi=Math.cos(phi);
+	var sinPhi=Math.sin(phi);
+	var h=this.re*cosPhi-this.im*sinPhi;
+	this.im=this.re*sinPhi+this.im*cosPhi;
+	this.re=h;
+	return this;
+}
+
+// set equal to a complex number times a phase
+CNumber.prototype.aPhase=function(a,phi){
+	var cosPhi=Math.cos(phi);
+	var sinPhi=Math.sin(phi);
+	this.re=a.re*cosPhi-a.im*sinPhi;
+	this.im=a.re*sinPhi+a.im*cosPhi;
+	return this;
+}
+
+// add a complex number times a phase
+CNumber.prototype.addAPhase=function(a,phi){
+	var cosPhi=Math.cos(phi);
+	var sinPhi=Math.sin(phi);
+	this.re+=a.re*cosPhi-a.im*sinPhi;
+	this.im+=a.re*sinPhi+a.im*cosPhi;
+	return this;
+}
+
+// parameters for general appearance
 var size=512;
 var backgroundColor="rgb(200,200,150)";
 var lineWidth=3;
 var lineColor="rgb(0,0,150)";
-var scaleFactor=0.5;
 
+// parameters for the curve
+var nSteps=1000;
+var scale=0.25*size;
+var m=1;
+var N=5;
+
+var a1=cNumber(1.0,0);
 
 function x(t){
 	return 0.6*Math.cos(t)-0.3*Math.cos(6*t)-0.1*Math.cos(11*t)+Math.cos(-4*t);
@@ -83,6 +146,10 @@ function x(t){
 
 function y(t){
 	return 0.6*Math.sin(t)-0.3*Math.sin(6*t)-0.1*Math.sin(11*t)+Math.sin(-4*t);
+}
+
+function updateZ(t){
+	z.aPhase(a1,0).addAPhase(cNumber(0.1,0.8),10*t).addAPhase(cNumber(0,0.3),-15*t).phase(m*t);
 }
 </script>
 </html>
