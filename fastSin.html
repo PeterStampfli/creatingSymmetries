@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<head>
+	<title>Fast sinus</title>
+</head>
+<body>
+	<p> 
+		Activate javascript and check the console !
+	</p>
+</body>
+<script>
+function time(){
+	return new Date().getTime();
+}
+
+function powerOf2(n){
+	return Math.round(Math.pow(2,n));
+}
+
+
+
+var sinTab;
+var sinTabLengthM1;
+var sinTabLength4;
+var sinTabFactor;
+
+	//var sinTabLength=powerOf2(16);
+	var sinTabLength=100;
+	sinTabLengthM1=sinTabLength-1;
+	sinTabLength4=sinTabLength/4;
+    sinTabFactor = 0.5*sinTabLength/Math.PI;
+
+/*
+function setupSinTable(p) {
+    sinTab = new Array(sinTabLength);
+    for (var i = 0; i < sinTabLength; i++) {
+        sinTab[i] = Math.sin(i/sinTabFactor);
+    }
+}
+
+setupSinTable(16);
+
+
+function fastSin(x){
+	return sinTab[Math.round(x*sinTabFactor)&sinTabLengthM1];
+
+}
+
+function fastCos(x){
+	return sinTab[(Math.round(x*sinTabFactor)+sinTabLength4)&sinTabLengthM1];
+}
+/*
+for (var i=-10;i<10;i++){
+	x=i*0.6;
+	console.log("exact, lookup "+Math.cos(x)+" "+fastCos(x));
+}
+*/
+
+nChecks=10000000;
+
+var x=0;
+var y=0;
+var range=63;
+var dx=range/nChecks;
+var start=0;
+x=0;
+start=time();
+while(x<range){
+	y+=Math.sin(x);
+
+	x+=dx;
+}
+
+console.log("using the sine function: "+(time()-start)/1000);
+/*
+x=0;
+start=time();
+while(x<range){
+	y+=fastSin(x);
+
+	x+=dx;
+}
+
+console.log("using the fast sine function: "+(time()-start)/1000);
+
+x=0;
+start=time();
+while(x<range){
+	y+=fastCos(x);
+
+	x+=dx;
+}
+
+console.log("using the fast cos function: "+(time()-start)/1000);
+
+
+x=0;
+start=time();
+while(x<range){
+
+	x+=dx;
+}
+
+console.log("the empty loop: "+(time()-start)/1000);
+*/
+x=0;
+start=time();
+while(x<range){
+
+	x+=dx;
+}
+
+console.log("the empty loop: "+(time()-start)/1000);
+
+console.log(y);
+</script>
+</html>

@@ -91,11 +91,11 @@ function cNumber(re,im) {
 }
 
 //  set a complex number equalö to given components
-function set(re,im) {
+CNumber.prototype.set=function(re,im) {
 	this.re=re;
 	this.im=im;
     return this;
-}
+};
 
 
 //  multiply a complex number with a phase
@@ -106,25 +106,14 @@ CNumber.prototype.phase=function(phi){
 	this.im=this.re*sinPhi+this.im*cosPhi;
 	this.re=h;
 	return this;
-}
-
-// set equal to a complex number times a phase
-CNumber.prototype.aPhase=function(a,phi){
+};
+CNumber.prototype.add=function(re,im,phi){
 	var cosPhi=Math.cos(phi);
 	var sinPhi=Math.sin(phi);
-	this.re=a.re*cosPhi-a.im*sinPhi;
-	this.im=a.re*sinPhi+a.im*cosPhi;
+	this.re+=re*cosPhi-im*sinPhi;
+	this.im+=re*sinPhi+im*cosPhi;
 	return this;
-}
-
-// add a complex number times a phase
-CNumber.prototype.addAPhase=function(a,phi){
-	var cosPhi=Math.cos(phi);
-	var sinPhi=Math.sin(phi);
-	this.re+=a.re*cosPhi-a.im*sinPhi;
-	this.im+=a.re*sinPhi+a.im*cosPhi;
-	return this;
-}
+};
 
 // parameters for general appearance
 var size=512;
@@ -134,22 +123,10 @@ var lineColor="rgb(0,0,150)";
 
 // parameters for the curve
 var nSteps=1000;
-var scale=0.25*size;
-var m=1;
-var N=5;
-
-var a1=cNumber(1.0,0);
-
-function x(t){
-	return 0.6*Math.cos(t)-0.3*Math.cos(6*t)-0.1*Math.cos(11*t)+Math.cos(-4*t);
-}
-
-function y(t){
-	return 0.6*Math.sin(t)-0.3*Math.sin(6*t)-0.1*Math.sin(11*t)+Math.sin(-4*t);
-}
+var scale=0.2*size;
 
 function updateZ(t){
-	z.aPhase(a1,0).addAPhase(cNumber(0.1,0.8),10*t).addAPhase(cNumber(0,0.3),-15*t).phase(m*t);
+	z.set(1,0).add(0.37,0.77,5*t).add(0,0.53,-15*t).phase(2*t);
 }
 </script>
 </html>

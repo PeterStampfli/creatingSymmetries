@@ -1137,7 +1137,7 @@ function drawPixelLine(fromI, toI, j) {
         y = locMapYTab[mapIndex];
         mapIndex++;
         //  color symmetry
-        sampleInput(x,y);
+        makePixelColor(x,y);
         //
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
@@ -1218,6 +1218,11 @@ scaleOutputToInput = 1
 var outsideRed = 0;
 var outsideGreen = 0;
 var outsideBlue = 200;
+
+//get the color of a pixel, trivial case, no color symmetry
+function makePixelColor(x,y){
+    sampleInput(x,y);
+}
 
 // presetting special symmetries, fixing the height to width ratio of the unit cell
 function setSymmetries() {

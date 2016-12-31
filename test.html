@@ -4,38 +4,52 @@
 <head>
 	<title>Test</title>
 </head>
-<link rel="stylesheet" type="text/css" href="caleidoscope.css">
 <body>
 	<p> 
-		check the console !
+		Activate javascript and check the console !
 	</p>
 </body>
 <script>
+
 function time(){
 	return new Date().getTime();
 }
 
-nCheck=10000000;
+var sinTabFactor;
 
-x=0;
-dx=6.28/nCheck;
+	//var sinTabLength=powerOf2(16);
+	var sinTabLength=100;
+	sinTabLengthM1=sinTabLength-1;
+	sinTabLength4=sinTabLength/4;
+ //   sinTabFactor = 0.5*sinTabLength/Math.PI;
+  //  sinTabFactor = 0.5;
+
+
+nChecks=10000000;
+
+var x=0;
+var y;
+var range=63;
+var dx=range/nChecks;
+var start;
 start=time();
-while(x<6.28){
-	//y=Math.floor(x);
-	//y=Math.floor(x);
+while(x<range){
+	y=Math.sin(x);
+
 	x+=dx;
 }
-console.log((time()-start)/1000);
 
-function powerOf2(n){
-	result=1;
-	while (n>0){
-		result*=2;
-		n--;
-	}
-	return result;
+console.log("using the sine function: "+(time()-start)/1000);
+
+x=0;
+start=time();
+while(x<range){
+
+	x+=dx;
 }
-console.log(powerOf2(5));
-console.log(-1&(powerOf2(6)-1));
+
+console.log("the empty loop: "+(time()-start)/1000);
+
+
 </script>
 </html>
