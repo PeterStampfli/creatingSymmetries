@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <head>
-	<title>Fast sinus</title>
+	<title>Fast sin + cos</title>
 </head>
 <body>
 	<p> 
@@ -19,43 +19,62 @@ function powerOf2(n){
 }
 
 
+function errorCheck(start,end,nSteps,trueFunction,approximateFunction){
+	var x=start;
+	var dx=(end-start)/nSteps;
+	var error=0;
+	while (x<end){
+		error=Math.max(error,Math.abs(trueFunction(x)-approximateFunction(x)));
+		x+=dx;
+	}
+	return error;
+}
 
-var sinTab;
-var sinTabLengthM1;
-var sinTabLength4;
-var sinTabFactor;
 
-	//var sinTabLength=powerOf2(16);
-	var sinTabLength=100;
-	sinTabLengthM1=sinTabLength-1;
-	sinTabLength4=sinTabLength/4;
-    sinTabFactor = 0.5*sinTabLength/Math.PI;
 
-/*
-function setupSinTable(p) {
-    sinTab = new Array(sinTabLength);
-    for (var i = 0; i < sinTabLength; i++) {
-        sinTab[i] = Math.sin(i/sinTabFactor);
+var sinTab=[];
+var cosTab=[];
+var sinCosTabLengthM1=0;
+var sinCosTabFactor=1;
+
+
+
+function setupSinCosTable(p) {
+	var sinCosTabLength=powerOf2(p);
+    sinTab.length = sinCosTabLength;
+    cosTab.length = sinCosTabLength;
+	sinCosTabLengthM1=sinCosTabLength-1;
+    sinCosTabFactor = 0.5*sinCosTabLength/Math.PI;
+    var factor=1.0/sinCosTabFactor;
+    var x=0;
+    for (var i = 0; i < sinCosTabLength; i++) {
+    	x=i*factor;
+        sinTab[i] = Math.sin(x);
+        cosTab[i] = Math.cos(x);
     }
 }
 
-setupSinTable(16);
+setupSinCosTable(16);
 
 
 function fastSin(x){
-	return sinTab[Math.round(x*sinTabFactor)&sinTabLengthM1];
+	return sinTab[Math.round(x*sinCosTabFactor)&sinCosTabLengthM1];
 
 }
 
 function fastCos(x){
-	return sinTab[(Math.round(x*sinTabFactor)+sinTabLength4)&sinTabLengthM1];
+	return cosTab[Math.round(x*sinCosTabFactor)&sinCosTabLengthM1];
 }
 /*
 for (var i=-10;i<10;i++){
-	x=i*0.6;
+	x=i*0.3;
 	console.log("exact, lookup "+Math.cos(x)+" "+fastCos(x));
 }
 */
+
+
+console.log("sinus approximation error: "+errorCheck(-10,20,0.1,Math.sin,fastSin));
+console.log("cosinus approximation error: "+errorCheck(-10,20,0.1,Math.cos,fastCos));
 
 nChecks=10000000;
 
@@ -67,27 +86,27 @@ var start=0;
 x=0;
 start=time();
 while(x<range){
-	y+=Math.sin(x);
+	y=Math.sin(x);
 
 	x+=dx;
 }
 
-console.log("using the sine function: "+(time()-start)/1000);
-/*
+console.log("using the sin function: "+(time()-start)/1000);
+
 x=0;
 start=time();
 while(x<range){
-	y+=fastSin(x);
+	y=fastSin(x);
 
 	x+=dx;
 }
 
-console.log("using the fast sine function: "+(time()-start)/1000);
+console.log("using the fast sin function: "+(time()-start)/1000);
 
 x=0;
 start=time();
 while(x<range){
-	y+=fastCos(x);
+	y=fastCos(x);
 
 	x+=dx;
 }
@@ -103,7 +122,7 @@ while(x<range){
 }
 
 console.log("the empty loop: "+(time()-start)/1000);
-*/
+
 x=0;
 start=time();
 while(x<range){
@@ -113,6 +132,5 @@ while(x<range){
 
 console.log("the empty loop: "+(time()-start)/1000);
 
-console.log(y);
 </script>
 </html>

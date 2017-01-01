@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<head>
+	<title>Fast exp</title>
+</head>
+<body>
+	<p> 
+		Activate javascript and check the console !
+	</p>
+</body>
+<script>
+function time(){
+	return new Date().getTime();
+}
+
+function powerOf2(n){
+	return Math.round(Math.pow(2,n));
+}
+
+
+function errorCheck(start,end,nSteps,trueFunction,approximateFunction){
+	var x=start;
+	var dx=(end-start)/nSteps;
+	var absError=0;
+	var relError=0;
+	while (x<end){
+		absError=Math.max(absError,Math.abs(trueFunction(x)-approximateFunction(x)));
+		relError=Math.max(relError,Math.abs(trueFunction(x)-approximateFunction(x))
+			                     /(Math.abs(trueFunction(x)+approximateFunction(x))));
+		x+=dx;
+	}
+	console.log("max absolute error: "+absError);
+	console.log("max relative error: "+relError);
+}
+
+function compare(start,end,nSteps,trueFunction,approximateFunction){
+	var x=start;
+	var dx=(end-start)/nSteps;
+	var error=0;
+	while (x<end){
+		console.log(x+" "+trueFunction(x)+" "+approximateFunction(x));
+		x+=dx;
+	}
+}
+
+var expTabIntPos=[];
+var expTabIntNeg=[];
+var expTabFract=[];
+var expTabFactor=0;
+var expLimit=0;
+
+var sinTab=[];
+var cosTab=[];
+var sinCosTabLengthM1=0;
+var sinCosTabFactor=1;
+
+function setupExpTables(n,limit){
+	expLimit=limit;
+	expTabIntPos.length=limit+1;
+	expTabIntNeg.length=limit+1;
+	for (var i=0;i<=limit;i++){
+		expTabIntPos[i]=Math.exp(i);
+		expTabIntNeg[i]=Math.exp(-i);
+	}
+	expTabFract.length=n+1;
+	expTabFactor=n;
+	var factor=1.0/expTabFactor;
+	for (var i=0;i<=n;i++){
+		expTabFract[i]=Math.exp(i*factor);
+	}
+}
+
+function fastExp(x){
+	if (x>=0){
+		x=Math.min(x,expLimit);
+		var iPart=Math.floor(x);
+		return expTabIntPos[iPart]*expTabFract[Math.round(expTabFactor*(x-iPart))];
+	}
+	else {
+		x=Math.max(x,-expLimit);
+		var iPart=Math.floor(x);
+		return expTabIntNeg[-iPart]*expTabFract[Math.round(expTabFactor*(x-iPart))];
+	}
+}
+
+setupExpTables(100,100);
+
+
+compare(-3,3,10,Math.exp,fastExp);
+errorCheck(0,30,1000,Math.exp,fastExp);
+
+
+
+
+nChecks=1000000;
+
+var x=0;
+var y=0;
+var range=63;
+var dx=2*range/nChecks;
+var start=0;
+x=-range;
+start=time();
+while(x<range){
+	y=Math.exp(x);
+
+	x+=dx;
+}
+
+console.log("using the exp function: "+(time()-start)/1000);
+
+x=-range;
+start=time();
+while(x<range){
+	y=fastExp(x);
+
+	x+=dx;
+}
+
+console.log("using the fast exp function: "+(time()-start)/1000);
+
+
+
+x=-range;
+start=time();
+while(x<range){
+
+	x+=dx;
+}
+
+console.log("the empty loop: "+(time()-start)/1000);
+
+x=-range;
+start=time();
+while(x<range){
+
+	x+=dx;
+}
+
+console.log("the empty loop: "+(time()-start)/1000);
+
+</script>
+</html>
