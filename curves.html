@@ -2,23 +2,26 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <head>
-	<title>ornament</title>
+	<title>curves</title>
 </head>
 <body>
 	<noscript>
-		<h1 style="background-color:white">
+		<h1 style="background-color:orange">
 			Please allow execution of javascript !
 			<br>
 			(Else nothing happens.)
 		</h1>
 	</noscript>
-	<h4>
+	<h2>
+		Change the code of this page to create your own symmetric curves!
+	</h2>
+	<p>
 		To "download" this image 
 		<a id="downloadImageButton" href="">&nbsp click here ! &nbsp</a>
-	</h4>
+	</p>
 	<p>
-		To download the code of this page click
-		<a download href="ornament.html">&nbsp here &nbsp</a>.
+		To download the code of this page for doing your own work
+		<a download href="curves.html">&nbsp click here ! &nbsp</a>
 	</p>
 	<p>
 		<canvas id="outputCanvas" moz-opaque></canvas>
@@ -29,6 +32,7 @@
 var canvas;
 var canvasImage;
 
+// setting up the canvas, its context and line stayles
 window.onload = function () {
 	setupImageDownload();
     canvas = document.getElementById("outputCanvas");
@@ -44,6 +48,7 @@ window.onload = function () {
 
 };
 
+// how to download the canvas image
 function setupImageDownload(){
     var downloadImageButton = document.getElementById('downloadImageButton');
     //  for image downloading, using jpeg image format, default quality=0.92
@@ -54,6 +59,7 @@ function setupImageDownload(){
         }, false);
 }
 
+//  this draws the curve using the special function z(t)
 function drawing(){
 	var tpi=2*Math.PI;
 	var t=0;
@@ -90,15 +96,14 @@ function cNumber(re,im) {
     return new CNumber(re,im);
 }
 
-//  set a complex number equalö to given components
+//  set a complex number equal to given real and imaginary components
 CNumber.prototype.set=function(re,im) {
 	this.re=re;
 	this.im=im;
     return this;
 };
 
-
-//  multiply a complex number with a phase
+//  multiply a complex number with a phase factor exp(i * phase)
 CNumber.prototype.phase=function(phi){
 	var cosPhi=Math.cos(phi);
 	var sinPhi=Math.sin(phi);
@@ -107,6 +112,9 @@ CNumber.prototype.phase=function(phi){
 	this.re=h;
 	return this;
 };
+
+// add to a complex number the product of another complex number tiomes a phase factor
+// adds (re + i * im) * exp(i * phi) to the complex number
 CNumber.prototype.add=function(re,im,phi){
 	var cosPhi=Math.cos(phi);
 	var sinPhi=Math.sin(phi);
@@ -115,16 +123,25 @@ CNumber.prototype.add=function(re,im,phi){
 	return this;
 };
 
-// parameters for general appearance
+// parameters to define the general appearance of the curve
+
+// the size of the image
 var size=512;
+
+// colors and line widths
 var backgroundColor="rgb(200,200,150)";
 var lineWidth=3;
 var lineColor="rgb(0,0,150)";
 
 // parameters for the curve
+
+// the number of line segments
 var nSteps=1000;
+
+// a scale factor, adjust to fit the image on the canvas
 var scale=0.2*size;
 
+//  this is the special function z(t) that defines the curve
 function updateZ(t){
 	z.set(1,0).add(0.37,0.77,5*t).add(0,0.53,-15*t).phase(2*t);
 }

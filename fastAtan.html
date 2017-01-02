@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <head>
-	<title>Fast exp</title>
+	<title>Fast atan</title>
 </head>
 <body>
 	<p> 
@@ -52,43 +52,40 @@ function makeFunctionTable(length,start,delta,theFunction){
 	return table;
 }
 
-var expTabIntPos=[];
-var expTabIntNeg=[];
-var expTabFract=[];
-var expTabFactor=0;
-var expLimit=0;
+var atanTab=[];
+var atanTabFactor=0;
+var pi2=0.5*Math.PI;
 
-var sinTab=[];
-var cosTab=[];
-var sinCosTabLengthM1=0;
-var sinCosTabFactor=1;
 
-function setupExpTables(n,limit){
-	expLimit=limit;
-	expTabIntPos=makeFunctionTable(limit+1,0,1,Math.exp);
-	expTabIntNeg=makeFunctionTable(limit+1,0,-1,Math.exp);
-	expTabFactor=n;
-	expTabFract=makeFunctionTable(limit+1,0,1.0/expTabFactor,Math.exp);
+function setupAtanTable(n){
+	atanTabFactor=n;
+	atanTab=makeFunctionTable(n+1,0,1.0/atanTabFactor,Math.atan);
 }
 
-function fastExp(x){
-	if (x>=0){
-		x=Math.min(x,expLimit);
-		var iPart=Math.floor(x);
-		return expTabIntPos[iPart]*expTabFract[Math.round(expTabFactor*(x-iPart))];
+function fastAtan(x){
+	if (x>0){
+		if (x<1){
+			return atanTab[Math.round(x*atanTabFactor)];
+		}
+		else {
+			return pi2-atanTab[Math.round(atanTabFactor/x)];
+		}
 	}
 	else {
-		x=Math.max(x,-expLimit);
-		var iPart=Math.floor(x);
-		return expTabIntNeg[-iPart]*expTabFract[Math.round(expTabFactor*(x-iPart))];
+		if (x>-1){
+			return -atanTab[Math.round(-x*atanTabFactor)];
+		}
+		else {
+			return atanTab[Math.round(-atanTabFactor/x)]-pi2;
+		}
 	}
 }
 
-setupExpTables(100,100);
 
+setupAtanTable(1000);
 
-compare(-3,3,10,Math.exp,fastExp);
-errorCheck(0,30,1000,Math.exp,fastExp);
+compare(-3,3,10,Math.atan,fastAtan);
+errorCheck(0,30,1000,Math.atan,fastAtan);
 
 
 
@@ -103,22 +100,22 @@ var start=0;
 x=-range;
 start=time();
 while(x<range){
-	y=Math.exp(x);
+	y=Math.atan(x);
 
 	x+=dx;
 }
 
-console.log("using the exp function: "+(time()-start)/1000);
+console.log("using the atan function: "+(time()-start)/1000);
 
 x=-range;
 start=time();
 while(x<range){
-	y=fastExp(x);
+	y=fastAtan(x);
 
 	x+=dx;
 }
 
-console.log("using the fast exp function: "+(time()-start)/1000);
+console.log("using the fast atan function: "+(time()-start)/1000);
 
 
 

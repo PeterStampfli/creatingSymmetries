@@ -31,6 +31,13 @@ function errorCheck(start,end,nSteps,trueFunction,approximateFunction){
 }
 
 
+function makeFunctionTable(length,start,delta,theFunction){
+	table=new Array(length);
+	for (var i = 0;i<length;i++){
+		table[i]=theFunction(start+i*delta);
+	}
+	return table;
+}
 
 var sinTab=[];
 var cosTab=[];
@@ -41,17 +48,10 @@ var sinCosTabFactor=1;
 
 function setupSinCosTable(p) {
 	var sinCosTabLength=powerOf2(p);
-    sinTab.length = sinCosTabLength;
-    cosTab.length = sinCosTabLength;
-	sinCosTabLengthM1=sinCosTabLength-1;
+ 	sinCosTabLengthM1=sinCosTabLength-1;
     sinCosTabFactor = 0.5*sinCosTabLength/Math.PI;
-    var factor=1.0/sinCosTabFactor;
-    var x=0;
-    for (var i = 0; i < sinCosTabLength; i++) {
-    	x=i*factor;
-        sinTab[i] = Math.sin(x);
-        cosTab[i] = Math.cos(x);
-    }
+    sinTab=makeFunctionTable(sinCosTabLength,0,1.0/sinCosTabFactor,Math.sin);
+    cosTab=makeFunctionTable(sinCosTabLength,0,1.0/sinCosTabFactor,Math.cos);
 }
 
 setupSinCosTable(16);
