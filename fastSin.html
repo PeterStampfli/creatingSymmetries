@@ -19,15 +19,14 @@ function powerOf2(n){
 }
 
 
-function errorCheck(start,end,nSteps,trueFunction,approximateFunction){
+function errorCheck(start,end,step,trueFunction,approximateFunction){
 	var x=start;
-	var dx=(end-start)/nSteps;
 	var error=0;
 	while (x<end){
 		error=Math.max(error,Math.abs(trueFunction(x)-approximateFunction(x)));
-		x+=dx;
+		x+=step;
 	}
-	return error;
+	console.log("max error :"+error);
 }
 
 
@@ -43,6 +42,7 @@ var sinTab=[];
 var cosTab=[];
 var sinCosTabLengthM1=0;
 var sinCosTabFactor=1;
+var sinCosTabHigherCorrection=0;
 
 
 
@@ -50,7 +50,8 @@ function setupSinCosTable(p) {
 	var sinCosTabLength=powerOf2(p);
  	sinCosTabLengthM1=sinCosTabLength-1;
     sinCosTabFactor = 0.5*sinCosTabLength/Math.PI;
-    sinTab=makeFunctionTable(sinCosTabLength,0,1.0/sinCosTabFactor,Math.sin);
+    sinCosTabHigherCorrection=0.25/sinCosTabFactor/sinCosTabFactor;
+    sinTab=makeFunctionTable(sinCosTabLength+1,0,1.0/sinCosTabFactor,Math.sin);
     cosTab=makeFunctionTable(sinCosTabLength,0,1.0/sinCosTabFactor,Math.cos);
 }
 
@@ -59,7 +60,22 @@ setupSinCosTable(16);
 
 function fastSin(x){
 	return sinTab[Math.round(x*sinCosTabFactor)&sinCosTabLengthM1];
+}
 
+function fastInterpolatedSin(x){
+	x*=sinCosTabFactor;
+	var index=Math.floor(x);
+	var dx=x-index;
+	index=index&sinCosTabLengthM1;
+	return sinTab[index]*(1-dx)+sinTab[index+1]*dx;
+}
+
+function fastImprovedInterpolatedSin(x){
+	x*=sinCosTabFactor;
+	var index=Math.floor(x);
+	var dx=x-index;
+	index=index&sinCosTabLengthM1;
+	return sinTab[index]*(1-dx)*(1+sinCosTabHigherCorrection*dx)+sinTab[index+1]*dx*(1+sinCosTabHigherCorrection*(1-dx));
 }
 
 function fastCos(x){
@@ -73,10 +89,17 @@ for (var i=-10;i<10;i++){
 */
 
 
-console.log("sinus approximation error: "+errorCheck(-10,20,0.1,Math.sin,fastSin));
-console.log("cosinus approximation error: "+errorCheck(-10,20,0.1,Math.cos,fastCos));
+console.log("fast sinus approximation error: ");
+errorCheck(-20,20,0.1,Math.sin,fastSin);
 
-nChecks=10000000;
+console.log("interpolated sinus approximation error: ");
+errorCheck(-10,20,0.1,Math.sin,fastInterpolatedSin);
+console.log("improved interpolated sinus approximation error: ");
+errorCheck(-10,20,0.1,Math.sin,fastImprovedInterpolatedSin);
+console.log("cosinus approximation error: ");
+errorCheck(-10,20,0.1,Math.cos,fastCos);
+
+nChecks=1000000;
 
 var x=0;
 var y=0;
@@ -85,13 +108,33 @@ var dx=range/nChecks;
 var start=0;
 x=0;
 start=time();
+
 while(x<range){
 	y=Math.sin(x);
 
 	x+=dx;
 }
-
 console.log("using the sin function: "+(time()-start)/1000);
+
+x=0;
+start=time();
+while(x<range){
+	y=fastImprovedInterpolatedSin(x);
+
+	x+=dx;
+}
+
+console.log("using the fast improved interpolated sin function: "+(time()-start)/1000);
+
+x=0;
+start=time();
+while(x<range){
+	y=fastInterpolatedSin(x);
+
+	x+=dx;
+}
+
+console.log("using the fast interpolated sin function: "+(time()-start)/1000);
 
 x=0;
 start=time();
@@ -113,15 +156,18 @@ while(x<range){
 
 console.log("using the fast cos function: "+(time()-start)/1000);
 
+function empty(x){
+	return x;
+}
 
 x=0;
 start=time();
 while(x<range){
-
+	y=empty(x);
 	x+=dx;
 }
 
-console.log("the empty loop: "+(time()-start)/1000);
+console.log("the empty function: "+(time()-start)/1000);
 
 x=0;
 start=time();
