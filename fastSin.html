@@ -18,17 +18,36 @@ function powerOf2(n){
 	return Math.round(Math.pow(2,n));
 }
 
+var PI2=Math.PI*0.5;
+
 
 function errorCheck(start,end,step,trueFunction,approximateFunction){
 	var x=start;
-	var error=0;
+	var absError=0;
+	var relError=0;
+	var trueValue=0;
+	var approximateValue=0;
 	while (x<end){
-		error=Math.max(error,Math.abs(trueFunction(x)-approximateFunction(x)));
+		trueValue=trueFunction(x);
+		approximateValue=approximateFunction(x);
+		absError=Math.max(absError,Math.abs(trueValue-approximateValue));
+		relError=2*Math.max(relError,Math.abs(trueValue-approximateValue)
+			                     /(Math.abs(trueValue)+Math.abs(approximateValue)));
 		x+=step;
 	}
-	console.log("max error :"+error);
+	console.log("max absolute error: "+absError);
+	console.log("max relative error: "+relError);
 }
 
+function compare(start,end,step,trueFunction,approximateFunction){
+	var x=start;
+	var error=0;
+	console.log("compare:  x, true function, approximation, error");
+	while (x<end){
+		console.log(x+" "+trueFunction(x)+" "+approximateFunction(x)+" "+(approximateFunction(x)-trueFunction(x)));
+		x+=step;
+	}
+}
 
 function makeFunctionTable(length,start,delta,theFunction){
 	table=new Array(length);
@@ -39,65 +58,76 @@ function makeFunctionTable(length,start,delta,theFunction){
 }
 
 var sinTab=[];
-var cosTab=[];
-var sinCosTabLengthM1=0;
-var sinCosTabFactor=1;
-var sinCosTabHigherCorrection=0;
+var sinTabLengthM1=0;
+var sinTabFactor=1;
+var sinTabHigherCorrection=0;
 
 
 
 function setupSinCosTable(p) {
-	var sinCosTabLength=powerOf2(p);
- 	sinCosTabLengthM1=sinCosTabLength-1;
-    sinCosTabFactor = 0.5*sinCosTabLength/Math.PI;
-    sinCosTabHigherCorrection=0.25/sinCosTabFactor/sinCosTabFactor;
-    sinTab=makeFunctionTable(sinCosTabLength+1,0,1.0/sinCosTabFactor,Math.sin);
-    cosTab=makeFunctionTable(sinCosTabLength,0,1.0/sinCosTabFactor,Math.cos);
+	var sinTabLength=powerOf2(p);
+ 	sinTabLengthM1=sinTabLength-1;
+    sinTabFactor = 0.5*sinTabLength/Math.PI;
+    sinTabHigherCorrection=0.25/sinTabFactor/sinTabFactor;
+    sinTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,Math.sin);
 }
 
-setupSinCosTable(16);
+setupSinCosTable(12);
+
+console.log(powerOf2(12));
 
 
 function fastSin(x){
-	return sinTab[Math.round(x*sinCosTabFactor)&sinCosTabLengthM1];
+	return sinTab[Math.round(x*sinTabFactor)&sinTabLengthM1];
 }
 
 function fastInterpolatedSin(x){
-	x*=sinCosTabFactor;
+	x*=sinTabFactor;
 	var index=Math.floor(x);
 	var dx=x-index;
-	index=index&sinCosTabLengthM1;
+	index=index&sinTabLengthM1;
 	return sinTab[index]*(1-dx)+sinTab[index+1]*dx;
 }
 
 function fastImprovedInterpolatedSin(x){
-	x*=sinCosTabFactor;
+	x*=sinTabFactor;
 	var index=Math.floor(x);
 	var dx=x-index;
-	index=index&sinCosTabLengthM1;
-	return sinTab[index]*(1-dx)*(1+sinCosTabHigherCorrection*dx)+sinTab[index+1]*dx*(1+sinCosTabHigherCorrection*(1-dx));
+	index=index&sinTabLengthM1;
+	return sinTab[index]*(1-dx)*(1+sinTabHigherCorrection*dx)+sinTab[index+1]*dx*(1+sinTabHigherCorrection*(1-dx));
 }
 
 function fastCos(x){
-	return cosTab[Math.round(x*sinCosTabFactor)&sinCosTabLengthM1];
+	return sinTab[Math.round((x+PI2)*sinTabFactor)&sinTabLengthM1];
 }
-/*
-for (var i=-10;i<10;i++){
-	x=i*0.3;
-	console.log("exact, lookup "+Math.cos(x)+" "+fastCos(x));
+
+function fastInterpolatedCos(x){
+	x=sinTabFactor*(x+PI2);
+	var index=Math.floor(x);
+	var dx=x-index;
+	index=index&sinTabLengthM1;
+	return sinTab[index]*(1-dx)+sinTab[index+1]*dx;
 }
-*/
+
+function fastImprovedInterpolatedCos(x){
+	x=sinTabFactor*(x+PI2);
+	var index=Math.floor(x);
+	var dx=x-index;
+	index=index&sinTabLengthM1;
+	return sinTab[index]*(1-dx)*(1+sinTabHigherCorrection*dx)+sinTab[index+1]*dx*(1+sinTabHigherCorrection*(1-dx));
+}
 
 
 console.log("fast sinus approximation error: ");
-errorCheck(-20,20,0.1,Math.sin,fastSin);
+errorCheck(-20,20,0.01,Math.sin,fastSin);
+//compare(-2,2,0.1,Math.sin,fastSin);
 
 console.log("interpolated sinus approximation error: ");
-errorCheck(-10,20,0.1,Math.sin,fastInterpolatedSin);
+errorCheck(-10,20,0.01,Math.sin,fastInterpolatedSin);
 console.log("improved interpolated sinus approximation error: ");
-errorCheck(-10,20,0.1,Math.sin,fastImprovedInterpolatedSin);
+errorCheck(-10,20,0.01,Math.sin,fastImprovedInterpolatedSin);
 console.log("cosinus approximation error: ");
-errorCheck(-10,20,0.1,Math.cos,fastCos);
+errorCheck(-10,20,0.01,Math.cos,fastCos);
 
 nChecks=1000000;
 

@@ -38,8 +38,9 @@ function compare(start,end,nSteps,trueFunction,approximateFunction){
 	var x=start;
 	var dx=(end-start)/nSteps;
 	var error=0;
+	console.log("compare:  x, true function, approximation, error");
 	while (x<end){
-		console.log(x+" "+trueFunction(x)+" "+approximateFunction(x));
+		console.log(x+" "+trueFunction(x)+" "+approximateFunction(x)+" "+(approximateFunction(x)-trueFunction(x)));
 		x+=dx;
 	}
 }
