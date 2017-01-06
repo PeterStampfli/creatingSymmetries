@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <head>
-	<title>fastSin</title>
+	<title>Fast sin + cos</title>
 </head>
 <body>
 	<p> 
@@ -86,6 +86,9 @@ function setupSinCosTable(p) {
 function fastSin(x){
 	return sinTab[Math.round(x*sinTabFactor)&sinTabLengthM1];
 }
+function fastSinModulus(x){
+	return sinTab[Math.round(x*sinTabFactor)%sinTabLengthM1];
+}
 
 //  using linear interpolation
 function fastInterpolatedSin(x){
@@ -131,7 +134,7 @@ function fastImprovedInterpolatedCos(x){
 	return sinTab[index]*(1-dx)*(1+sinTabHigherCorrection*dx)+sinTab[index+1]*dx*(1+sinTabHigherCorrection*(1-dx));
 }
 
-
+console.log(-10%4);
 // using a table of 4097 elements
 //==============================================
 
@@ -155,7 +158,7 @@ errorCheck(-10,20,0.01,Math.cos,fastCos);
 // checking the speed
 //===================================================0
 
-nChecks=10000000;
+nChecks=100000000;
 
 var x=0;
 var y=0;
@@ -164,13 +167,13 @@ var dx=range/nChecks;
 var start=0;
 x=0;
 start=time();
-
+/*
 while(x<range){
 	y=Math.sin(x);
 	x+=dx;
 }
 console.log("using the sin function: "+(time()-start)/1000);
-
+*/
 x=0;
 start=time();
 while(x<range){
@@ -196,13 +199,29 @@ while(x<range){
 }
 console.log("using the fast sin function: "+(time()-start)/1000);
 
+x=0;
+start=time();
+while(x<range){
+	y=fastSinModulus(x);
+
+	x+=dx;
+}
+console.log("using the modulus fast sin function: "+(time()-start)/1000);
+
 //  for reference - the empty loop
 x=0;
 start=time();
 while(x<range){
 	x+=dx;
 }
-console.log("the empty loop: "+(time()-start)/1000);
+console.log("the empty loop: "+(time()-start)/1000);//  for reference - the empty loop
+
+x=0;
+start=time();
+for (var i=nChecks;i>0;i--){
+	x+=dx;
+}
+console.log("the empty for loop: "+(time()-start)/1000);
 
 </script>
 </html>

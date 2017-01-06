@@ -11,18 +11,26 @@ var squareSymmetry;
 var hexagonSymmetry;
 
 window.onload = function () {
-    hintPatch = true;
+    hintPatch = false;
+    connectLoadImage();
     setSymmetries();
     connectNewInputImage();
-    setupReferenceCanvas();
-    setupOutputCanvas();
+    getCanvases();
+    getChoosers();
+    referenceCanvasAddEventListeners();
     setupOrientationCanvas(200);
-    makeInteractions();
-    updateOutputDimensions(512, 512);
-    updatePeriod(400, 400);
+    orientationCanvasAddEventListeners();
+    activateDownloadButtons();
+    updateOutputDimensions(512);
     drawing();
 };
 
+//=================================================================================
+//  globals, called from html
+//=============================================================================
+window['startLoadImage'] = startLoadImage;
+window['setWidth'] = setWidth;
+window['setInterpolation'] =setInterpolation;
 
 // collection of small functions used in different places
 //=================================================================
@@ -33,6 +41,50 @@ function makeMultipleOf4(i) {
     return i - i % 4;
 }
 
+// accelerated trigonometric functions for the mapping functions:
+// tables for the sine and cosine functions
+var sinXTab = [];
+var sinYTab = [];
+
+// making the tables, depending on the period lengths of the unit cell
+// we need a full period to make lookup as simple as possible for higher frequencies
+function setupSinTable(sinTab, length) {
+    var factor = 2 * Math.PI / length;
+    var length4 = length / 4;
+    var length2 = length / 2;
+    var i;
+    var sinus;
+    sinTab.length = length;
+    sinTab[0] = 0;
+    sinTab[length2] = 0;
+    for (i = 1; i <= length4; i++) {
+        sinus = Math.sin(factor * i);
+        sinTab[i] = sinus;
+        sinTab[length2 - i] = sinus;
+        sinTab[length2 + i] = -sinus;
+        sinTab[length - i] = -sinus;
+    }
+}
+// the sin and cos functions, periodic on the unit lattice dimensions,
+//  for any integer multiple of the side length of a pixel
+//====================================================
+//  horizontal
+function sinX(i) {
+    return sinXTab[i % periodWidth];
+}
+
+function cosX(i) {
+    return sinXTab[(i + periodWidth4) % periodWidth];
+}
+
+// vertical
+function sinY(i) {
+    return sinYTab[i % periodHeight];
+}
+
+function cosY(i) {
+    return sinYTab[(i + periodHeight4) % periodHeight];
+}
 
 /*
   u   u    sss     eeee   rrrr        iii     aaa
@@ -59,6 +111,15 @@ var inputPixels;
 
 // first load the image data file in a file reader
 var imageReader = new FileReader();
+var imageInput = document.getElementById('imageInput');
+
+function connectLoadImage(){
+    imageInput.addEventListener('change',startLoadImage,false);
+}
+
+function startLoadImage() {
+    imageReader.readAsDataURL(imageInput.files[0]);
+}
 
 // connect the inputImage to the file reader and to subsequent processing
 function connectNewInputImage() {
@@ -85,7 +146,7 @@ function useNewInputImage() {
     offScreenCanvasImage = offScreenCanvas.getContext("2d");
     offScreenCanvasImage.drawImage(inputImage, 0, 0);
     // set the dimensions of the reference canvas and draw image on it
-    adjustReference();
+    setupReference();
     // reference image: draw the entire input image and get the pixels
     referenceImage.drawImage(inputImage, 0, 0, inputWidth, inputHeight,
         0, 0, referenceWidth, referenceHeight);
@@ -100,6 +161,12 @@ function useNewInputImage() {
 
 // choosing output image sizes and lengths of the periodic unit cell
 //===============================================================
+// connect the choosers
+var outputWidthChooser;
+
+function getChoosers() {
+    outputWidthChooser = document.getElementById('outputWidthChooser');
+}
 
 // size for generated image
 var outputWidth;
@@ -119,28 +186,27 @@ var mapYTab = [];
 var mapWidth;
 var mapHeight;
 
-// the choosers
-var outputWidthChooser;
-var outputHeightChooser;
-var periodWidthChooser;
-var periodHeightChooser;
-
-// set a new period width and height, equal to output dimensions
+// set a new period width and height, limited to output dimensions
 // force multiple of 4, fix ratio between width and height for special symmetries
 // get output pixels of the periodic unit cell
 function updatePeriod() {
-    periodWidth = outputWidth;
-    periodHeight = outputWidth;
-    periodWidth4 = periodWidth / 4;
-    periodHeight4 = periodHeight / 4;
-    setMapDimensions();
-    mapXTab.length = mapWidth * mapHeight;
-    mapYTab.length = mapWidth * mapHeight;
-    setupMapTables();
-    // output canvas, get data of unit cell	
-    outputData = outputImage.getImageData(0, 0, periodWidth, periodHeight);
-    outputPixels = outputData.data;
+        
+        // make integer multiples of 4
+        periodWidth = outputWidth;
+        periodHeight = outputWidth;
+        periodWidth4 = periodWidth / 4;
+        periodHeight4 = periodHeight / 4;
+        setupSinTable(sinXTab, periodWidth);
+        setupSinTable(sinYTab, periodHeight);
+        setMapDimensions();
+        mapXTab.length = mapWidth * mapHeight;
+        mapYTab.length = mapWidth * mapHeight;
+        setupMapTables();
+        // output canvas, get data of unit cell	
+        outputData = outputImage.getImageData(0, 0, periodWidth, periodHeight);
+        outputPixels = outputData.data;
 }
+
 // set a new output width and height, forces it to be a multiple of 4
 // makes a blue screen as output image
 // does NOT limit the period dimensions (avoid tangle, responsability of callers)
@@ -155,50 +221,72 @@ function updateOutputDimensions(newWidth) {
         // make the canvas opaque, blue screen of nothing if there is no input image
         outputImage.fillStyle = "Blue";
         outputImage.fillRect(0, 0, outputWidth, outputHeight);
+        updatePeriod(); 
     }
 }
 
+//  choose output image width and height, limit periods
+function setWidth(data) {
+    updateOutputDimensions(parseInt(data,10));
+    drawing();
+}
+
+
 //  the download buttons
 //=========================================================================
+var imageFilename = 'theImage.jpg';
+var htmlFilename = 'rosette.html';
+var cssFilename = 'caleidoscope.css';
+// using a minified js file for the actual html page -> download the unminified js file
+var jsDownloadname = 'rosette.js';                              // the download gets THIS name
+var jsFilename = 'rosette.js';                                     // actually, this file is taken and downloaded
+var js2Downloadname = 'rosetteMap.js';                              // the download gets THIS name
+var js2Filename = 'rosetteMap.js';                                     // actually, this file is taken and downloaded
 
-// make up interactions with html elements
-function makeInteractions(){
-    var imageInputButton = document.getElementById('imageInput')
-    imageInputButton.addEventListener('change',function(){
-            imageReader.readAsDataURL(imageInputButton.files[0]);
-        },false);
-    // we need the choosers to write back the corrected data
-    outputWidthChooser = document.getElementById('outputWidthChooser');
-    outputWidthChooser.addEventListener('change',function(){
-            updateOutputDimensions(parseInt(outputWidthChooser.value,10));
-            updatePeriod(); // limit the period
-            drawing();
-        },false);
-    var interpolationChoosers=document.getElementsByClassName('interpolation');
-    interpolationChoosers[0].addEventListener('click',function(){
-            pixelInterpolation = pixelInterpolationNearest;
-            drawing();
-        },false);
-    interpolationChoosers[1].addEventListener('click',function(){
-            pixelInterpolation = pixelInterpolationLinear;
-            drawing();
-        },false);
-    interpolationChoosers[2].addEventListener('click',function(){
-            pixelInterpolation = pixelInterpolationCubic;
-            drawing();
-        },false);
+function activateDownloadButtons() {
+    function addDownload(buttonName, downloadname, filename) {
+        	var theButton=document.getElementById(buttonName);
+        	theButton.addEventListener('click', function () {
+            	theButton.href = filename;
+            	theButton.download = downloadname;
+        }, false);
+    }
     var downloadImageButton = document.getElementById('downloadImageButton');
     //  for image downloading, using jpeg image format, default quality=0.92
     downloadImageButton.addEventListener('click', function () {
-            //  use correct data format and filename
-            downloadImageButton.href = outputCanvas.toDataURL("image/jpeg"); // the data URL is made at the time of the click
-            downloadImageButton.download = "theImage.jpg";
-        }, false);
-
+        //  use correct data format and filename
+        downloadImageButton.href = outputCanvas.toDataURL("image/jpeg"); // the data URL is made at the time of the click
+        downloadImageButton.download = imageFilename;
+    }, false);
+    addDownload('downloadHTMLButton', htmlFilename, htmlFilename);
+    addDownload('downloadCSSButton', cssFilename, cssFilename);
+    addDownload('downloadJSButton', jsDownloadname, jsFilename);
+  //  addDownload('downloadJS2Button', js2Downloadname, js2Filename);
 }
-
 //  the canvases and their interaction
 //============================================================================
+var outputCanvas;
+var outputImage;
+var referenceCanvas;
+var referenceImage;
+var orientationCanvas;
+var orientationImage;
+
+// image and pixel data of output canvas, using only one periodic unit cell
+var outputData;
+var outputPixels;
+// image and pixel data of the reference canvas
+var referenceData;
+var referencePixels;
+
+function getCanvases() {
+    referenceCanvas = document.getElementById("referenceCanvas");
+    referenceImage = referenceCanvas.getContext("2d");
+    outputCanvas = document.getElementById("outputCanvas");
+    outputImage = outputCanvas.getContext("2d");
+    orientationCanvas = document.getElementById("orientationCanvas");
+    orientationImage = orientationCanvas.getContext("2d");
+}
 
 // override default mouse actions, especially important for the mouse wheel
 function stopEventPropagationAndDefaultAction(event) {
@@ -242,12 +330,6 @@ function mouseUpHandler(event) {
 }
 // the output canvas interactions
 //=================================================
-var outputCanvas;
-var outputImage;
-
-// image and pixel data of output canvas, using only one periodic unit cell
-var outputData;
-var outputPixels;
 
 // control the offset of the output
 var outputOffsetX = 0;
@@ -256,33 +338,9 @@ var outputOffsetY = 0;
 // and change its size
 var changeSize = 1.1;
 
-function outputMouseWheelHandler(event) {
-    stopEventPropagationAndDefaultAction(event);
-    var factor = event.deltaY > 0 ? changeSize : 1 / changeSize;
-    updateOutputDimensions(factor * outputWidth, factor * outputHeight);
-    updatePeriod(factor * periodWidth, factor * periodHeight);
-    outputOffsetX *= factor;
-    outputOffsetY *= factor;
-    scaleOutputToInput /= factor;
-    drawing();
-    return false;
-}
-
-// listeners for useCapture, acting in bottom down capturing phase
-//  they should return false to stop event propagation ...
-function setupOutputCanvas() {
-    outputCanvas = document.getElementById("outputCanvas");
-    outputImage = outputCanvas.getContext("2d");
-    outputCanvas.addEventListener("wheel", outputMouseWheelHandler, true);
-}
 
 // the reference canvas interactions
 //==========================================================================
-var referenceCanvas;
-var referenceImage;
-// image and pixel data of the reference canvas
-var referenceData;
-var referencePixels;
 // maximum size of reference image
 var referenceSize = 300;
 //  derived dimensions for the reference canvas
@@ -298,7 +356,7 @@ var referenceCenterY;
 var scaleOutputToInput;
 var changeScaleFactor = 1.1;
 
-function adjustReference() {
+function setupReference() {
     // set up dimensions of the reference image
     // the reference canvas has the same width/height ratio as the input image
     //   the larger dimension is equal to the referenceSize
@@ -362,9 +420,7 @@ function referenceMouseWheelHandler(event) {
     return false;
 }
 
-function setupReferenceCanvas() {
-    referenceCanvas = document.getElementById("referenceCanvas");
-    referenceImage = referenceCanvas.getContext("2d");
+function referenceCanvasAddEventListeners() {
     referenceCanvas.addEventListener("mousedown", referenceMouseDownHandler, true);
     referenceCanvas.addEventListener("mouseup", mouseUpHandler, true);
     referenceCanvas.addEventListener("mousemove", referenceMouseMoveHandler, true);
@@ -374,8 +430,6 @@ function setupReferenceCanvas() {
 
 // orientation canvas and its interactions
 //=========================================================
-var orientationCanvas;
-var orientationImage;
 //  orientation canvas is square and gives the orientation angle of sampling
 var orientationSize;
 var angle;
@@ -390,6 +444,18 @@ function setAngle(newAngle) {
     angle = newAngle;
     cosAngle = Math.cos(angle);
     sinAngle = Math.sin(angle);
+}
+
+// setup the orientation canvas dimensions and transformation matrix
+//  zero is at center und unit is radius (half the size)
+function setupOrientationCanvas(size) {
+    orientationSize = size;
+    orientationCanvas.width = size;
+    orientationCanvas.height = size;
+    orientationImage.scale(orientationSize / 2 - 1, orientationSize / 2 - 1);
+    orientationImage.translate(1, 1);
+    setAngle(0);
+    drawOrientation();
 }
 
 // we use transformed coordinates
@@ -455,23 +521,12 @@ function orientationMouseWheelHandler(event) {
     return false;
 }
 
-// setup the orientation canvas dimensions and transformation matrix
-//  zero is at center und unit is radius (half the size)
-function setupOrientationCanvas(size) {
-    orientationCanvas = document.getElementById("orientationCanvas");
-    orientationImage = orientationCanvas.getContext("2d");
+function orientationCanvasAddEventListeners() {
     orientationCanvas.addEventListener("mousedown", orientationMouseDownHandler, true);
     orientationCanvas.addEventListener("mouseup", mouseUpHandler, true);
     orientationCanvas.addEventListener("mousemove", orientationMouseMoveHandler, true);
     orientationCanvas.addEventListener("mouseout", mouseUpHandler, true);
     orientationCanvas.addEventListener("wheel", orientationMouseWheelHandler, true);
-    orientationSize = size;
-    orientationCanvas.width = size;
-    orientationCanvas.height = size;
-    orientationImage.scale(orientationSize / 2 - 1, orientationSize / 2 - 1);
-    orientationImage.translate(1, 1);
-    setAngle(0);
-    drawOrientation();
 }
 
 /*   ppp    iii    x    x   
@@ -485,7 +540,6 @@ function setupOrientationCanvas(size) {
 //  outputData contains exactly one periodic cell
 //  the images are offset by outputOffsetX and outputOffsetY
 //  note that putImageData has different API than drawImage
-
 function putPixelsPeriodicallyOnCanvas() {
     var copyWidth;
     var copyHeight;
@@ -539,6 +593,21 @@ var pixelInterpolation = pixelInterpolationNearest;
 var pixelRed;
 var pixelGreen;
 var pixelBlue;
+
+function setInterpolation(string) {
+    switch (string) {
+    case "nearest":
+        pixelInterpolation = pixelInterpolationNearest;
+        break;
+    case "linear":
+        pixelInterpolation = pixelInterpolationLinear;
+        break;
+    case "cubic":
+        pixelInterpolation = pixelInterpolationCubic;
+        break;
+    }
+    drawing();
+}
 
 // nearest neighbor
 function pixelInterpolationNearest(x, y, inData) {
@@ -998,34 +1067,21 @@ function threeFoldRotational() {
 // the line starts at (fromI,j) and goes upwards to (toI,j)  (all INTEGERS)
 // addressing pixels in the periodic unit cell AND points in the (mapXTab[...],mapYTab[...])
 
-// sampling transformation
-var centerX;
-var centerY;
-var scaleSin;
-var scaleCos;
-// sample input at transformed coordinates
-// result in pixelRed, pixelGreen, pixelBlue
-function sampleInput(x,y){
-    // translation, rotation and scaling
-    var newX = scaleCos * x - scaleSin * y + centerX;
-    y = scaleSin * x + scaleCos * y + centerY;
-    x = newX;
-    //  get the interpolated input pixel color components, write on output pixels
-    pixelInterpolation(x, y, inputData);
-    // mark the reference image pixel, make it fully opaque
-    var h = Math.round(scaleInputToReference * x);
-    var k = Math.round(scaleInputToReference * y);
-    // but check if we are on the reference canvas
-    if ((h >= 0) && (h < referenceWidth) && (k >= 0) && (k < referenceHeight)) {
-        referencePixels[4 * (referenceWidth * k + h) + 3] = 255;
-    }
-}
-
-
 function drawPixelLine(fromI, toI, j) {
+    //  reference image, local variables
+    var locReferencePixels = referencePixels;
+    var locReferenceWidth = referenceWidth;
+    var locReferenceHeight = referenceHeight;
+    var locScaleInputToReference = scaleInputToReference;
     // local reference to the mapping table
     var locMapXTab = mapXTab;
     var locMapYTab = mapYTab;
+    // translation: center of sampling as defined by the mouse on the reference image
+    var centerX = referenceCenterX / scaleInputToReference;
+    var centerY = referenceCenterY / scaleInputToReference;
+    //  scaling and rotation: transformation matrix elements
+    var scaleCos = scaleOutputToInput * cosAngle;
+    var scaleSin = scaleOutputToInput * sinAngle;
     //  sampling coordinates (input image)
     var x, y, newX;
     //  integer coordinates in the reference image
@@ -1041,38 +1097,42 @@ function drawPixelLine(fromI, toI, j) {
         x = locMapXTab[mapIndex];
         y = locMapYTab[mapIndex];
         mapIndex++;
-        //  color symmetry
-        makePixelColor(x,y);
-        //
+        // translation, rotation and scaling
+        newX = scaleCos * x - scaleSin * y + centerX;
+        y = scaleSin * x + scaleCos * y + centerY;
+        x = newX;
+        //  get the interpolated input pixel color components, write on output pixels
+        pixelInterpolation(x, y, inputData);
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;
         outputIndex += 2;
+        // mark the reference image pixel, make it fully opaque
+        h = Math.round(locScaleInputToReference * x);
+        k = Math.round(locScaleInputToReference * y);
+        // but check if we are on the reference canvas
+        if ((h >= 0) && (h < locReferenceWidth) && (k >= 0) && (k < locReferenceHeight)) {
+            locReferencePixels[4 * (locReferenceWidth * k + h) + 3] = 255;
+        }
     }
 }
 
 //  make the symmetries, draw the full output image and reference image
 //==========================================================
 function drawing(){
-	if (!inputLoaded){						// no input means nothing to do
-		return;
-	}
-	// white out: make the reference image semitransparent
-	setAlphaReferenceImagePixels(128);
-	// make the symmetries on the output image
-    // translation: center of sampling as defined by the mouse on the reference image
-    centerX = referenceCenterX / scaleInputToReference;
-    centerY = referenceCenterY / scaleInputToReference;
-    //  scaling and rotation: transformation matrix elements
-    scaleCos = scaleOutputToInput * cosAngle;
-    scaleSin = scaleOutputToInput * sinAngle;
-	makeSymmetriesFarris();
-	// put the symmetric image on the output canvas
-	putPixelsPeriodicallyOnCanvas();
-	// put the reference image
-	putPixelsOnReferenceCanvas();
-	// hint for debugging
-	showHintPatch();
+    if (!inputLoaded){                      // no input means nothing to do
+        return;
+    }
+    // white out: make the reference image semitransparent
+    setAlphaReferenceImagePixels(128);
+    // make the symmetries on the output image
+    makeSymmetriesFarris();
+    // put the symmetric image on the output canvas
+    putPixelsPeriodicallyOnCanvas();
+    // put the reference image
+    putPixelsOnReferenceCanvas();
+    // hint for debugging
+    showHintPatch();
 }
 
 // symmetry dependent
@@ -1089,6 +1149,10 @@ function setMapDimensions() {
 //for debugging: show the basic map on output as red lines
 //================================================================
 function showHintPatch() {
+    if (hintPatch && inputLoaded) {
+        outputImage.strokeStyle = "Red";
+        outputImage.strokeRect(outputOffsetX, outputOffsetY, mapWidth, mapHeight);
+    }
 }
 
 //  trivial map for simple maping
@@ -1109,7 +1173,7 @@ function trivialMapTables() {
 }
 
 function setupMapTables() {
-    trivialMapTables();
+    rosetteMapTables();
 }
 
 // initial mapping scale
@@ -1119,11 +1183,6 @@ scaleOutputToInput = 1
 var outsideRed = 0;
 var outsideGreen = 0;
 var outsideBlue = 200;
-
-//get the color of a pixel, trivial case, no color symmetry
-function makePixelColor(x,y){
-    sampleInput(x,y);
-}
 
 // presetting special symmetries, fixing the height to width ratio of the unit cell
 function setSymmetries() {
@@ -1143,6 +1202,6 @@ function makeSymmetriesFarris() {
     //verticalMirror(periodHeight/2);
     //horizontalMirror(periodWidth);
     //threeFoldRotational();
-    sixFoldRotational();
+    //sixFoldRotational();
 
 }

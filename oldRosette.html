@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <head>
-	<title>new rosette</title>
+	<title>Rosette</title>
 </head>
 <link rel="stylesheet" type="text/css" href="caleidoscope.css">
 <body>
@@ -15,19 +15,21 @@
 	</noscript>
 		<p>
 			Choose the input image file:
-			<input type="file" accept="image/*" id="imageInput" 
-				>
+			<input type="file" accept="image/*" id="imageInput">
 		</p>
 		<p>
 			Choose the size of the generated image: 
-			<input type="text" class="numbers" id="outputWidthChooser" maxlength="4" />.
+			<input type="text" class="numbers" id="outputWidthChooser" maxlength="4" 
+				onchange="setWidth(this.value)"/>
+			.
 		</p>
-		<p>			
+		<p>
+			
 			<form action="">
 				Choose image interpolation:
-				<input type="radio" name="interpolation" class='interpolation' checked>nearest
-				<input type="radio" name="interpolation" class='interpolation'>linear
-				<input type="radio" name="interpolation" class='interpolation'>cubic
+				<input type="radio" name="interpolation" onclick="setInterpolation('nearest')" checked value="nearest">nearest
+				<input type="radio" name="interpolation" onclick="setInterpolation('linear')" value="linear">linear
+				<input type="radio" name="interpolation" onclick="setInterpolation('cubic')" value="cubic">cubic
 			</form>
 		</p>
 		<h4>
@@ -36,9 +38,10 @@
 		</h4>
 	<p>
 		To download the codes of this page click:
-		<a download href="caleidoscope.html">&nbsp here for html &nbsp</a>,
-		<a download href="caleidoscope.css">&nbsp here for css &nbsp</a>,
-		<a download href="caleidoscope.js">&nbsp here for javascript &nbsp</a>.
+		<a id="downloadHTMLButton" href="">&nbsp html &nbsp</a>,
+		<a id="downloadCSSButton" href="">&nbsp css &nbsp</a>,
+		<a id="downloadJSButton" href="">&nbsp basic js &nbsp</a>,
+		<a download href="rosetteMap.js">&nbsp map js &nbsp</a>.
 	</p>
 		<p style="text-align:center">
 		<canvas id="outputCanvas" moz-opaque></canvas>
@@ -49,5 +52,6 @@
 		<canvas id="orientationCanvas" style="vertical-align: top;";></canvas>
 	</p>
 </body>
-	<script src="newRosette.js"></script>
+	<script src="oldRosette.js"></script>
+	<script src="oldRosetteMap.js"></script>
 </html>
