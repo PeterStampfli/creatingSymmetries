@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <head>
-	<title>Fast exp</title>
+	<title>fastExp</title>
 </head>
 <body>
 	<p> 
@@ -16,10 +16,6 @@
 
 function time(){
 	return new Date().getTime();
-}
-
-function powerOf2(n){
-	return Math.round(Math.pow(2,n));
 }
 
 function errorCheck(start,end,step,trueFunction,approximateFunction){
@@ -65,26 +61,23 @@ var expMaxArgument=Math.floor(Math.log(Number.MAX_VALUE))+1;
 var expMinArgument=Math.floor(Math.log(Number.MIN_VALUE));
 // tables for integer and fractional part
 var expTabIntPart=[];
-var expTabIntPartLength=0;
+var expTabIntPartMaxIndex=0;
 var expTabFractPart=[];
 var expTabFactor=0;
-
-expMinArgument=-10;
-expMaxArgument=10;
+var expTabHigherCorrection=0;
 
 function setupExpTables(n){
-	expTabIntPartLength=expMaxArgument-expMinArgument;
-	for (var i=0;i<=expTabIntPartLength;i++){
-		expTabIntPart[i]=Math.exp(i+expMinArgument);   // care of offset argument
-	}
+	expTabIntPartMaxIndex=expMaxArgument-expMinArgument;
+	expTabIntPart=makeFunctionTable(expTabIntPartMaxIndex+1,expMinArgument,1,Math.exp);
 	expTabFactor=n;
+    expTabHigherCorrection=0.25/expTabFactor/expTabFactor;
 	expTabFractPart=makeFunctionTable(n+1,0,1.0/expTabFactor,Math.exp);
 }
 
 
 function fastExp(x){
 	var indexToIntPart=Math.floor(x);
-	return expTabIntPart[Math.max(0,Math.min(expTabIntPartLength,indexToIntPart-expMinArgument))]*
+	return expTabIntPart[Math.max(0,Math.min(expTabIntPartMaxIndex,indexToIntPart-expMinArgument))]*
 	       expTabFractPart[Math.round(expTabFactor*(x-indexToIntPart))];
 }
 
@@ -93,21 +86,42 @@ function fastInterpolatedExp(x){
 	var dx=expTabFactor*(x-indexToIntPart);
 	var indexToFractPart=Math.floor(dx);
 	dx-=indexToFractPart;
-	return expTabIntPart[Math.max(0,Math.min(expTabIntPartLength,indexToIntPart-expMinArgument))]*
+	return expTabIntPart[Math.max(0,Math.min(expTabIntPartMaxIndex,indexToIntPart-expMinArgument))]*
 	       (expTabFractPart[indexToFractPart]*(1-dx)+expTabFractPart[indexToFractPart+1]*dx);
 }
 
+function fastImprovedInterpolatedExp(x){
+	var indexToIntPart=Math.floor(x);
+	var dx=expTabFactor*(x-indexToIntPart);
+	var indexToFractPart=Math.floor(dx);
+	dx-=indexToFractPart;
+	return expTabIntPart[Math.max(0,Math.min(expTabIntPartMaxIndex,indexToIntPart-expMinArgument))]*
+	       (expTabFractPart[indexToFractPart]*(1-dx)*(1-expTabHigherCorrection*dx)
+	       	   +expTabFractPart[indexToFractPart+1]*dx*(1-expTabHigherCorrection*(1-dx)));
+}
+
+
+
+//	return sinTab[index]*(1-dx)*(1+sinTabHigherCorrection*dx)+sinTab[index+1]*dx*(1+sinTabHigherCorrection*(1-dx));
+
+
 setupExpTables(1000);
 
+console.log("simple approximation");
 errorCheck(0,4,1.0/60000,Math.exp,fastExp);
+
+console.log("linear interpolation");
 errorCheck(0,4,1.0/60000,Math.exp,fastInterpolatedExp);
+
+console.log("improved linear interpolation");
+errorCheck(0,4,1.0/60000,Math.exp,fastImprovedInterpolatedExp);
 
 
 
 // checking the speed
 //===================================================0
 
-var nChecks=10000000;
+var nChecks=100000000;
 
 var x=0;
 var y=0;
@@ -118,24 +132,24 @@ x=0;
 start=time();
 
 while(x<range){
-	y=Math.exp(x);
+	y+=Math.exp(x);
 	x+=dx;
 }
 console.log("using the Math.exp function: "+(time()-start)/1000);
 
-/*
+
 x=0;
 start=time();
 while(x<range){
-	y=fastImprovedInterpolatedSin(x);
+	y+=fastImprovedInterpolatedExp(x);
 	x+=dx;
 }
 console.log("using the 'quadratic' interpolated sin function: "+(time()-start)/1000);
-*/
+
 x=0;
 start=time();
 while(x<range){
-	y=fastInterpolatedExp(x);
+	y+=fastInterpolatedExp(x);
 	x+=dx;
 }
 console.log("using the fast interpolated exp function: "+(time()-start)/1000);
@@ -143,7 +157,7 @@ console.log("using the fast interpolated exp function: "+(time()-start)/1000);
 x=0;
 start=time();
 while(x<range){
-	y=fastExp(x);
+	y=+fastExp(x);
 
 	x+=dx;
 }
@@ -156,6 +170,6 @@ while(x<range){
 	x+=dx;
 }
 console.log("the empty loop: "+(time()-start)/1000);
-
+console.log(y);
 </script>
 </html>

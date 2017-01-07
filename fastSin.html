@@ -91,9 +91,9 @@ function fastSin(x){
 function fastInterpolatedSin(x){
 	x*=sinTabFactor;
 	var index=Math.floor(x);
-	var dx=x-index;
+	x-=index;
 	index=index&sinTabLengthM1;
-	return sinTab[index]*(1-dx)+sinTab[index+1]*dx;
+	return sinTab[index]*(1-x)+sinTab[index+1]*x;
 }
 
 //  using the "quadratic" interpolation
@@ -203,6 +203,15 @@ while(x<range){
 	x+=dx;
 }
 console.log("the empty loop: "+(time()-start)/1000);
+
+//  for reference - the empty loop
+x=0;
+start=time();
+while(x<range){
+	y=Math.log(x);
+	x+=dx;
+}
+console.log("the log : "+(time()-start)/1000);
 
 </script>
 </html>
