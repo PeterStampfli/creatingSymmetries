@@ -18,21 +18,66 @@ function time(){
 	return new Date().getTime();
 }
 
-function errorCheck(start,end,step,trueFunction,approximateFunction){
+function timing(start,end,nChecks,theFunction){
+	var y=0;
 	var x=start;
+	var dx=(end-start)/nChecks;
+	var startTime=time();
+	while (x<end){
+		y+=theFunction(x);
+		x+=dx;
+	}
+	console.log("time in seconds. "+(time()-startTime)/1000);
+	return y;
+}
+
+function emptyTiming(start,end,nChecks){
+	var y=0;
+	var x=start;
+	var dx=(end-start)/nChecks;
+	var startTime=time();
+	while (x<end){
+		y+=dx;
+		x+=dx;
+	}
+	console.log("empty loop time in seconds. "+(time()-startTime)/1000);
+	return y;
+}
+
+function absErrorCheck(start,end,step,trueFunction,approximateFunction){
+	var x=start;
+	var xMax=0;
 	var absError=0;
+	var absErrorMax=-1;
+	while (x<=end){
+		absError=Math.abs(trueFunction(x)-approximateFunction(x));
+		if (absError>absErrorMax){
+			absErrorMax=absError;
+			xMax=x;
+		}
+		x+=step;
+	}
+	console.log("max absolute error: "+absErrorMax+" at "+xMax);
+}
+
+function relErrorCheck(start,end,step,trueFunction,approximateFunction){
+	var x=start;
+	var xMax=0;
 	var relError=0;
+	var relErrorMax=-1;
 	var trueValue=0;
 	var approximateValue=0;
 	while (x<=end){
 		trueValue=trueFunction(x);
 		approximateValue=approximateFunction(x);
-		absError=Math.max(absError,Math.abs(trueValue-approximateValue));
-		relError=Math.max(relError,Math.abs(trueValue-approximateValue)/(Math.abs(trueValue)+Math.abs(approximateValue)));
+		relError=2*Math.abs(trueValue-approximateValue)/(Math.abs(trueValue)+Math.abs(approximateValue));
+		if (relError>relErrorMax){
+			relErrorMax=relError;
+			xMax=x;
+		}
 		x+=step;
 	}
-	console.log("max absolute error: "+absError);
-	console.log("max relative error: "+relError);
+	console.log("max relative error: "+relErrorMax+" at "+xMax);
 }
 
 function compare(start,end,step,trueFunction,approximateFunction){
@@ -53,7 +98,6 @@ function makeFunctionTable(length,start,delta,theFunction){
 	return table;
 }
 
-
 var logTab=[];
 var logTabFactor=0;
 var logTabLimit=0;
@@ -64,79 +108,73 @@ function setupLogTable(n,limit){
 	logTab=makeFunctionTable(n+1,1.0,1.0/logTabFactor,Math.log);
 }
 
-
 function specialFastLog(x){
 	if (x<1){
-		return -fastLog(1.0/x);
+		x=1.0/x;
+		if (x>logTabLimit){
+			return -Math.log(x);
+		}
+		else {
+			return -logTab[Math.round(logTabFactor*(x-1.0))];
+		}
 	}
-	if (x>logTabLimit){
-		return Math.log(x);
+	else {
+		if (x>logTabLimit){
+			return Math.log(x);
+		}
+		else {
+			return logTab[Math.round(logTabFactor*(x-1.0))];
+		}
 	}
-
-	return logTab[Math.round(logTabFactor*(x-1.0))];
 }
 
 function specialFastInterpolatedLog(x){
 	if (x<1){
-		return -fastLog(1.0/x);
+		x=1.0/x;
+		if (x>logTabLimit){
+			return -Math.log(x);
+		}
+		else {
+			x=logTabFactor*(x-1.0);
+			var index=Math.floor(x);
+			x-=index;
+			return -(logTab[index]*(1-x)+logTab[index+1]*x);
+		}
+	}	
+	else {
+		if (x>logTabLimit){
+			return Math.log(x);
+		}
+		else {
+			x=logTabFactor*(x-1.0);
+			var index=Math.floor(x);
+			x-=index;
+			return logTab[index]*(1-x)+logTab[index+1]*x;
+		}
 	}
-	if (x>logTabLimit){
-		return Math.log(x);
-	}
-	x=logTabFactor*(x-1.0);
-	var index=Math.floor(x);
-	x-=index;
-	return logTab[index]*(1-x)+logTab[index+1]*x;
 }
 
 setupLogTable(10000,10);
 
-errorCheck(1,100,0.1,Math.log,specialFastLog);
-errorCheck(1,100,0.1,Math.log,specialFastInterpolatedLog);
+
+
+
+
+absErrorCheck(0.1,10,1/678,Math.log,specialFastLog);
+absErrorCheck(0.1,10,1/678,Math.log,specialFastInterpolatedLog);
 
 
 
 var nChecks=10000000;
-
 var x=0;
-var y=0;
-var range=logTabLimit;
-var dx=range/nChecks;
-var start=0.1;
-x=1;
-start=time();
 
-while(x<range){
-	y+=Math.log(x);
-	x+=dx;
-}
-console.log("using the math.log function: "+(time()-start)/1000);
-
-x=1;
-start=time();
-
-while(x<range){
-	y+=specialFastInterpolatedLog(x);
-	x+=dx;
-}
-console.log("fast linear interpolated: "+(time()-start)/1000);
-
-x=1;
-start=time();
-
-while(x<range){
-	y+=specialFastLog(x);
-	x+=dx;
-}
-console.log("fast simple: "+(time()-start)/1000);
-
-x=1;
-start=time();
-
-while(x<range){
-	x+=dx;
-}
-console.log("empty loop: "+(time()-start)/1000);
+x=emptyTiming(0.1,10,nChecks);
+console.log("simple approximation");
+x=timing(0.1,10,nChecks,specialFastLog);
+console.log("linear interpolation");
+x=timing(0.1,10,nChecks,specialFastInterpolatedLog);
+console.log("Math.log");
+x=timing(0.1,10,nChecks,Math.log);
 
 </script>
 </html>

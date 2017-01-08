@@ -8,6 +8,9 @@
 	<p> 
 		Activate javascript and check the console !
 	</p>
+	<p> 
+		With a decent browser you can save this page on your own computer. Edit it and make your own experiments.
+	</p>
 </body>
 <script>
 "use strict";
@@ -16,6 +19,32 @@
 
 function time(){
 	return new Date().getTime();
+}
+
+function timing(start,end,nChecks,theFunction){
+	var y=0;
+	var x=start;
+	var dx=(end-start)/nChecks;
+	var startTime=time();
+	while (x<end){
+		y+=theFunction(x);
+		x+=dx;
+	}
+	console.log("time in seconds. "+(time()-startTime)/1000);
+	return y;
+}
+
+function emptyTiming(start,end,nChecks){
+	var y=0;
+	var x=start;
+	var dx=(end-start)/nChecks;
+	var startTime=time();
+	while (x<end){
+		y+=dx;
+		x+=dx;
+	}
+	console.log("empty loop time in seconds. "+(time()-startTime)/1000);
+	return y;
 }
 
 function errorCheck(start,end,step,trueFunction,approximateFunction){
@@ -74,7 +103,6 @@ function setupExpTables(n){
 	expTabFractPart=makeFunctionTable(n+1,0,1.0/expTabFactor,Math.exp);
 }
 
-
 function fastExp(x){
 	var indexToIntPart=Math.floor(x);
 	return expTabIntPart[Math.max(0,Math.min(expTabIntPartMaxIndex,indexToIntPart-expMinArgument))]*
@@ -100,11 +128,6 @@ function fastImprovedInterpolatedExp(x){
 	       	   +expTabFractPart[indexToFractPart+1]*dx*(1-expTabHigherCorrection*(1-dx)));
 }
 
-
-
-//	return sinTab[index]*(1-dx)*(1+sinTabHigherCorrection*dx)+sinTab[index+1]*dx*(1+sinTabHigherCorrection*(1-dx));
-
-
 setupExpTables(1000);
 
 console.log("simple approximation");
@@ -116,12 +139,10 @@ errorCheck(0,4,1.0/60000,Math.exp,fastInterpolatedExp);
 console.log("improved linear interpolation");
 errorCheck(0,4,1.0/60000,Math.exp,fastImprovedInterpolatedExp);
 
-
-
 // checking the speed
 //===================================================0
 
-var nChecks=100000000;
+var nChecks=10000000;
 
 var x=0;
 var y=0;
@@ -136,7 +157,6 @@ while(x<range){
 	x+=dx;
 }
 console.log("using the Math.exp function: "+(time()-start)/1000);
-
 
 x=0;
 start=time();
@@ -170,6 +190,16 @@ while(x<range){
 	x+=dx;
 }
 console.log("the empty loop: "+(time()-start)/1000);
-console.log(y);
+
+x=emptyTiming(0,range,nChecks);
+console.log("simple fast exp");
+x+=timing(0,range,nChecks,fastExp);
+console.log("linear interpolation fast exp");
+x+=timing(0,range,nChecks,fastInterpolatedExp);
+console.log("improved quadratic interpolation fast exp");
+x+=timing(0,range,nChecks,fastImprovedInterpolatedExp);
+console.log("Math.exp");
+x+=timing(0,range,nChecks,Math.exp);
+console.log(x);
 </script>
 </html>
