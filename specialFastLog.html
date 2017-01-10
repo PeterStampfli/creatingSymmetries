@@ -9,136 +9,20 @@
 		Activate javascript and check the console !
 	</p>
 </body>
+<script src="fastFunctions.js"></script>
+
 <script>
 "use strict";
 // some utilies
 //==============================================================================
 
-function time(){
-	return new Date().getTime();
-}
-
-function timing(start,end,nChecks,theFunction){
-	var y=0;
-	var x=start;
-	var dx=(end-start)/nChecks;
-	var startTime=time();
-	while (x<end){
-		y+=theFunction(x);
-		x+=dx;
-	}
-	console.log("time in seconds. "+(time()-startTime)/1000);
-	return y;
-}
-
-function emptyTiming(start,end,nChecks){
-	var y=0;
-	var x=start;
-	var dx=(end-start)/nChecks;
-	var startTime=time();
-	while (x<end){
-		y+=dx;
-		x+=dx;
-	}
-	console.log("empty loop time in seconds. "+(time()-startTime)/1000);
-	return y;
-}
-
-function absErrorCheck(start,end,step,trueFunction,approximateFunction){
-	var x=start;
-	var xMax=0;
-	var absError=0;
-	var absErrorMax=-1;
-	while (x<=end){
-		absError=Math.abs(trueFunction(x)-approximateFunction(x));
-		if (absError>absErrorMax){
-			absErrorMax=absError;
-			xMax=x;
-		}
-		x+=step;
-	}
-	console.log("max absolute error: "+absErrorMax+" at "+xMax);
-}
-
-function relErrorCheck(start,end,step,trueFunction,approximateFunction){
-	var x=start;
-	var xMax=0;
-	var relError=0;
-	var relErrorMax=-1;
-	var trueValue=0;
-	var approximateValue=0;
-	while (x<=end){
-		trueValue=trueFunction(x);
-		approximateValue=approximateFunction(x);
-		relError=2*Math.abs(trueValue-approximateValue)/(Math.abs(trueValue)+Math.abs(approximateValue));
-		if (relError>relErrorMax){
-			relErrorMax=relError;
-			xMax=x;
-		}
-		x+=step;
-	}
-	console.log("max relative error: "+relErrorMax+" at "+xMax);
-}
-
-function compare(start,end,step,trueFunction,approximateFunction){
-	var x=start;
-	var error=0;
-	console.log("compare:  x, true function, approximation, error");
-	while (x<=end){
-		console.log(x+" "+trueFunction(x)+" "+approximateFunction(x)+" "+(approximateFunction(x)-trueFunction(x)));
-		x+=step;
-	}
-}
-
-function makeFunctionTable(length,start,delta,theFunction){
-	var table=new Array(length);
-	for (var i = 0;i<length;i++){
-		table[i]=theFunction(start+i*delta);
-	}
-	return table;
-}
-
-var logTab=[];
-var logTabFactor=0;
-var logTabXMin=0;
-var logTabXMax=0;
-
-function setupLogTable(n,xMin,xMax){
-	logTabXMin=xMin;
-	logTabXMax=xMax;
-	logTabFactor=n/(xMax-xMin);
-	logTab=makeFunctionTable(n+1,xMin,1.0/logTabFactor,Math.log);
-}
-
-function specialFastLog(x){
-	if (x<logTabXMin){
-		return Math.log(x);
-	}
-	if (x>logTabXMax){
-		return Math.log(x);
-	}
-		return logTab[Math.round(logTabFactor*(x-logTabXMin))];
-}
-
-function specialFastInterpolatedLog(x){
-	if (x<logTabXMin){
-		return Math.log(x);
-	}
-	if (x>logTabXMax){
-		return Math.log(x);
-	}
-	x=logTabFactor*(x-logTabXMin);
-	var index=Math.floor(x);
-	x-=index;
-	return logTab[index]*(1-x)+logTab[index+1]*x;
-}
 
 setupLogTable(10000,0.5,5);
 
 absErrorCheck(0.1,10,1/678,Math.log,specialFastLog);
 absErrorCheck(0.1,10,1/678,Math.log,specialFastInterpolatedLog);
 
-var nChecks=100000000;
+var nChecks=10000000;
 var x=0;
 
 x=emptyTiming(0.5,5,nChecks);

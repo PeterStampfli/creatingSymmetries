@@ -12,132 +12,24 @@
 		With a decent browser you can save this page on your own computer. Edit it and make your own experiments.
 	</p>
 </body>
+<script src="fastFunctions.js"></script>
+
 <script>
 "use strict";
-// some utilies
-//==============================================================================
-
-function time(){
-	return new Date().getTime();
-}
-
-function timing(start,end,nChecks,theFunction){
-	var y=0;
-	var x=start;
-	var dx=(end-start)/nChecks;
-	var startTime=time();
-	while (x<end){
-		y+=theFunction(x);
-		x+=dx;
-	}
-	console.log("time in seconds. "+(time()-startTime)/1000);
-	return y;
-}
-
-function emptyTiming(start,end,nChecks){
-	var y=0;
-	var x=start;
-	var dx=(end-start)/nChecks;
-	var startTime=time();
-	while (x<end){
-		y+=dx;
-		x+=dx;
-	}
-	console.log("empty loop time in seconds. "+(time()-startTime)/1000);
-	return y;
-}
-
-function errorCheck(start,end,step,trueFunction,approximateFunction){
-	var x=start;
-	var absError=0;
-	var relError=0;
-	var trueValue=0;
-	var approximateValue=0;
-	while (x<=end){
-		trueValue=trueFunction(x);
-		approximateValue=approximateFunction(x);
-		absError=Math.max(absError,Math.abs(trueValue-approximateValue));
-		relError=Math.max(relError,Math.abs(trueValue-approximateValue)/(Math.abs(trueValue)+Math.abs(approximateValue)));
-		x+=step;
-	}
-	console.log("max absolute error: "+absError);
-	console.log("max relative error: "+relError);
-}
-
-function compare(start,end,step,trueFunction,approximateFunction){
-	var x=start;
-	var error=0;
-	console.log("compare:  x, true function, approximation, error");
-	while (x<=end){
-		console.log(x+" "+trueFunction(x)+" "+approximateFunction(x)+" "+(approximateFunction(x)-trueFunction(x)));
-		x+=step;
-	}
-}
-
-function makeFunctionTable(length,start,delta,theFunction){
-	var table=new Array(length);
-	for (var i = 0;i<length;i++){
-		table[i]=theFunction(start+i*delta);
-	}
-	return table;
-}
 
 // the exponential function
 //=================================================
 
-//  possible range of argument (integer part)
-var expMaxArgument=Math.floor(Math.log(Number.MAX_VALUE))+1;
-var expMinArgument=Math.floor(Math.log(Number.MIN_VALUE));
-// tables for integer and fractional part
-var expTabIntPart=[];
-var expTabIntPartMaxIndex=0;
-var expTabFractPart=[];
-var expTabFactor=0;
-var expTabHigherCorrection=0;
-
-function setupExpTables(n){
-	expTabIntPartMaxIndex=expMaxArgument-expMinArgument;
-	expTabIntPart=makeFunctionTable(expTabIntPartMaxIndex+1,expMinArgument,1,Math.exp);
-	expTabFactor=n;
-    expTabHigherCorrection=0.25/expTabFactor/expTabFactor;
-	expTabFractPart=makeFunctionTable(n+1,0,1.0/expTabFactor,Math.exp);
-}
-
-function fastExp(x){
-	var indexToIntPart=Math.floor(x);
-	return expTabIntPart[Math.max(0,Math.min(expTabIntPartMaxIndex,indexToIntPart-expMinArgument))]*
-	       expTabFractPart[Math.round(expTabFactor*(x-indexToIntPart))];
-}
-
-function fastInterpolatedExp(x){
-	var indexToIntPart=Math.floor(x);
-	var dx=expTabFactor*(x-indexToIntPart);
-	var indexToFractPart=Math.floor(dx);
-	dx-=indexToFractPart;
-	return expTabIntPart[Math.max(0,Math.min(expTabIntPartMaxIndex,indexToIntPart-expMinArgument))]*
-	       (expTabFractPart[indexToFractPart]*(1-dx)+expTabFractPart[indexToFractPart+1]*dx);
-}
-
-function fastImprovedInterpolatedExp(x){
-	var indexToIntPart=Math.floor(x);
-	var dx=expTabFactor*(x-indexToIntPart);
-	var indexToFractPart=Math.floor(dx);
-	dx-=indexToFractPart;
-	return expTabIntPart[Math.max(0,Math.min(expTabIntPartMaxIndex,indexToIntPart-expMinArgument))]*
-	       (expTabFractPart[indexToFractPart]*(1-dx)*(1-expTabHigherCorrection*dx)
-	       	   +expTabFractPart[indexToFractPart+1]*dx*(1-expTabHigherCorrection*(1-dx)));
-}
-
 setupExpTables(1000);
 
 console.log("simple approximation");
-errorCheck(0,4,1.0/60000,Math.exp,fastExp);
+absErrorCheck(0,4,1.0/60000,Math.exp,fastExp);
 
 console.log("linear interpolation");
-errorCheck(0,4,1.0/60000,Math.exp,fastInterpolatedExp);
+absErrorCheck(0,4,1.0/60000,Math.exp,fastInterpolatedExp);
 
 console.log("improved linear interpolation");
-errorCheck(0,4,1.0/60000,Math.exp,fastImprovedInterpolatedExp);
+absErrorCheck(0,4,1.0/60000,Math.exp,fastImprovedInterpolatedExp);
 
 // checking the speed
 //===================================================0

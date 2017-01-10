@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<head>
+	<title>specialFastAtan</title>
+</head>
+<body>
+	<p> 
+		Activate javascript and check the console !
+	</p>
+</body>
+<script src="fastFunctions.js"></script>
+
+<script>
+
+
+
+setupAtanTable(1000);
+
+absErrorCheck(0,1,1/678,Math.atan,specialFastAtan);
+absErrorCheck(0,1,1/678,Math.atan,specialFastInterpolatedAtan);
+
+var nChecks=10000000;
+var x=0;
+
+x=emptyTiming(0.5,5,nChecks);
+console.log("simple approximation");
+x=timing(0,1,nChecks,specialFastAtan);
+console.log("linear interpolation");
+x=timing(0,1,nChecks,specialFastInterpolatedAtan);
+console.log("Math.atan");
+x=timing(0,1,nChecks,Math.atan);
+
+</script>
+</html>
