@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <head>
-	<title>fastLog</title>
+	<title>specialFastLog</title>
 </head>
 <body>
 	<p> 
@@ -100,81 +100,54 @@ function makeFunctionTable(length,start,delta,theFunction){
 
 var logTab=[];
 var logTabFactor=0;
-var logTabLimit=0;
+var logTabXMin=0;
+var logTabXMax=0;
 
-function setupLogTable(n,limit){
-	logTabLimit=limit;
-	logTabFactor=n/(limit-1);
-	logTab=makeFunctionTable(n+1,1.0,1.0/logTabFactor,Math.log);
+function setupLogTable(n,xMin,xMax){
+	logTabXMin=xMin;
+	logTabXMax=xMax;
+	logTabFactor=n/(xMax-xMin);
+	logTab=makeFunctionTable(n+1,xMin,1.0/logTabFactor,Math.log);
 }
 
 function specialFastLog(x){
-	if (x<1){
-		x=1.0/x;
-		if (x>logTabLimit){
-			return -Math.log(x);
-		}
-		else {
-			return -logTab[Math.round(logTabFactor*(x-1.0))];
-		}
+	if (x<logTabXMin){
+		return Math.log(x);
 	}
-	else {
-		if (x>logTabLimit){
-			return Math.log(x);
-		}
-		else {
-			return logTab[Math.round(logTabFactor*(x-1.0))];
-		}
+	if (x>logTabXMax){
+		return Math.log(x);
 	}
+		return logTab[Math.round(logTabFactor*(x-logTabXMin))];
 }
 
 function specialFastInterpolatedLog(x){
-	if (x<1){
-		x=1.0/x;
-		if (x>logTabLimit){
-			return -Math.log(x);
-		}
-		else {
-			x=logTabFactor*(x-1.0);
-			var index=Math.floor(x);
-			x-=index;
-			return -(logTab[index]*(1-x)+logTab[index+1]*x);
-		}
-	}	
-	else {
-		if (x>logTabLimit){
-			return Math.log(x);
-		}
-		else {
-			x=logTabFactor*(x-1.0);
-			var index=Math.floor(x);
-			x-=index;
-			return logTab[index]*(1-x)+logTab[index+1]*x;
-		}
+	if (x<logTabXMin){
+		return Math.log(x);
 	}
+	if (x>logTabXMax){
+		return Math.log(x);
+	}
+	x=logTabFactor*(x-logTabXMin);
+	var index=Math.floor(x);
+	x-=index;
+	return logTab[index]*(1-x)+logTab[index+1]*x;
 }
 
-setupLogTable(10000,10);
-
-
-
-
+setupLogTable(10000,0.5,5);
 
 absErrorCheck(0.1,10,1/678,Math.log,specialFastLog);
 absErrorCheck(0.1,10,1/678,Math.log,specialFastInterpolatedLog);
 
-
-
-var nChecks=10000000;
+var nChecks=100000000;
 var x=0;
 
-x=emptyTiming(0.1,10,nChecks);
+x=emptyTiming(0.5,5,nChecks);
 console.log("simple approximation");
-x=timing(0.1,10,nChecks,specialFastLog);
+x=timing(0.5,5,nChecks,specialFastLog);
 console.log("linear interpolation");
-x=timing(0.1,10,nChecks,specialFastInterpolatedLog);
+x=timing(0.5,5,nChecks,specialFastInterpolatedLog);
 console.log("Math.log");
-x=timing(0.1,10,nChecks,Math.log);
+x=timing(0.5,5,nChecks,Math.log);
 
 </script>
 </html>
