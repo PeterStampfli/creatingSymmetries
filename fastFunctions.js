@@ -110,7 +110,7 @@ var sinTabLengthM1=0;
 var sinTabFactor=1;
 var sinTabHigherCorrection=0;
 
-// set up the table, its length is a power of 2
+// set up the table, its length is a power of 2 (plus one for linear interpolation)
 function setupSinCosTable(p) {
 	var sinTabLength=Math.round(Math.pow(2,p));
  	sinTabLengthM1=sinTabLength-1;
@@ -191,6 +191,7 @@ function setupExpTables(n){
 	expTabIntPart=makeFunctionTable(expTabIntPartMaxIndex+1,expMinArgument,1,Math.exp);
 	expTabFactor=n;
     expTabHigherCorrection=0.25/expTabFactor/expTabFactor;
+    // for the fractional part, x=0 ... 1, excluding 1, the additional point is for interpolation
 	expTabFractPart=makeFunctionTable(n+1,0,1.0/expTabFactor,Math.exp);
 }
 
@@ -228,9 +229,10 @@ function fastImprovedInterpolatedExp(x){
 var atanTab=[];
 var atanTabFactor=0;
 
+// for x=0 ... 1, including 1, thus we need n+1 points plus 1 for linear interpolation
 function setupAtanTable(n){
 	atanTabFactor=n;
-	atanTab=makeFunctionTable(n+1,0,1.0/atanTabFactor,Math.atan);
+	atanTab=makeFunctionTable(n+2,0,1.0/atanTabFactor,Math.atan);
 }
 
 // inverse tangent for 0<=x<=1
@@ -260,7 +262,7 @@ function setupLogTable(n,xMin,xMax){
 	logTabXMin=xMin;
 	logTabXMax=xMax;
 	logTabFactor=n/(xMax-xMin);
-	logTab=makeFunctionTable(n+1,xMin,1.0/logTabFactor,Math.log);
+	logTab=makeFunctionTable(n+2,xMin,1.0/logTabFactor,Math.log);   // plus 2 because includes upper limit and one data point for linbear interpolation
 }
 
 function specialFastLog(x){

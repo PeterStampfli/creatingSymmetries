@@ -540,25 +540,53 @@ var pixelRed;
 var pixelGreen;
 var pixelBlue;
 
+// default color for outside
+function defaultColor(){
+    pixelRed = outsideRed;
+    pixelGreen = outsideGreen;
+    pixelBlue = outsideBlue;
+    return;
+}
+
 // nearest neighbor
 function pixelInterpolationNearest(x, y, inData) {
     // local variables for fast access
     var inPixels = inData.data;
     var inWidth = inData.width;
     var inHeight = inData.height;
+    //  rounded coordinates
     //  catch the case that the point is outside, we use there a solid color
     // with a small safety margin
-    if ((x < -1) || (y < -1) || (x > inWidth) || (y > inHeight)) {
-        pixelRed = outsideRed;
-        pixelGreen = outsideGreen;
-        pixelBlue = outsideBlue;
-        return;
+    var h = Math.round(x);
+    var k = Math.round(y);
+    if (h<0){
+        if (h<-1){
+            defaultColor();
+            return;
+        }
+        h=0;
     }
-    //  rounded coordinates
-    h = Math.round(x);
-    k = Math.round(y);
-    var h = Math.max(0, Math.min(inWidth - 1, h));
-    var k = Math.max(0, Math.min(inHeight - 1, k));
+    else if (h>=inWidth){
+        if (h>inWidth){
+            defaultColor();
+            return;
+        }
+        h=inWidth - 1;
+    }
+    if (k<0){
+        if (k<-1){
+            defaultColor();
+            return;
+        }
+        k=0;
+    }
+    else if (k>=inHeight){
+        if (k>inHeight){
+            defaultColor();
+            return;
+        }
+        k=inHeight - 1;
+    }
     var inIndex = 4 * (inWidth * k + h);
     pixelRed = inPixels[inIndex++]; //red
     pixelGreen = inPixels[inIndex++]; // green
@@ -571,14 +599,6 @@ function pixelInterpolationLinear(x, y, inData) {
     var inPixels = inData.data;
     var inWidth = inData.width;
     var inHeight = inData.height;
-    //  catch the case that the point is outside, we use there a solid color
-    // with a small safety margin
-    if ((x < -1) || (y < -1) || (x > inWidth) || (y > inHeight)) {
-        pixelRed = outsideRed;
-        pixelGreen = outsideGreen;
-        pixelBlue = outsideBlue;
-        return;
-    }
     //  coordinates of base pixel
     var h = Math.floor(x);
     var k = Math.floor(y);
@@ -587,10 +607,20 @@ function pixelInterpolationLinear(x, y, inData) {
     var h0, h1, k0, k1;
     var i00, i01, i10, i11;
     var f00, f01, f10, f11;
+    //  catch the case that the point is outside, we use there a solid color
+    // with a small safety margin
     if (k < 0) { // out of the bottom
+        if (k<-1){
+            defaultColor();
+            return;
+        }
         k0 = 0;
         k1 = 0;
     } else if (k >= inHeight - 1) { // out of top
+        if (k>=inHeight){
+            defaultColor();
+            return;
+        }
         k0 = 4 * inWidth * (inHeight - 1);
         k1 = k0;
     } else {
@@ -598,9 +628,17 @@ function pixelInterpolationLinear(x, y, inData) {
         k1 = k0 + 4 * inWidth;
     }
     if (h < 0) { // out left
+        if (h<-1){
+            defaultColor();
+            return;
+        }
         h0 = 0;
         h1 = 0;
     } else if (h >= inWidth - 1) { // out right
+        if (h>=inWidth){
+            defaultColor();
+            return;
+        }
         h0 = 4 * (inWidth - 1);
         h1 = h0;
     } else {
@@ -636,14 +674,6 @@ function pixelInterpolationCubic(x, y, inData) {
     var inPixels = inData.data;
     var inWidth = inData.width;
     var inHeight = inData.height;
-    //  catch the case that the point is outside, we use there a solid color
-    // with a small safety margin
-    if ((x < -1) || (y < -1) || (x > inWidth) || (y > inHeight)) {
-        pixelRed = outsideRed;
-        pixelGreen = outsideGreen;
-        pixelBlue = outsideBlue;
-        return;
-    }
     //  coordinates of base pixel
     var h = Math.floor(x);
     var k = Math.floor(y);
@@ -656,11 +686,19 @@ function pixelInterpolationCubic(x, y, inData) {
     var j2 = j0 + 2;
     // too low
     if (jm < 0) {
+        if (k<-1){
+            defaultColor();
+            return;
+        }
         jm = 0;
         j0 = 0;
         j1 = Math.max(0, j1);
         j2 = Math.max(0, j2);
     } else if (j2 >= inHeight) { // to high
+        if (k>=inHeight){
+            defaultColor();
+            return;
+        }
         j2 = inHeight - 1;
         j1 = inHeight - 1;
         j0 = Math.min(j1, inHeight - 1);
@@ -678,11 +716,19 @@ function pixelInterpolationCubic(x, y, inData) {
     var i2 = i0 + 2;
     // too low
     if (im < 0) {
+        if (h<-1){
+            defaultColor();
+            return;
+        }
         im = 0;
         i0 = 0;
         i1 = Math.max(0, i1);
         i2 = Math.max(0, i2);
     } else if (i2 >= inWidth) { // too high
+            if (h>=inWidth){
+                defaultColor();
+                return;
+            }
         i2 = inWidth - 1;
         i1 = inWidth - 1;
         i0 = Math.min(i0, inWidth - 1);
@@ -913,6 +959,7 @@ function downDiagonalMirror(length) {
 }
 
 // six- and threefold rotational symmetry require "skewed" copies
+//  these are slower ...
 //=======================================================================================
 
 // sixFold rotational symmetry
