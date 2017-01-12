@@ -153,19 +153,20 @@ var phi=0;
 var xImage=0;
 var yImage=0;
 
-function set(re,im,rPower,phiPower){
-   // var interIm=
+function imageSet(re,im,rPower,phiPower){
+    var interIm=fastInterpolatedExp(rPower*logR);
+    var interRe=interIm*fastInterpolatedCos(phiPower*phi);
+    interIm=interIm*fastInterpolatedSin(phiPower*phi);
+    xImage=re*interRe-im*interIm;
+    yImage=re*interIm+im*interRe;
 }
 
-
-function mapping(phi){
-
-    var r=fastInterpolatedExp(1.5*logR);
-    // the trivial map
-    phi*=5;
-
-    xImage=r*fastInterpolatedCos(phi)+0.4*fastInterpolatedCos(2*phi)*r;
-    yImage=r*fastInterpolatedSin(phi)+0.4*fastInterpolatedSin(2*phi)*r;
+function imageAdd(re,im,rPower,phiPower){
+    var interIm=fastInterpolatedExp(rPower*logR);
+    var interRe=interIm*fastInterpolatedCos(phiPower*phi);
+    interIm=interIm*fastInterpolatedSin(phiPower*phi);
+    xImage+=re*interRe-im*interIm;
+    yImage+=re*interIm+im*interRe;
 }
 
 function rosetteMapTables() {
@@ -192,29 +193,76 @@ function rosetteMapTables() {
      		logR=0.5*specialFastInterpolatedLog(x*x+y*y);
             phiBase=specialFastInterpolatedAtan(y/x);
             // sector 1
-            mapping(phiBase);
+            phi=phiBase;
+            mapping();
             storeImage(mapSizeHalf+iBase,mapSizeHalf+jBase);
             // sector 2, change that for mirror symmetry
-            mapping(PIHALF-phiBase);
+            phi=PIHALF-phiBase;
+            mapping();
             storeImage(mapSizeHalf+jBase,mapSizeHalf+iBase);
             // sector 3, 
-            mapping(PIHALF+phiBase);
+            phi=PIHALF+phiBase;
+            mapping();
             storeImage(mapSizeHalf-1-jBase,mapSizeHalf+iBase);
             // sector 4, change that for mirror symmetry
-            mapping(Math.PI-phiBase);
+            phi=Math.PI-phiBase;
+            mapping();
             storeImage(mapSizeHalf-1-iBase,mapSizeHalf+jBase);
             // sector 5, change that for mirror symmetry
-            mapping(Math.PI+phiBase);
+            phi=Math.PI+phiBase;
+            mapping();
             storeImage(mapSizeHalf-1-iBase,mapSizeHalf-1-jBase);
             // sector 6, change that for mirror symmetry
-            mapping(PI3HALF-phiBase);
+            phi=PI3HALF-phiBase;
+            mapping();
             storeImage(mapSizeHalf-1-jBase,mapSizeHalf-1-iBase);
             // sector 7, change that for mirror symmetry
-            mapping(PI3HALF+phiBase);
+            phi=PI3HALF+phiBase;
+            mapping();
             storeImage(mapSizeHalf+jBase,mapSizeHalf-1-iBase);
             // sector 8, change that for mirror symmetry
-            mapping(-phiBase);
+            phi=-phiBase;
+            mapping();
             storeImage(mapSizeHalf+iBase,mapSizeHalf-1-jBase);
         }
     }
+}
+
+// other symmetry dependent parts
+//=============================================================================
+
+// initial mapping scale
+//  (x,y) coordinates to pixels
+scaleOutputToInput = 200
+
+// the replacement color for outside pixels
+var outsideRed = 100;
+var outsideGreen = 100;
+var outsideBlue = 100;
+
+// invert the color
+function invert(){
+    pixelRed=255-pixelRed;
+    pixelGreen=255-pixelGreen;
+    pixelBlue=255-pixelBlue;
+}
+
+//get the color of a pixel, trivial case, no color symmetry
+function makePixelColor(x,y){
+    if (y>0){
+        sampleInput(x,y);
+    }
+    else {
+        sampleInput(x,-y);
+        invert();
+    }
+}
+
+function mapping(){
+
+    imageSet(1,0,2,6);
+    imageAdd(1,0,-2,-6);
+  //  imageAdd(0,0.5,3,-12);
+  //  imageAdd(0,0.5,3,12);
+
 }

@@ -12,14 +12,12 @@ var hexagonSymmetry;
 
 window.onload = function () {
     hintPatch = true;
-    setSymmetries();
     connectNewInputImage();
     setupReferenceCanvas();
     setupOutputCanvas();
     setupOrientationCanvas(200);
     makeInteractions();
     updateOutputDimensions(512, 512);
-    updatePeriod(400, 400);
     drawing();
 };
 
@@ -105,13 +103,6 @@ function useNewInputImage() {
 var outputWidth;
 var outputHeight;
 
-// dimensions of the periodic unit cell
-var periodWidth;
-var periodHeight;
-//  their quarters
-var periodWidth4;
-var periodHeight4;
-
 // the table for the mapping function 
 var mapXTab = [];
 var mapYTab = [];
@@ -121,26 +112,7 @@ var mapHeight;
 
 // the choosers
 var outputWidthChooser;
-var outputHeightChooser;
-var periodWidthChooser;
-var periodHeightChooser;
 
-// set a new period width and height, equal to output dimensions
-// force multiple of 4, fix ratio between width and height for special symmetries
-// get output pixels of the periodic unit cell
-function updatePeriod() {
-    periodWidth = outputWidth;
-    periodHeight = outputWidth;
-    periodWidth4 = periodWidth / 4;
-    periodHeight4 = periodHeight / 4;
-    setMapDimensions();
-    mapXTab.length = mapWidth * mapHeight;
-    mapYTab.length = mapWidth * mapHeight;
-    setupMapTables();
-    // output canvas, get data of unit cell	
-    outputData = outputImage.getImageData(0, 0, periodWidth, periodHeight);
-    outputPixels = outputData.data;
-}
 // set a new output width and height, forces it to be a multiple of 4
 // makes a blue screen as output image
 // does NOT limit the period dimensions (avoid tangle, responsability of callers)
@@ -155,11 +127,16 @@ function updateOutputDimensions(newWidth) {
         // make the canvas opaque, blue screen of nothing if there is no input image
         outputImage.fillStyle = "Blue";
         outputImage.fillRect(0, 0, outputWidth, outputHeight);
+        mapWidth = outputWidth;
+        mapHeight = outputWidth;
+        mapXTab.length = mapWidth * mapHeight;
+        mapYTab.length = mapWidth * mapHeight;
+        rosetteMapTables();
+        // output canvas, get data of unit cell 
+        outputData = outputImage.getImageData(0, 0, outputWidth, outputWidth);
+        outputPixels = outputData.data;
     }
 }
-
-//  the download buttons
-//=========================================================================
 
 // make up interactions with html elements
 function makeInteractions(){
@@ -260,7 +237,6 @@ function outputMouseWheelHandler(event) {
     stopEventPropagationAndDefaultAction(event);
     var factor = event.deltaY > 0 ? changeSize : 1 / changeSize;
     updateOutputDimensions(factor * outputWidth, factor * outputHeight);
-    updatePeriod(factor * periodWidth, factor * periodHeight);
     outputOffsetX *= factor;
     outputOffsetY *= factor;
    // scaleOutputToInput /= factor;
@@ -481,43 +457,7 @@ function setupOrientationCanvas(size) {
      p       i      x  x
      p      iii    x    x
  */  
-//  put the pixels of the ImageData object outputData periodically on the output canvas
-//  outputData contains exactly one periodic cell
-//  the images are offset by outputOffsetX and outputOffsetY
-//  note that putImageData has different API than drawImage
 
-function putPixelsPeriodicallyOnCanvas() {
-    var copyWidth;
-    var copyHeight;
-    var targetX;
-    var targetY;
-    var sourceX;
-    var sourceY;
-    for (var cornerY = outputOffsetY - periodHeight; cornerY < outputHeight; cornerY += periodHeight) {
-        if (cornerY < 0) {
-            sourceY = -cornerY;
-            targetY = cornerY; // strange, actually difference between source corner and intended
-            copyHeight = outputOffsetY;
-        } else {
-            sourceY = 0;
-            targetY = cornerY;
-            copyHeight = Math.min(outputHeight - cornerY, periodHeight);
-        }
-        for (var cornerX = outputOffsetX - periodWidth; cornerX < outputWidth; cornerX += periodWidth) {
-            if (cornerX < 0) {
-                sourceX = -cornerX;
-                targetX = cornerX;
-                copyWidth = outputOffsetX;
-            } else {
-                sourceX = 0;
-                targetX = cornerX;
-                copyWidth = Math.min(outputWidth - cornerX, periodWidth);
-            }
-            outputImage.putImageData(outputData,
-                targetX, targetY, sourceX, sourceY, copyWidth, copyHeight);
-        }
-    }
-}
 
 /* functions for getting interpolated pixels from an image data object (inData)
  *==============================================================================
@@ -559,33 +499,9 @@ function pixelInterpolationNearest(x, y, inData) {
     // with a small safety margin
     var h = Math.round(x);
     var k = Math.round(y);
-    if (h<0){
-        if (h<-1){
-            defaultColor();
-            return;
-        }
-        h=0;
-    }
-    else if (h>=inWidth){
-        if (h>inWidth){
-            defaultColor();
-            return;
-        }
-        h=inWidth - 1;
-    }
-    if (k<0){
-        if (k<-1){
-            defaultColor();
-            return;
-        }
-        k=0;
-    }
-    else if (k>=inHeight){
-        if (k>inHeight){
-            defaultColor();
-            return;
-        }
-        k=inHeight - 1;
+    if ((h<0)||(h>=inWidth)||(k<0)||(k>=inHeight)){
+        defaultColor();
+        return;
     }
     var inIndex = 4 * (inWidth * k + h);
     pixelRed = inPixels[inIndex++]; //red
@@ -602,55 +518,21 @@ function pixelInterpolationLinear(x, y, inData) {
     //  coordinates of base pixel
     var h = Math.floor(x);
     var k = Math.floor(y);
+     //  catch the case that the point is outside, we use there a solid color
+    if ((h<0)||(h+1>=inWidth)||(k<0)||(k+1>=inHeight)){
+        defaultColor();
+        return;
+    }
     var dx = x - h;
     var dy = y - k;
-    var h0, h1, k0, k1;
     var i00, i01, i10, i11;
     var f00, f01, f10, f11;
-    //  catch the case that the point is outside, we use there a solid color
-    // with a small safety margin
-    if (k < 0) { // out of the bottom
-        if (k<-1){
-            defaultColor();
-            return;
-        }
-        k0 = 0;
-        k1 = 0;
-    } else if (k >= inHeight - 1) { // out of top
-        if (k>=inHeight){
-            defaultColor();
-            return;
-        }
-        k0 = 4 * inWidth * (inHeight - 1);
-        k1 = k0;
-    } else {
-        k0 = 4 * inWidth * k;
-        k1 = k0 + 4 * inWidth;
-    }
-    if (h < 0) { // out left
-        if (h<-1){
-            defaultColor();
-            return;
-        }
-        h0 = 0;
-        h1 = 0;
-    } else if (h >= inWidth - 1) { // out right
-        if (h>=inWidth){
-            defaultColor();
-            return;
-        }
-        h0 = 4 * (inWidth - 1);
-        h1 = h0;
-    } else {
-        h0 = 4 * h;
-        h1 = h0 + 4;
-    }
-    i00 = h0 + k0;
-    i01 = h0 + k1;
-    i10 = h1 + k0;
-    i11 = h1 + k1;
-    // now all index points are inside
-    // same calculation for all cases
+    // the indices to pixel data
+    i00 = 4*(h+inWidth*k);
+    i01 = i00+4*inWidth;
+    i10 = i00+4;
+    i11 = i01+4;
+    //  the weights
     f00 = (1 - dx) * (1 - dy);
     f01 = (1 - dx) * dy;
     f10 = dx * (1 - dy);
@@ -794,245 +676,11 @@ function pixelInterpolationCubic(x, y, inData) {
     pixelBlue = Math.max(0, Math.round(blue));
 }
 
-// copy lines of pixels on the output image data object, only the RGB part
-// target goes right or left on a horizontal line from (targetI,targetJ) to (targetEndI,targetJ)
-// the source pixels may be on horizontal or vertical lines, or on inclined (skewed) lines
-//===================================================================================================
 
 // get a simple pixel index from indices (i,j) to pixels in the unit cell, using the width of the unit cell
 //  this is the index to the red component of the pixel, green,blue and alpha follow
 function index(i, j) {
-    return 4 * (Math.round(i) + periodWidth * Math.round(j));
-}
-
-//  going from left to right along a horizontal line
-//  line starts from (targetI,targetJ) (with integer coordinates) and goes to=(targetEndI,targetJ),
-//  where targetEndI>targetI may be float
-//  takes pixel from a horizontal or vertical line, starting at (sourceI,sourceJ), 
-//  making steps (sourceStepI,sourceStepJ) with components -1,0,1
-//===================================================================================
-
-function copyPixels(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceStepI, sourceStepJ) {
-    var target = index(targetI, targetJ);
-    var targetEnd = index(targetEndI, targetJ);
-    var source = index(sourceI, sourceJ);
-    var sourceStep = index(sourceStepI, sourceStepJ) - 2; // combined step, with compensation for pixel subcomponents 
-    while (target <= targetEnd) { // do complete pixels ...
-        outputPixels[target++] = outputPixels[source++];
-        outputPixels[target++] = outputPixels[source++];
-        outputPixels[target] = outputPixels[source];
-        target += 2; // ... skip blu,alpha, go to next pixel at right
-        source += sourceStep; // walk through the source
-    }
-}
-
-// same as copyPixels(), but now targetEndI<targetI, decreasing x-values
-// and thus going from the right to the left
-function copyPixelsRightToLeft(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceStepI, sourceStepJ) {
-    var target = index(targetI, targetJ);
-    var targetEnd = index(targetEndI, targetJ);
-    var source = index(sourceI, sourceJ);
-    var sourceStep = index(sourceStepI, sourceStepJ) - 2; // combined step, with compensation for pixel subcomponents 
-    while (target >= targetEnd) { // do complete pixels ...
-        outputPixels[target++] = outputPixels[source++];
-        outputPixels[target++] = outputPixels[source++];
-        outputPixels[target] = outputPixels[source];
-        target -= 6; // ... skip red,green, go to next pixel at left
-        source += sourceStep; // walk through the source
-    }
-}
-
-// same as copyPixels(), drawing a horizontal line of pixels
-// but now (sourceStepI,sourceStepJ) has to be a unit vector of any direction
-// we use interpolation to get the color of the source pixel with float coordinates
-
-function copyPixelSkewed(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceStepI, sourceStepJ) {
-    var target = index(targetI, targetJ);
-    var targetEnd = index(targetEndI, targetJ);
-    while (target <= targetEnd) {
-        pixelInterpolationLinear(sourceI, sourceJ, outputData);
-        outputPixels[target++]=pixelRed;
-        outputPixels[target++]=pixelGreen;
-        outputPixels[target]=pixelBlue;
-        target += 2;
-        sourceI += sourceStepI;
-        sourceJ += sourceStepJ;
-    }
-}
-
-// same as copyPixelsSkewed(), but now targetEndI<targetI, decreasing x-values
-// and thus going from the right to the left
-function copyPixelSkewedRightToLeft(targetI, targetEndI, targetJ, sourceI, sourceJ, sourceStepI, sourceStepJ) {
-    var target = index(targetI, targetJ);
-    var targetEnd = index(targetEndI, targetJ); // all pixel components
-    while (target >= targetEnd) {
-        pixelInterpolationLinear(sourceI, sourceJ, outputData);
-        outputPixels[target++]=pixelRed;
-        outputPixels[target++]=pixelGreen;
-        outputPixels[target]=pixelBlue;
-        target -= 6;
-        sourceI += sourceStepI;
-        sourceJ += sourceStepJ;
-    }
-}
-
-// and now the special symmetries, that can be done with integer pixel coordinates
-// going horizontally or vertically
-//==========================================================================
-// NOTE THAT THE Y_AXIS GOES FROM TOP TO BOTTOM AND THAT THIS "INVERSES THINGS"
-//============================================================================
-
-//  copy a rectangular piece, same orientation, to another place inside the unit cell
-//  target rectangle should not overlap the source rectangle
-
-function copyRectangle(targetI, targetJ, sourceI, sourceJ, width, height) {
-    var targetEndJ = targetJ + height;
-    var targetEndI = targetI + width - 1;
-    while (targetJ < targetEndJ) {
-        copyPixels(targetI, targetEndI, targetJ, sourceI, sourceJ, 1, 0);
-        targetJ++;
-        sourceJ++;
-    }
-}
-
-// copying the two quarters of the left half of the unit cell crosswise to the right
-//  as needed for rhombic or hexagonal symmetry
-function rhombicCopy() {
-    copyRectangle(periodWidth / 2, 0, 0, periodHeight / 2, periodWidth / 2, periodHeight / 2);
-    copyRectangle(periodWidth / 2, periodHeight / 2, 0, 0, periodWidth / 2, periodHeight / 2);
-}
-
-
-// mirrorsymmetry at the horizontal axis at periodicHeight/2 
-// copies the lower half onto the upper half with variable length (number of pixels)
-//  reasonable values are periodicLength or periodicLength/2
-function horizontalMirror(length) {
-    for (var fromJ = 0; fromJ < periodHeight / 2; fromJ++) {
-        copyPixels(0, length - 1, periodHeight - fromJ - 1, 0, fromJ, 1, 0);
-    }
-}
-
-// mirror symmetry in the unit cell at a vertical axis lying at periodicWidth/2
-//  copies the left half onto the right half, with variable length (number of pixels)
-//  reasonable values are periodicLength and periodicLength/2
-function verticalMirror(length) {
-    var periodWidth2 = periodWidth / 2;
-    for (var fromJ = 0; fromJ < length; fromJ++) {
-        copyPixels(periodWidth2, periodWidth - 1, fromJ, periodWidth2 - 1, fromJ, -1, 0);
-    }
-}
-
-// quarter turn rotational symmetry around center of unit cell (periodWidth/2,periodHeight/2)
-// turns (numericall) lower left quarter 90 degrees clockwise to the upper left quarter, which is overwritten
-function quarterTurn() {
-    var period2 = Math.min(periodWidth, periodHeight) / 2;
-    for (var j = 0; j < period2; j++) {
-        copyPixels(0, period2 - 1, j + period2, period2 - 1 - j, 0, 0, 1);
-    }
-}
-
-// half turn rotational symmetry around center of unit cell (periodWidth/2,periodHeight/2)
-// turns left half 180 degrees to the right half, which is overwritten
-function halfTurn() {
-    var periodWidth2 = periodWidth / 2;
-    for (var j = 0; j < periodHeight; j++) {
-        copyPixels(periodWidth2, periodWidth - 1, j, periodWidth2 - 1, periodWidth - 1 - j, -1, 0);
-    }
-}
-
-//  mirrorsymmetry at the upwards going diagonal x=y
-//  takes the lower sector (j<i) and overwrites the upper (j>i)
-//  reasonable values are length=period/2 typically (length=period ???)
-function upDiagonalMirror(length) {
-    for (var j = 0; j < length; j++) {
-        copyPixels(0, j - 1, j, j, 0, 0, 1);
-    }
-}
-
-// mirrorsymmetry at the down going diagonal x+y=length-1
-// takes the lower sector x+y<length-1 and overwrites x+y>length-1 (x<length,y<length)
-// reasonable value length=perioWidth/2
-function downDiagonalMirror(length) {
-    for (var j = 0; j < length; j++) {
-        copyPixels(length - 1 - j, length - 1, j, length - 1 - j, j, 0, -1);
-    }
-}
-
-// six- and threefold rotational symmetry require "skewed" copies
-//  these are slower ...
-//=======================================================================================
-
-// sixFold rotational symmetry
-// using the image in the triangle with corners (0,0), (periodWidth/3,0) and (periodWidth/6,periodHeight/2)
-// to cover the entire unit cell with rotated images (multiples of 60 degrees)
-
-function sixFoldRotational() {
-    var j;
-    // the upper half triangle at the left border
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelSkewed(0, 0.3333 * periodWidth * (0.5 - j / periodHeight), periodHeight / 2 + j,
-            0.5 * periodWidth * (0.5 - j / periodHeight), 0.5 * (periodHeight / 2 - 1 - j), -0.5, 1.5 * periodHeight / periodWidth);
-    }
-    // the lower half-triangle at the left border
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelSkewed(0, 0.3333 * periodWidth * j / periodHeight, j,
-            0.5 * j * periodWidth / periodHeight, 0.5 * j, 0.5, -1.5 * periodHeight / periodWidth);
-    }
-    // the right half of the upper equilateral triangle 
-    //  
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelSkewed(0.16666 * periodWidth, 0.3333 * periodWidth * (0.5 + j / periodHeight), periodHeight / 2 + j,
-            periodWidth * (0.3333 - 0.5 * j / periodHeight), 0.5 * j, 0.5, 1.5 * periodHeight / periodWidth);
-    }
-    // the left half of the upper equilateral triangle 
-    //  
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelSkewedRightToLeft(0.16666 * periodWidth, 0.3333 * periodWidth * (0.5 - j / periodHeight), periodHeight / 2 + j,
-            periodWidth * (0.3333 - 0.5 * j / periodHeight), 0.5 * j, -0.5, -1.5 * periodHeight / periodWidth);
-    }
-    // local inversion symmetry at (periodWidth/4,periodHeight/4), left to right
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelsRightToLeft(periodWidth / 2 - 1, 0.3333 * periodWidth * (1 - j / periodHeight), j,
-            0, periodHeight / 2 - 1 - j, 1, 0);
-    }
-    // local inversion symmetry at (periodWidth/4,periodHeight*3/4), left to right
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelsRightToLeft(periodWidth / 2 - 1, 0.3333 * periodWidth * (0.5 + j / periodHeight), periodHeight / 2 + j,
-            0, periodHeight - 1 - j, 1, 0);
-    }
-    rhombicCopy();
-}
-
-// threeFold rotational symmetry
-// using the image in the rhomb with corners (periodWidth/2,periodHeight/2), (periodWidth/3,periodHeight-1),
-//   (periodWidth/6,periodHeight/2) and (periodWidth/3,0)
-// covers the entire unit cell with rotated copies (multiples of 120 degrees)
-
-function threeFoldRotational() {
-    var j;
-    //lower left trapeze
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelSkewed(0, 0.3333 * periodWidth * (1 - j / periodHeight), j,
-            0.5 * periodWidth - 0.5 * j / periodHeight * periodWidth, 0.5 * periodHeight - 0.5 * j, -0.5, 1.5 * periodHeight / periodWidth);
-    }
-    // upper left trapeze
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelSkewed(0, 0.3333 * periodWidth * (0.5 + j / periodHeight), periodHeight / 2 + j,
-            0.25 * periodWidth + 0.5 * j / periodHeight * periodWidth, 0.75 * periodHeight - 0.5 * j, -0.5, -1.5 * periodHeight / periodWidth);
-    }
-    // lower right triangle
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelSkewedRightToLeft(periodWidth / 2 - 1, 0.3333 * periodWidth * (1 + j / periodHeight), j,
-            0.5 * periodWidth * (0.5 + j / periodHeight), 0.75 * periodHeight - 0.5 * j, 0.5, 1.5 * periodHeight / periodWidth);
-
-    }
-    // upper right triangle
-    for (j = 0; j < periodHeight / 2; j++) {
-        copyPixelSkewedRightToLeft(periodWidth / 2 - 1, periodWidth / 2 - 1 - 0.3333 * j * periodWidth / periodHeight, periodHeight / 2 + j,
-            0.5 * periodWidth - 0.5 * j / periodHeight * periodWidth, 0.5 * periodHeight - 0.5 * j, 0.5, -1.5 * periodHeight / periodWidth);
-
-    }
-    rhombicCopy();
+    return 4 * (Math.round(i) + outputWidth * Math.round(j));
 }
 
 // making the symmetric image, using the general method of F. Farris
@@ -1050,7 +698,8 @@ var centerX;
 var centerY;
 var scaleSin;
 var scaleCos;
-// sample input at transformed coordinates
+
+// sample input image at transformed coordinates
 // result in pixelRed, pixelGreen, pixelBlue
 function sampleInput(x,y){
     // translation, rotation and scaling
@@ -1113,85 +762,13 @@ function drawing(){
     //  scaling and rotation: transformation matrix elements
     scaleCos = scaleOutputToInput * cosAngle;
     scaleSin = scaleOutputToInput * sinAngle;
-	makeSymmetriesFarris();
-	// put the symmetric image on the output canvas
-	putPixelsPeriodicallyOnCanvas();
-	// put the reference image
-	putPixelsOnReferenceCanvas();
-	// hint for debugging
-	showHintPatch();
-}
-
-// symmetry dependent
-//=============================================================================
-// setting symmetry dependent map dimensions as function of period dimensions
-// =====================================================================
-function setMapDimensions() {
-    mapWidth = periodWidth / 2;
-    mapHeight = periodHeight / 2;
-    mapWidth = periodWidth;
-    mapHeight = periodHeight;
-}
-
-//for debugging: show the basic map on output as red lines
-//================================================================
-function showHintPatch() {
-}
-
-//  trivial map for simple maping
-// ========================================================================
-function trivialMapTables() {
-    var locmapWidth = mapWidth;
-    var locmapHeight = mapHeight;
-    var locmapWidth2 = mapWidth / 2;
-    var locmapHeight2 = mapHeight / 2;
-    var index = 0;
-    var i, j;
-    for (j = 0; j < locmapHeight; j++) {
-        for (i = 0; i < locmapWidth; i++) {
-            mapXTab[index] = i - locmapWidth2;
-            mapYTab[index++] = j - locmapHeight2;
-        }
-    }
-}
-
-function setupMapTables() {
-    //trivialMapTables();
-    rosetteMapTables();
-}
-
-// initial mapping scale
-//  (x,y) coordinates to pixels
-scaleOutputToInput = 200
-
-// the replacement color for outside pixels
-var outsideRed = 0;
-var outsideGreen = 0;
-var outsideBlue = 200;
-
-//get the color of a pixel, trivial case, no color symmetry
-function makePixelColor(x,y){
-    sampleInput(x,y);
-}
-
-// presetting special symmetries, fixing the height to width ratio of the unit cell
-function setSymmetries() {
-    squareSymmetry = false;
-    hexagonSymmetry = true;
-}
-
-// draw the unit cell on output image
-// the shape of the basic map and symmetries in unit cell depend on symmetry of the image
-//=================================================================================
-function makeSymmetriesFarris() {
-    // draw the basic map, using the mapping in the map tables 
+   // draw the basic map, using the mapping in the map tables
     for (var j = 0; j < mapHeight; j++) {
         drawPixelLine(0, mapWidth - 1, j);
     }
-    // the symmetries inside the unit cell
-    //verticalMirror(periodHeight/2);
-    //horizontalMirror(periodWidth);
-    //threeFoldRotational();
-    //sixFoldRotational();
-
+	// put the symmetric image on the output canvas
+    outputImage.putImageData(outputData,0, 0, 0, 0, outputWidth, outputWidth);
+	// put the reference image
+	putPixelsOnReferenceCanvas();
 }
+
