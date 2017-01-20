@@ -145,7 +145,13 @@ function specialFastInterpolatedAtan(x){
 // then a pixel address is put in the table
 // a unit length corresponds
 // ========================================================================
-// using sectors
+
+var mapScale=0;
+var mapOffsetI=0;
+var mapOffsetJ=0;
+
+
+
 
 var logR=0;
 var phi=0;
@@ -153,21 +159,8 @@ var phi=0;
 var xImage=0;
 var yImage=0;
 
-function imageSet(re,im,rPower,phiPower){
-    var interIm=fastInterpolatedExp(rPower*logR);
-    var interRe=interIm*fastInterpolatedCos(phiPower*phi);
-    interIm=interIm*fastInterpolatedSin(phiPower*phi);
-    xImage=re*interRe-im*interIm;
-    yImage=re*interIm+im*interRe;
-}
 
-function imageAdd(re,im,rPower,phiPower){
-    var interIm=fastInterpolatedExp(rPower*logR);
-    var interRe=interIm*fastInterpolatedCos(phiPower*phi);
-    interIm=interIm*fastInterpolatedSin(phiPower*phi);
-    xImage+=re*interRe-im*interIm;
-    yImage+=re*interIm+im*interRe;
-}
+
 
 function rosetteMapTables() {
  
@@ -254,13 +247,40 @@ function makePixelColor(x,y){
     }
     else {
         sampleInput(x,-y);
-        invert();
+        pixelRed=255-pixelRed;
+        pixelGreen=255-pixelGreen;
+        pixelBlue=255-pixelBlue;    
     }
 }
 
-function mapping(){
 
-    imageSet(1,0,2,6);
+function imageZero(){
+    xImage=0;
+    yImage=0;
+}
+
+// the complex variant
+function imageAdd(re,im,rPower,phiPower){
+    var interIm=fastInterpolatedExp(rPower*logR);
+    var interRe=interIm*fastInterpolatedCos(phiPower*phi);
+    interIm=interIm*fastInterpolatedSin(phiPower*phi);
+    xImage+=re*interRe-im*interIm;
+    yImage+=re*interIm+im*interRe;
+}
+
+// the real parts
+function imageAddR(a,b,c,d,rPower,phiPower){
+    var rk=fastInterpolatedExp(rPower*logR);
+    var rkSinPhi=phiPower*phi;
+    var rkCosPhi=rk*fastInterpolatedCos(rkSinPhi);
+    rkSinPhi=rk*fastInterpolatedSin(rkSinPhi);
+    xImage+=a*rkCosPhi+b*rkSinPhi;
+    yImage+=c*rkCosPhi+d*rkSinPhi;
+}
+
+function mapping(){
+    imageZero();
+    imageAdd(1,0,2,6);
     imageAdd(1,0,-2,-6);
   //  imageAdd(0,0.5,3,-12);
   //  imageAdd(0,0.5,3,12);

@@ -18,19 +18,11 @@ window.onload = function () {
     setupOrientationCanvas(200);
     makeInteractions();
     updateOutputDimensions(512, 512);
+    mapOffsetI=outputWidth/2;
+    mapOffsetJ=outputWidth/2;
+    mapScale=2.0/outputWidth;
     drawing();
 };
-
-
-// collection of small functions used in different places
-//=================================================================
-
-// return a (smaller) integer multiple of four of any number
-function makeMultipleOf4(i) {
-    i = Math.floor(i);
-    return i - i % 4;
-}
-
 
 /*
   u   u    sss     eeee   rrrr        iii     aaa
@@ -107,8 +99,8 @@ var outputHeight;
 var mapXTab = [];
 var mapYTab = [];
 //  with dimensions (part of the periodic unit cell)
-var mapWidth;
-var mapHeight;
+var mapWidth=0;
+var mapHeight=0;
 
 // the choosers
 var outputWidthChooser;
@@ -117,7 +109,7 @@ var outputWidthChooser;
 // makes a blue screen as output image
 // does NOT limit the period dimensions (avoid tangle, responsability of callers)
 function updateOutputDimensions(newWidth) {
-    newWidth = makeMultipleOf4(Math.round(newWidth));
+    newWidth = Math.round(newWidth);
     if (newWidth != outputWidth) {
         outputWidthChooser.value = newWidth.toString();
         outputWidth = newWidth;
@@ -499,7 +491,7 @@ function pixelInterpolationNearest(x, y, inData) {
     // with a small safety margin
     var h = Math.round(x);
     var k = Math.round(y);
-    if ((h<0)||(h>=inWidth)||(k<0)||(k>=inHeight)){
+    if ((h<1)||(h+2>=inWidth)||(k<1)||(k+2>=inHeight)){
         defaultColor();
         return;
     }
@@ -519,7 +511,7 @@ function pixelInterpolationLinear(x, y, inData) {
     var h = Math.floor(x);
     var k = Math.floor(y);
      //  catch the case that the point is outside, we use there a solid color
-    if ((h<0)||(h+1>=inWidth)||(k<0)||(k+1>=inHeight)){
+    if ((h<1)||(h+2>=inWidth)||(k<1)||(k+2>=inHeight)){
         defaultColor();
         return;
     }
@@ -559,70 +551,12 @@ function pixelInterpolationCubic(x, y, inData) {
     //  coordinates of base pixel
     var h = Math.floor(x);
     var k = Math.floor(y);
+    if ((h<1)||(h+2>=inWidth)||(k<1)||(k+2>=inHeight)){
+        defaultColor();
+        return;
+    }
     var dx = x - h;
     var dy = y - k;
-    //  the various vertical positions, getting the correct row numbers of pixels
-    var j0 = k;
-    var jm = j0 - 1;
-    var j1 = j0 + 1;
-    var j2 = j0 + 2;
-    // too low
-    if (jm < 0) {
-        if (k<-1){
-            defaultColor();
-            return;
-        }
-        jm = 0;
-        j0 = 0;
-        j1 = Math.max(0, j1);
-        j2 = Math.max(0, j2);
-    } else if (j2 >= inHeight) { // to high
-        if (k>=inHeight){
-            defaultColor();
-            return;
-        }
-        j2 = inHeight - 1;
-        j1 = inHeight - 1;
-        j0 = Math.min(j1, inHeight - 1);
-        jm = Math.min(j1, inHeight - 1);
-    }
-    //  transforming pixelrow numbers to indices of the input image data
-    jm *= 4 * inWidth;
-    j0 *= 4 * inWidth;
-    j1 *= 4 * inWidth;
-    j2 *= 4 * inWidth;
-    // the various horizontal positions (column numbers of pixels)
-    var i0 = h;
-    var im = i0 - 1;
-    var i1 = i0 + 1;
-    var i2 = i0 + 2;
-    // too low
-    if (im < 0) {
-        if (h<-1){
-            defaultColor();
-            return;
-        }
-        im = 0;
-        i0 = 0;
-        i1 = Math.max(0, i1);
-        i2 = Math.max(0, i2);
-    } else if (i2 >= inWidth) { // too high
-            if (h>=inWidth){
-                defaultColor();
-                return;
-            }
-        i2 = inWidth - 1;
-        i1 = inWidth - 1;
-        i0 = Math.min(i0, inWidth - 1);
-        im = Math.min(im, inWidth - 1);
-    }
-    //  transforming column numbers to indices to input image data
-    im *= 4;
-    i0 *= 4;
-    i1 *= 4;
-    i2 *= 4;
-    // combined indices, for different heights at same x-position
-    var indexM, index0, index1, index2;
     // the factorized weight function
     var kernel = mitchellNetrovalli;
     // y (vertical position) dependent values
@@ -632,40 +566,41 @@ function pixelInterpolationCubic(x, y, inData) {
     var ky2 = kernel(2 - dy);
     // x (horizontal position) dependent values, sweeping in x-direction
     var kx;
-    // color summation in parts
-    var red, green, blue;
+    // combined indices, for different heights at same x-position
+    var indexM, index0, index1, index2;
+    var inWidth4=inWidth*4;
     // the first column
-    indexM = jm + im;
-    index0 = j0 + im;
-    index1 = j1 + im;
-    index2 = j2 + im;
+    index0 = inWidth4 * k +4*(h-1);
+    indexM = index0-inWidth4;
+    index1 = index0+inWidth4;
+    index2 = index1+inWidth4;
     kx = kernel(1 + dx);
-    red = kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
-    green = kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
-    blue = kx * (kym * inPixels[indexM] + ky0 * inPixels[index0] + ky1 * inPixels[index1] + ky2 * inPixels[index2]);
-    // the second column, just at the left of (x,y)
-    indexM = jm + i0;
-    index0 = j0 + i0;
-    index1 = j1 + i0;
-    index2 = j2 + i0;
+    var red = kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    var green = kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
+    var blue = kx * (kym * inPixels[indexM] + ky0 * inPixels[index0] + ky1 * inPixels[index1] + ky2 * inPixels[index2]);
+    // the second column, just at the left of (x,y), skipping alpha
+    indexM +=2;
+    index0 +=2;
+    index1 +=2;
+    index2 +=2;
     kx = kernel(dx);
     red += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
     green += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
     blue += kx * (kym * inPixels[indexM] + ky0 * inPixels[index0] + ky1 * inPixels[index1] + ky2 * inPixels[index2]);
     //  the third column, just at the right of (x,y)
-    indexM = jm + i1;
-    index0 = j0 + i1;
-    index1 = j1 + i1;
-    index2 = j2 + i1;
+    indexM +=2;
+    index0 +=2;
+    index1 +=2;
+    index2 +=2;
     kx = kernel(1 - dx);
     red += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
     green += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
     blue += kx * (kym * inPixels[indexM] + ky0 * inPixels[index0] + ky1 * inPixels[index1] + ky2 * inPixels[index2]);
     // the forth column
-    indexM = jm + i2;
-    index0 = j0 + i2;
-    index1 = j1 + i2;
-    index2 = j2 + i2;
+    indexM +=2;
+    index0 +=2;
+    index1 +=2;
+    index2 +=2;
     kx = kernel(2 - dx);
     red += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
     green += kx * (kym * inPixels[indexM++] + ky0 * inPixels[index0++] + ky1 * inPixels[index1++] + ky2 * inPixels[index2++]);
@@ -732,13 +667,15 @@ function drawPixelLine(fromI, toI, j) {
     var outputEnd = index(toI, j);
     //  index to the mapping function table
     var mapIndex = fromI + mapWidth * j;
+    // function for making the color
+    var locMakePixelColor=makePixelColor;
     while (outputIndex <= outputEnd) {
         // some mapping from (i,j) to (x,y) stored in a map table !!!
         x = locMapXTab[mapIndex];
         y = locMapYTab[mapIndex];
         mapIndex++;
         //  color symmetry
-        makePixelColor(x,y);
+        locMakePixelColor(x,y);
         //
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
@@ -746,6 +683,7 @@ function drawPixelLine(fromI, toI, j) {
         outputIndex += 2;
     }
 }
+
 
 //  make the symmetries, draw the full output image and reference image
 //==========================================================
@@ -771,4 +709,3 @@ function drawing(){
 	// put the reference image
 	putPixelsOnReferenceCanvas();
 }
-
