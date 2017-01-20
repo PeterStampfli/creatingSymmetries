@@ -152,7 +152,6 @@ var phi=0;
 var xImage=0;
 var yImage=0;
 
-
 function rosetteMapTables() {
     var locMapOffsetI=Math.floor(mapOffsetI)+0.5;
     var locMapOffsetJ=Math.floor(mapOffsetJ)+0.5;
@@ -169,11 +168,8 @@ function rosetteMapTables() {
         for (i=0;i<mapWidth;i++){
             x=(i-locMapOffsetI)*locMapScale;
             locMapping(0.5*Math.log(y2+x*x),Math.atan2(y,x));
-
-
             mapXTab[index] = xImage;
-            mapYTab[index++] = yImage;
-           
+            mapYTab[index++] = yImage;          
         }
     }
 }
@@ -244,5 +240,5 @@ function mappingUnity(logR,phi){
     xImage=r*fastInterpolatedCos(phi);
     yImage=r*fastInterpolatedSin(phi);
 }
-  var mapping;
-  mapping=mappingUnity;
+var mapping;
+mapping=mappingUnity;

@@ -3,24 +3,15 @@
 //  the startup function
 //==============================================================================
 
-//  switching on and off the hint for the patch
-var hintPatch = false;
-
-// using special symmetries
-var squareSymmetry;
-var hexagonSymmetry;
-
 var initialOutputSize=512;
 
-
 window.onload = function () {
-    hintPatch = true;
     connectNewInputImage();
     setupReferenceCanvas();
     setupOutputCanvas();
     setupOrientationCanvas(200);
     makeInteractions();
-    initialOutputDimensions(256, 256);
+    initialOutputDimensions(initialOutputSize, initialOutputSize);
     drawing();
 };
 
@@ -33,8 +24,8 @@ window.onload = function () {
   u   u       s    e      r   r        i     a   a
    uuu    ssss     eeee   r   r       iii    a   a
 */
-// User interaction, in sequence of the html code
-//====================================================
+// User interaction
+//======================
 
 //  choose and load the input image file
 //=================================================
@@ -61,6 +52,8 @@ function connectNewInputImage() {
     inputImage.onload = useNewInputImage;
 }
 
+// read the input image with an offscreen canvas
+//  the offscreen canvas is local and will be disposed after quitting this function
 function useNewInputImage() {
     var offScreenCanvas;
     var offScreenCanvasImage;
@@ -88,14 +81,24 @@ function useNewInputImage() {
     drawing();
 }
 
-// choosing output image sizes and lengths of the periodic unit cell
-//===============================================================
+// choosing output image sizes
+//=============================
+var outputCanvas;
+var outputImage;
+
+// image and pixel data of output canvas
+var outputData;
+var outputPixels;
 
 // size for generated image
 var outputWidth;
 var outputHeight;
 
-// the table for the mapping function 
+// the choosers
+var outputWidthChooser;
+var outputHeightChooser;
+
+// the table for the mapping function (same size as output canvas)
 var mapXTab = [];
 var mapYTab = [];
 //  with dimensions (part of the periodic unit cell)
@@ -105,10 +108,6 @@ var mapHeight=0;
 var mapScale=0;
 var mapOffsetI=0;
 var mapOffsetJ=0;
-
-// the choosers
-var outputWidthChooser;
-var outputHeightChooser;
 
 // set a new output width and height, forces it to be a multiple of 4
 // makes a blue screen as output image
@@ -128,7 +127,8 @@ function setOutputDimensions(newWidth,newHeight){
     outputPixels = outputData.data;
 }
 
-function updateMap(){
+// set map dimensions and update the table values
+function updateMapDimensions(){
     mapWidth = outputWidth;
     mapHeight = outputHeight;
     mapXTab.length = mapWidth * mapHeight;
@@ -136,14 +136,19 @@ function updateMap(){
     mapTables();
 }
 
+// for initialization: sets initial map properties
+//  before transformation, coordinates have values
+// (x,y)=(0,0) at center and x=+/-2 at right and left border
+//  y=+/-2 at top and bottom border for square image
 function initialOutputDimensions(width,height){
-    setOutputDimensions(width,width);
+    setOutputDimensions(width,height);
     mapOffsetI=width/2;
-    mapOffsetJ=width/2;
-    mapScale=2.0/width;
-    updateMap();
+    mapOffsetJ=height/2;
+    mapScale=4.0/Math.sqrt(width*width+height*height);
+    updateMapDimensions();
 }
 
+//  changing the size of the image: update the map properties to get the same image at higher resolution
 function updateOutputDimensions(newWidth,newHeight) {
     newWidth = Math.round(newWidth);
     newHeight = Math.round(newHeight);
@@ -155,12 +160,11 @@ function updateOutputDimensions(newWidth,newHeight) {
         mapOffsetJ*=outputHeight/oldHeight;
         mapScale*=Math.sqrt((oldWidth*oldWidth+oldHeight*oldHeight)/
                             (outputWidth*outputWidth+outputHeight*outputHeight));
-        updateMap();
-
+        updateMapDimensions();
     }
 }
 
-// make up interactions with html elements
+// make up interactions with html elements: adds event listeners
 function makeInteractions(){
     var imageInputButton = document.getElementById('imageInput')
     imageInputButton.addEventListener('change',function(){
@@ -243,26 +247,18 @@ function mouseUpHandler(event) {
     mousePressed = false;
     return false;
 }
+
 // the output canvas interactions
 //=================================================
-var outputCanvas;
-var outputImage;
 
-// image and pixel data of output canvas, using only one periodic unit cell
-var outputData;
-var outputPixels;
-
-// control the offset of the output
-var outputOffsetX = 0;
-var outputOffsetY = 0;
-
-// and change its size
 var changeSize = 1.1;
 
 function outputMouseWheelHandler(event) {
     stopEventPropagationAndDefaultAction(event);
     var factor = event.deltaY > 0 ? changeSize : 1 / changeSize;
     mapScale *= factor;
+    mapOffsetI=mapOffsetI/factor+(1-1.0/factor)*0.5*outputWidth;
+    mapOffsetJ=mapOffsetJ/factor+(1-1.0/factor)*0.5*outputHeight;
     mapTables();
     drawing();
     return false;
@@ -338,11 +334,6 @@ function adjustReference() {
     referenceCenterY = referenceHeight / 2;
     // get scale of mapping from input image to the reference image
     scaleInputToReference = referenceWidth / inputWidth;
-}
-
-// put pixels on reference canvas
-function putPixelsOnReferenceCanvas() {
-    referenceImage.putImageData(referenceData, 0, 0);
 }
 
 // fade-out all pixels by setting alpha
@@ -665,13 +656,6 @@ function pixelInterpolationCubic(x, y, inData) {
     pixelBlue = Math.max(0, Math.round(blue));
 }
 
-
-// get a simple pixel index from indices (i,j) to pixels in the unit cell, using the width of the unit cell
-//  this is the index to the red component of the pixel, green,blue and alpha follow
-function index(i, j) {
-    return 4 * (Math.round(i) + outputWidth * Math.round(j));
-}
-
 // making the symmetric image, using the general method of F. Farris
 // a mapping table defines the map between output image coordinates and sampled input image pixels
 // together with an interactively defined additional translation, rotation and scaling
@@ -692,7 +676,7 @@ var scaleCos;
 // result in pixelRed, pixelGreen, pixelBlue
 function sampleInput(x,y){
     // translation, rotation and scaling
-    var newX = scaleCos * x - scaleSin * y + centerX;256
+    var newX = scaleCos * x - scaleSin * y + centerX;
     y = scaleSin * x + scaleCos * y + centerY;
     x = newX;
     //  get the interpolated input pixel color components, write on output pixels
@@ -703,38 +687,6 @@ function sampleInput(x,y){
     // but check if we are on the reference canvas
     if ((h >= 0) && (h < referenceWidth) && (k >= 0) && (k < referenceHeight)) {
         referencePixels[4 * (referenceWidth * k + h) + 3] = 255;
-    }
-}
-
-
-function drawPixelLine(fromI, toI, j) {
-    // local reference to the mapping table
-    var locMapXTab = mapXTab;
-    var locMapYTab = mapYTab;
-    //  sampling coordinates (input image)
-    var x, y, newX;
-    //  integer coordinates in the reference image
-    var h, k;
-    //  index to the output image pixel, start
-    var outputIndex = index(fromI, j);
-    //  the end value
-    var outputEnd = index(toI, j);
-    //  index to the mapping function table
-    var mapIndex = fromI + mapWidth * j;
-    // function for making the color
-    var locMakePixelColor=makePixelColor;
-    while (outputIndex <= outputEnd) {
-        // some mapping from (i,j) to (x,y) stored in a map table !!!
-        x = locMapXTab[mapIndex];
-        y = locMapYTab[mapIndex];
-        mapIndex++;
-        //  color symmetry
-        locMakePixelColor(x,y);
-        //
-        outputPixels[outputIndex++]=pixelRed;
-        outputPixels[outputIndex++]=pixelGreen;
-        outputPixels[outputIndex]=pixelBlue;
-        outputIndex += 2;
     }
 }
 
@@ -754,12 +706,25 @@ function drawing(){
     //  scaling and rotation: transformation matrix elements
     scaleCos = scaleOutputToInput * cosAngle;
     scaleSin = scaleOutputToInput * sinAngle;
-   // draw the basic map, using the mapping in the map tables
-    for (var j = 0; j < mapHeight; j++) {
-        drawPixelLine(0, mapWidth - 1, j);
+    // make local variables to speed up things
+    // local reference to the mapping table
+    var locMapXTab = mapXTab;
+    var locMapYTab = mapYTab;
+    // function for making the color
+    var locMakePixelColor=makePixelColor;
+
+    var outputIndex=0;
+    var mapIndex=0;
+    var mapSize=mapXTab.length;
+    for (mapIndex=0;mapIndex<mapSize;mapIndex++){
+        locMakePixelColor(locMapXTab[mapIndex],locMapYTab[mapIndex]);
+        outputPixels[outputIndex++]=pixelRed;
+        outputPixels[outputIndex++]=pixelGreen;
+        outputPixels[outputIndex]=pixelBlue;
+        outputIndex += 2;
     }
-	// put the symmetric image on the output canvas
-    outputImage.putImageData(outputData,0, 0, 0, 0, outputWidth, outputHeight);
+	// put the image on the output canvas
+    outputImage.putImageData(outputData,0, 0);
 	// put the reference image
-	putPixelsOnReferenceCanvas();
+    referenceImage.putImageData(referenceData, 0, 0);
 }
