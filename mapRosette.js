@@ -146,13 +146,6 @@ function specialFastInterpolatedAtan(x){
 // a unit length corresponds
 // ========================================================================
 
-var mapScale=0;
-var mapOffsetI=0;
-var mapOffsetJ=0;
-
-
-
-
 var logR=0;
 var phi=0;
 
@@ -160,63 +153,27 @@ var xImage=0;
 var yImage=0;
 
 
-
-
 function rosetteMapTables() {
- 
-    function storeImage(i,j){
-        index=mapSize*j+i;
-        mapXTab[index] = xImage;
-        mapYTab[index] = yImage;
-    }
-
-    var mapSize = mapWidth;
-    var mapSizeHalf = mapWidth / 2;
-    var normFactor=4.0/mapWidth;
-    var index = 0;
-    var iBase,jBase;
+    var locMapOffsetI=Math.floor(mapOffsetI)+0.5;
+    var locMapOffsetJ=Math.floor(mapOffsetJ)+0.5;
+    var locMapScale=mapScale;
     var x=0;
     var y=0;
-    var phiBase=0;
-   //  using 8 sectors
-    for (iBase = 0; iBase < mapSizeHalf; iBase++) {
-       	x=normFactor*(iBase+0.5);
-        for (jBase=0;jBase<=iBase;jBase++) {
-     		y=normFactor*(jBase+0.5);
-     		logR=0.5*specialFastInterpolatedLog(x*x+y*y);
-            phiBase=specialFastInterpolatedAtan(y/x);
-            // sector 1
-            phi=phiBase;
-            mapping();
-            storeImage(mapSizeHalf+iBase,mapSizeHalf+jBase);
-            // sector 2, change that for mirror symmetry
-            phi=PIHALF-phiBase;
-            mapping();
-            storeImage(mapSizeHalf+jBase,mapSizeHalf+iBase);
-            // sector 3, 
-            phi=PIHALF+phiBase;
-            mapping();
-            storeImage(mapSizeHalf-1-jBase,mapSizeHalf+iBase);
-            // sector 4, change that for mirror symmetry
-            phi=Math.PI-phiBase;
-            mapping();
-            storeImage(mapSizeHalf-1-iBase,mapSizeHalf+jBase);
-            // sector 5, change that for mirror symmetry
-            phi=Math.PI+phiBase;
-            mapping();
-            storeImage(mapSizeHalf-1-iBase,mapSizeHalf-1-jBase);
-            // sector 6, change that for mirror symmetry
-            phi=PI3HALF-phiBase;
-            mapping();
-            storeImage(mapSizeHalf-1-jBase,mapSizeHalf-1-iBase);
-            // sector 7, change that for mirror symmetry
-            phi=PI3HALF+phiBase;
-            mapping();
-            storeImage(mapSizeHalf+jBase,mapSizeHalf-1-iBase);
-            // sector 8, change that for mirror symmetry
-            phi=-phiBase;
-            mapping();
-            storeImage(mapSizeHalf+iBase,mapSizeHalf-1-jBase);
+    var y2=0;
+    var locMapping=mapping;
+    var i,j;
+    var index=0;
+    for (j=0;j<mapHeight;j++){
+        y=(j-locMapOffsetJ)*locMapScale;
+        y2=y*y;
+        for (i=0;i<mapWidth;i++){
+            x=(i-locMapOffsetI)*locMapScale;
+            locMapping(0.5*Math.log(y2+x*x),Math.atan2(y,x));
+
+
+            mapXTab[index] = xImage;
+            mapYTab[index++] = yImage;
+           
         }
     }
 }
@@ -233,24 +190,18 @@ var outsideRed = 100;
 var outsideGreen = 100;
 var outsideBlue = 100;
 
-// invert the color
-function invert(){
-    pixelRed=255-pixelRed;
-    pixelGreen=255-pixelGreen;
-    pixelBlue=255-pixelBlue;
-}
 
 //get the color of a pixel, trivial case, no color symmetry
 function makePixelColor(x,y){
-    if (y>0){
+   // if (y>0){
         sampleInput(x,y);
-    }
+ /*   }
     else {
         sampleInput(x,-y);
         pixelRed=255-pixelRed;
         pixelGreen=255-pixelGreen;
         pixelBlue=255-pixelBlue;    
-    }
+    }*/
 }
 
 
@@ -278,11 +229,20 @@ function imageAddR(a,b,c,d,rPower,phiPower){
     yImage+=c*rkCosPhi+d*rkSinPhi;
 }
 
-function mapping(){
+function mappingColorInversion(){
     imageZero();
     imageAdd(1,0,2,6);
     imageAdd(1,0,-2,-6);
   //  imageAdd(0,0.5,3,-12);
   //  imageAdd(0,0.5,3,12);
-
 }
+
+var mapTables=rosetteMapTables;
+
+function mappingUnity(logR,phi){
+    var r=fastInterpolatedExp(logR);
+    xImage=r*fastInterpolatedCos(phi);
+    yImage=r*fastInterpolatedSin(phi);
+}
+  var mapping;
+  mapping=mappingUnity;

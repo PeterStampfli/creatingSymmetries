@@ -10,6 +10,9 @@ var hintPatch = false;
 var squareSymmetry;
 var hexagonSymmetry;
 
+var initialOutputSize=512;
+
+
 window.onload = function () {
     hintPatch = true;
     connectNewInputImage();
@@ -17,10 +20,7 @@ window.onload = function () {
     setupOutputCanvas();
     setupOrientationCanvas(200);
     makeInteractions();
-    updateOutputDimensions(512, 512);
-    mapOffsetI=outputWidth/2;
-    mapOffsetJ=outputWidth/2;
-    mapScale=2.0/outputWidth;
+    initialOutputDimensions(256, 256);
     drawing();
 };
 
@@ -102,31 +102,61 @@ var mapYTab = [];
 var mapWidth=0;
 var mapHeight=0;
 
+var mapScale=0;
+var mapOffsetI=0;
+var mapOffsetJ=0;
+
 // the choosers
 var outputWidthChooser;
+var outputHeightChooser;
 
 // set a new output width and height, forces it to be a multiple of 4
 // makes a blue screen as output image
 // does NOT limit the period dimensions (avoid tangle, responsability of callers)
-function updateOutputDimensions(newWidth) {
+function setOutputDimensions(newWidth,newHeight){
+    outputWidthChooser.value = newWidth.toString();
+    outputHeightChooser.value = newHeight.toString();
+    outputWidth = newWidth;
+    outputHeight = newHeight;
+    outputCanvas.width = outputWidth;
+    outputCanvas.height = outputHeight;
+    // make the canvas opaque, blue screen of nothing if there is no input image
+    outputImage.fillStyle = "Blue";
+    outputImage.fillRect(0, 0, outputWidth, outputHeight);
+    // output canvas, get data of unit cell 
+    outputData = outputImage.getImageData(0, 0, outputWidth, outputHeight);
+    outputPixels = outputData.data;
+}
+
+function updateMap(){
+    mapWidth = outputWidth;
+    mapHeight = outputHeight;
+    mapXTab.length = mapWidth * mapHeight;
+    mapYTab.length = mapWidth * mapHeight;
+    mapTables();
+}
+
+function initialOutputDimensions(width,height){
+    setOutputDimensions(width,width);
+    mapOffsetI=width/2;
+    mapOffsetJ=width/2;
+    mapScale=2.0/width;
+    updateMap();
+}
+
+function updateOutputDimensions(newWidth,newHeight) {
     newWidth = Math.round(newWidth);
-    if (newWidth != outputWidth) {
-        outputWidthChooser.value = newWidth.toString();
-        outputWidth = newWidth;
-        outputHeight = newWidth;
-        outputCanvas.width = outputWidth;
-        outputCanvas.height = outputHeight;
-        // make the canvas opaque, blue screen of nothing if there is no input image
-        outputImage.fillStyle = "Blue";
-        outputImage.fillRect(0, 0, outputWidth, outputHeight);
-        mapWidth = outputWidth;
-        mapHeight = outputWidth;
-        mapXTab.length = mapWidth * mapHeight;
-        mapYTab.length = mapWidth * mapHeight;
-        rosetteMapTables();
-        // output canvas, get data of unit cell 
-        outputData = outputImage.getImageData(0, 0, outputWidth, outputWidth);
-        outputPixels = outputData.data;
+    newHeight = Math.round(newHeight);
+    if ((newWidth != outputWidth) || (newHeight != outputHeight)) {
+        var oldWidth=outputWidth;
+        var oldHeight=outputHeight;
+        setOutputDimensions(newWidth,newHeight);
+        mapOffsetI*=outputWidth/oldWidth;
+        mapOffsetJ*=outputHeight/oldHeight;
+        mapScale*=Math.sqrt((oldWidth*oldWidth+oldHeight*oldHeight)/
+                            (outputWidth*outputWidth+outputHeight*outputHeight));
+        updateMap();
+
     }
 }
 
@@ -139,8 +169,12 @@ function makeInteractions(){
     // we need the choosers to write back the corrected data
     outputWidthChooser = document.getElementById('outputWidthChooser');
     outputWidthChooser.addEventListener('change',function(){
-            updateOutputDimensions(parseInt(outputWidthChooser.value,10));
-            updatePeriod(); // limit the period
+            updateOutputDimensions(parseInt(outputWidthChooser.value,10),outputHeight);
+            drawing();
+        },false);
+    outputHeightChooser = document.getElementById('outputHeightChooser');
+    outputHeightChooser.addEventListener('change',function(){
+            updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
             drawing();
         },false);
     var interpolationChoosers=document.getElementsByClassName('interpolation');
@@ -228,11 +262,27 @@ var changeSize = 1.1;
 function outputMouseWheelHandler(event) {
     stopEventPropagationAndDefaultAction(event);
     var factor = event.deltaY > 0 ? changeSize : 1 / changeSize;
-    updateOutputDimensions(factor * outputWidth, factor * outputHeight);
-    outputOffsetX *= factor;
-    outputOffsetY *= factor;
-   // scaleOutputToInput /= factor;
+    mapScale *= factor;
+    mapTables();
     drawing();
+    return false;
+}
+
+function outputMouseDownHandler(event) {
+    mouseDownHandler(event, outputCanvas);
+    return false;
+}
+
+function outputMouseMoveHandler(event) {
+    stopEventPropagationAndDefaultAction(event);
+    if (mousePressed) {
+        setMousePosition(event, outputCanvas);
+        mapOffsetI += mouseX - lastMouseX;
+        mapOffsetJ += mouseY - lastMouseY;
+        setLastMousePosition();
+        mapTables();
+        drawing();
+    }
     return false;
 }
 
@@ -241,6 +291,10 @@ function outputMouseWheelHandler(event) {
 function setupOutputCanvas() {
     outputCanvas = document.getElementById("outputCanvas");
     outputImage = outputCanvas.getContext("2d");
+    outputCanvas.addEventListener("mousedown", outputMouseDownHandler, true);
+    outputCanvas.addEventListener("mouseup", mouseUpHandler, true);
+    outputCanvas.addEventListener("mousemove", outputMouseMoveHandler, true);
+    outputCanvas.addEventListener("mouseout", mouseUpHandler, true);
     outputCanvas.addEventListener("wheel", outputMouseWheelHandler, true);
 }
 
@@ -638,7 +692,7 @@ var scaleCos;
 // result in pixelRed, pixelGreen, pixelBlue
 function sampleInput(x,y){
     // translation, rotation and scaling
-    var newX = scaleCos * x - scaleSin * y + centerX;
+    var newX = scaleCos * x - scaleSin * y + centerX;256
     y = scaleSin * x + scaleCos * y + centerY;
     x = newX;
     //  get the interpolated input pixel color components, write on output pixels
@@ -705,7 +759,7 @@ function drawing(){
         drawPixelLine(0, mapWidth - 1, j);
     }
 	// put the symmetric image on the output canvas
-    outputImage.putImageData(outputData,0, 0, 0, 0, outputWidth, outputWidth);
+    outputImage.putImageData(outputData,0, 0, 0, 0, outputWidth, outputHeight);
 	// put the reference image
 	putPixelsOnReferenceCanvas();
 }
