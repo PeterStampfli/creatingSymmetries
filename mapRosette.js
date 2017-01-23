@@ -149,6 +149,7 @@ function specialFastInterpolatedAtan(x){
 var logR=0;
 var phi=0;
 
+
 var xImage=0;
 var yImage=0;
 
@@ -167,7 +168,9 @@ function rosetteMapTables() {
         y2=y*y;
         for (i=0;i<mapWidth;i++){
             x=(i-locMapOffsetI)*locMapScale;
-            locMapping(0.5*Math.log(y2+x*x),Math.atan2(y,x));
+            logR=0.5*Math.log(y2+x*x);
+            phi=Math.atan2(y,x);
+            locMapping();
             mapXTab[index] = xImage;
             mapYTab[index++] = yImage;          
         }
@@ -189,15 +192,15 @@ var outsideBlue = 100;
 
 //get the color of a pixel, trivial case, no color symmetry
 function makePixelColor(x,y){
-   // if (y>0){
+    if (true){
         sampleInput(x,y);
- /*   }
+    }
     else {
-        sampleInput(x,-y);
+        sampleInput(-x,y);
         pixelRed=255-pixelRed;
         pixelGreen=255-pixelGreen;
         pixelBlue=255-pixelBlue;    
-    }*/
+    }
 }
 
 
@@ -229,16 +232,24 @@ function mappingColorInversion(){
     imageZero();
     imageAdd(1,0,2,6);
     imageAdd(1,0,-2,-6);
-  //  imageAdd(0,0.5,3,-12);
-  //  imageAdd(0,0.5,3,12);
+    imageAdd(0,0.5,-1,-12);
+    imageAdd(0,0.5,-3,12);
+}
+
+function realMapping(){
+    imageZero();
+    imageAddR(1,0,0,0,2,4);
+    imageAddR(0.2,0,0.5,0,-0.5,12);
 }
 
 var mapTables=rosetteMapTables;
 
-function mappingUnity(logR,phi){
+function mappingUnity(){
     var r=fastInterpolatedExp(logR);
     xImage=r*fastInterpolatedCos(phi);
     yImage=r*fastInterpolatedSin(phi);
 }
+
+
 var mapping;
-mapping=mappingUnity;
+mapping=realMapping;
