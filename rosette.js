@@ -1,5 +1,102 @@
 "use strict";
 
+//=================================================================================================
+// fast approximations of functions
+//=====================================================================================
+// returns a table of values of theFunction(x)
+// length is the number of values or length of the table
+// start is the starting value for x
+// delta is the distance between data points
+function makeFunctionTable(length,start,delta,theFunction){
+    var table=new Array(length);
+    for (var i = 0;i<length;i++){
+        table[i]=theFunction(start+i*delta);
+    }
+    return table;
+}
+//  the sine and cosine function
+//-------------------------------------------------------------------------------------------
+var PIHALF=Math.PI*0.5;
+
+var sinTab=[];
+var sinTabLengthM1=0;
+var sinTabFactor=1;
+var sinTabHigherCorrection=0;
+
+// set up the table, its length is a power of 2
+function setupSinCosTable(p) {
+    var sinTabLength=Math.round(Math.pow(2,p));
+    sinTabLengthM1=sinTabLength-1;
+    sinTabFactor = 0.5*sinTabLength/Math.PI;
+    sinTabHigherCorrection=0.25/sinTabFactor/sinTabFactor;
+    sinTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,Math.sin);
+}
+
+setupSinCosTable(12);
+
+//  using linear interpolation
+function fSin(x){
+    x*=sinTabFactor;
+    var index=Math.floor(x);
+    x-=index;
+    index=index&sinTabLengthM1;
+    return sinTab[index]*(1-x)+sinTab[index+1]*x;
+}
+
+//  using linear interpolation
+function fCos(x){
+    x=sinTabFactor*(x+PIHALF);
+    var index=Math.floor(x);
+    var dx=x-index;
+    index=index&sinTabLengthM1;
+    return sinTab[index]*(1-dx)+sinTab[index+1]*dx;
+}
+
+//  the exponential function
+//-----------------------------------------------------------------------
+
+//  possible range of argument (integer part)
+var expMaxArgument=Math.floor(Math.log(Number.MAX_VALUE))+1;
+var expMinArgument=Math.floor(Math.log(Number.MIN_VALUE));
+
+// tables for integer and fractional part
+var expTabIntPart=[];
+var expTabIntPartMaxIndex=0;
+var expTabFractPart=[];
+var expTabFactor=0;
+var expTabHigherCorrection=0;
+
+function setupExpTables(n){
+    expTabIntPartMaxIndex=expMaxArgument-expMinArgument;
+    expTabIntPart=makeFunctionTable(expTabIntPartMaxIndex+1,expMinArgument,1,Math.exp);
+    expTabFactor=n;
+    expTabHigherCorrection=0.25/expTabFactor/expTabFactor;
+    expTabFractPart=makeFunctionTable(n+1,0,1.0/expTabFactor,Math.exp);
+}
+
+setupExpTables(1000);
+
+function fExp(x){
+    var indexToIntPart=Math.floor(x);
+    var dx=expTabFactor*(x-indexToIntPart);
+    var indexToFractPart=Math.floor(dx);
+    dx-=indexToFractPart;
+    return expTabIntPart[Math.max(0,Math.min(expTabIntPartMaxIndex,indexToIntPart-expMinArgument))]*
+           (expTabFractPart[indexToFractPart]*(1-dx)+expTabFractPart[indexToFractPart+1]*dx);
+}
+
+/*
+  u   u    sss     eeee   rrrr        iii     aaa
+  u   u   s   s    e      r   r        i     a   a
+  u   u   s        e      r   r        i     a   a
+  u   u    sss     eee    rrrr         i     aaaaa
+  u   u       s    e      r  r         i     a   a
+  u   u       s    e      r   r        i     a   a
+   uuu    ssss     eeee   r   r       iii    a   a
+*/
+// User interaction
+//======================
+
 //  the startup function
 //==============================================================================
 
@@ -14,18 +111,6 @@ window.onload = function () {
     initialOutputDimensions(initialOutputSize, initialOutputSize);
     drawing();
 };
-
-/*
-  u   u    sss     eeee   rrrr        iii     aaa
-  u   u   s   s    e      r   r        i     a   a
-  u   u   s        e      r   r        i     a   a
-  u   u    sss     eee    rrrr         i     aaaaa
-  u   u       s    e      r  r         i     a   a
-  u   u       s    e      r   r        i     a   a
-   uuu    ssss     eeee   r   r       iii    a   a
-*/
-// User interaction
-//======================
 
 //  choose and load the input image file
 //=================================================
@@ -133,7 +218,7 @@ function updateMapDimensions(){
     mapHeight = outputHeight;
     mapXTab.length = mapWidth * mapHeight;
     mapYTab.length = mapWidth * mapHeight;
-    mapTables();
+    makeMapTables();
 }
 
 // for initialization: sets initial map properties
@@ -259,7 +344,7 @@ function outputMouseWheelHandler(event) {
     mapScale *= factor;
     mapOffsetI=mapOffsetI/factor+(1-1.0/factor)*0.5*outputWidth;
     mapOffsetJ=mapOffsetJ/factor+(1-1.0/factor)*0.5*outputHeight;
-    mapTables();
+    makeMapTables();
     drawing();
     return false;
 }
@@ -276,7 +361,7 @@ function outputMouseMoveHandler(event) {
         mapOffsetI += mouseX - lastMouseX;
         mapOffsetJ += mouseY - lastMouseY;
         setLastMousePosition();
-        mapTables();
+        makeMapTables();
         drawing();
     }
     return false;
@@ -656,30 +741,75 @@ function pixelInterpolationCubic(x, y, inData) {
     pixelBlue = Math.max(0, Math.round(blue));
 }
 
-// making the symmetric image, using the general method of F. Farris
-// a mapping table defines the map between output image coordinates and sampled input image pixels
-// together with an interactively defined additional translation, rotation and scaling
-//================================================================================================
 
-// drawing a line of pixels on the output image using sampled input image pixels
-//================================================================================
-// the line starts at (fromI,j) and goes upwards to (toI,j)  (all INTEGERS)
-// addressing pixels in the periodic unit cell AND points in the (mapXTab[...],mapYTab[...])
+//    I     m     m     aaa        ggg      eeeee
+//    I     mm   mm    a   a      g         e
+//    I     m m m m    aaaaa      g gg      eeeee
+//    I     m  m  m    a   a      g  g      e
+//    I     m     m    a   a       ggg      eeeee
+
+//  create the distorted symmetric image
+//==========================================================
+
+// I am using purely procedural programming. Object oriented programming would be nicer, but
+// object creation and garbage collection would take up time and slow down the program.
+// Tell me, if you can speed up things, EMail: pestampf@gmail.com!
+
+// First:
+//---------------------
+// For each pixel (i,j) of the output image we define a point (x,y) in space by
+// applying an offset and a scaling to i and j .
+// Then a function mapping(x,y) gives image point coordinates (xImage,yImage).
+// The coordinates are put in the mapXTab and mapYTab arrays.
+// The mapping(x,y) defines the symmetries of the image
+
+var xImage=0;
+var yImage=0;
+
+function makeMapTables() {
+    // local variables and references to speed up access
+    var locMapOffsetI=Math.floor(mapOffsetI)+0.5;
+    var locMapOffsetJ=Math.floor(mapOffsetJ)+0.5;
+    var locMapScale=mapScale;
+    var locMapXTab=mapXTab;
+    var locMapYTab=mapYTab;
+    //  this mapping function has to be defined depending on the desired image
+    var locMapping=mapping;
+    // do each pixel and store result of mapping
+    var i,j;
+    var x=0;
+    var y=0;
+    var index=0;
+    for (j=0;j<mapHeight;j++){
+        y=(j-locMapOffsetJ)*locMapScale;
+        for (i=0;i<mapWidth;i++){
+            x=(i-locMapOffsetI)*locMapScale;
+            locMapping(x,y);
+            locMapXTab[index] = xImage;
+            locMapYTab[index++] = yImage;          
+        }
+    }
+}
+
+
+
+
 
 // sampling transformation
-var centerX;
-var centerY;
-var scaleSin;
-var scaleCos;
+var inputCenterX;
+var inputCenterY;
+var inputScaleSin;
+var inputScaleCos;
 
 // sample input image at transformed coordinates
 // result in pixelRed, pixelGreen, pixelBlue
 function sampleInput(x,y){
     // translation, rotation and scaling
-    var newX = scaleCos * x - scaleSin * y + centerX;
-    y = scaleSin * x + scaleCos * y + centerY;
+    var newX = inputScaleCos * x - inputScaleSin * y + inputCenterX;
+    y = inputScaleSin * x + inputScaleCos * y + inputCenterY;
     x = newX;
     //  get the interpolated input pixel color components, write on output pixels
+    //
     pixelInterpolation(x, y, inputData);
     // mark the reference image pixel, make it fully opaque
     var h = Math.round(scaleInputToReference * x);
@@ -690,26 +820,24 @@ function sampleInput(x,y){
     }
 }
 
-
-//  make the symmetries, draw the full output image and reference image
-//==========================================================
 function drawing(){
-	if (!inputLoaded){						// no input means nothing to do
+	if (!inputLoaded){	
 		return;
 	}
-	// white out: make the reference image semitransparent
+	// make the reference image semitransparent
 	setAlphaReferenceImagePixels(128);
 	// make the symmetries on the output image
     // translation: center of sampling as defined by the mouse on the reference image
-    centerX = referenceCenterX / scaleInputToReference;
-    centerY = referenceCenterY / scaleInputToReference;
+    inputCenterX = referenceCenterX / scaleInputToReference;
+    inputCenterY = referenceCenterY / scaleInputToReference;
     //  scaling and rotation: transformation matrix elements
-    scaleCos = scaleOutputToInput * cosAngle;
-    scaleSin = scaleOutputToInput * sinAngle;
-    // make local variables to speed up things
+    inputScaleCos = scaleOutputToInput * cosAngle;
+    inputScaleSin = scaleOutputToInput * sinAngle;
+    // make local references to speed up things
     // local reference to the mapping table
     var locMapXTab = mapXTab;
     var locMapYTab = mapYTab;
+    var locOutputPixels=outputPixels;
     // function for making the color
     var locMakePixelColor=makePixelColor;
 
