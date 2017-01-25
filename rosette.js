@@ -279,6 +279,19 @@ function makeInteractions(){
             pixelInterpolation = pixelInterpolationCubic;
             drawing();
         },false);
+    var inversionChoosers=document.getElementsByClassName('inversion');
+    inversionChoosers[0].addEventListener('click',function(){
+             makePixelColor = sampleInput;
+            drawing();
+        },false);
+    inversionChoosers[1].addEventListener('click',function(){
+             makePixelColor = colorInversionMirror;
+            drawing();
+        },false);
+    inversionChoosers[2].addEventListener('click',function(){
+             makePixelColor = colorInversionRotation;
+            drawing();
+        },false);
     var downloadImageButton = document.getElementById('downloadImageButton');
     //  for image downloading, using jpeg image format, default quality=0.92
     downloadImageButton.addEventListener('click', function () {
@@ -398,7 +411,7 @@ var referenceCenterX;
 var referenceCenterY;
 
 // the wheel changes the scale: map to input image pixels, a larger scale zooms out
-var scaleOutputToInput;
+var scaleOutputToInput=200;
 var changeScaleFactor = 1.1;
 
 function adjustReference() {
@@ -602,6 +615,12 @@ var pixelRed;
 var pixelGreen;
 var pixelBlue;
 
+
+// the replacement color for outside pixels
+var outsideRed = 128;
+var outsideGreen = 128;
+var outsideBlue = 128;
+
 // default color for outside
 function defaultColor(){
     pixelRed = outsideRed;
@@ -755,10 +774,10 @@ function pixelInterpolationCubic(x, y, inData) {
 // object creation and garbage collection would take up time and slow down the program.
 // Tell me, if you can speed up things, EMail: pestampf@gmail.com!
 
-// First:
-//---------------------
 // For each pixel (i,j) of the output image we define a point (x,y) in space by
 // applying an offset and a scaling to i and j .
+// The offset and the scaling are changed by dragging the mouse on the ouput image 
+// and by turning the mouse wheel.
 // Then a function mapping(x,y) gives image point coordinates (xImage,yImage).
 // The coordinates are put in the mapXTab and mapYTab arrays.
 // The mapping(x,y) defines the symmetries of the image
@@ -791,11 +810,17 @@ function makeMapTables() {
     }
 }
 
+// The image point coordinates (xImage,yImage) are not directly addresses for the pixels of the input image.
 
+// For each output pixel we look up (xImage,yImage).
+// Color inversion symmetry depends on these coordinates. It may change their values.
+// Then the coordinates are rotated, scaled and translated. This can be adjusted by dragging the mouse on the 
+// two lower control panels and rotating the mouse wheel.
+// With the transformed coordinates and pixel interpolation we get a color from the input image.
+// For color inversion symmetry this color can be changed.
+// Finally, we use the color for the output pixel.
 
-
-
-// sampling transformation
+// parameters for the transformation
 var inputCenterX;
 var inputCenterY;
 var inputScaleSin;
@@ -820,6 +845,39 @@ function sampleInput(x,y){
     }
 }
 
+// default, no color inversion
+var makePixelColor=sampleInput;
+
+// color inversion
+// simplest type of color change, overwrite if you want something better
+function invertPixel(){
+    pixelRed=255-pixelRed;
+    pixelGreen=255-pixelGreen;
+    pixelBlue=255-pixelBlue;    
+}
+
+// color inversion with mirroring at the y-axis
+function colorInversionMirror(x,y){
+    if (x<0){
+        sampleInput(x,y);
+    }
+    else {
+        sampleInput(-x,y);
+        invertPixel();
+    }
+}
+
+// color inversion with a rotataion by 180 degrees
+function colorInversionRotation(x,y){
+    if (x<0){
+        sampleInput(x,y);
+    }
+    else {
+        sampleInput(-x,-y);
+        invertPixel();
+    }
+}
+
 function drawing(){
 	if (!inputLoaded){	
 		return;
@@ -827,7 +885,7 @@ function drawing(){
 	// make the reference image semitransparent
 	setAlphaReferenceImagePixels(128);
 	// make the symmetries on the output image
-    // translation: center of sampling as defined by the mouse on the reference image
+    // setting up the parameters for the transformation of the image coordinates
     inputCenterX = referenceCenterX / scaleInputToReference;
     inputCenterY = referenceCenterY / scaleInputToReference;
     //  scaling and rotation: transformation matrix elements
@@ -840,11 +898,12 @@ function drawing(){
     var locOutputPixels=outputPixels;
     // function for making the color
     var locMakePixelColor=makePixelColor;
-
+    // get the colors for each output pixel
     var outputIndex=0;
     var mapIndex=0;
     var mapSize=mapXTab.length;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
+        //sampleInput(locMapXTab[mapIndex],locMapYTab[mapIndex]);
         locMakePixelColor(locMapXTab[mapIndex],locMapYTab[mapIndex]);
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
@@ -855,4 +914,60 @@ function drawing(){
     outputImage.putImageData(outputData,0, 0);
 	// put the reference image
     referenceImage.putImageData(referenceData, 0, 0);
+}
+
+
+//===============================================================================
+//===============================================================================
+//
+//   rosette images
+//
+//=============================================================================
+//===============================================================================
+
+// initial mapping scale
+//  (x,y) coordinates to pixels
+scaleOutputToInput = 200
+
+// the replacement color for outside pixels
+outsideRed = 100;
+outsideGreen = 100;
+outsideBlue = 100;
+
+// color inversion: subtler methods??
+/*
+function invertPixel(){
+    pixelRed=255-pixelRed;
+    pixelGreen=255-pixelGreen;
+    pixelBlue=255-pixelBlue;    
+}
+*/
+
+
+//  make the mapping that defines the symmetry
+var logR=0;
+var phi=0;
+
+// initialization
+function imageZero(x,y){
+    logR=0.5*Math.log(y*y+x*x);
+    phi=Math.atan2(y,x);
+    xImage=0;
+    yImage=0;
+}
+
+// single parts
+function imageAdd(a,b,c,d,rPower,phiPower){
+    var rk=fExp(rPower*logR);
+    var rkSinPhi=phiPower*phi;
+    var rkCosPhi=rk*fCos(rkSinPhi);
+    rkSinPhi=rk*fSin(rkSinPhi);
+    xImage+=a*rkCosPhi+b*rkSinPhi;
+    yImage+=c*rkCosPhi+d*rkSinPhi;
+}
+
+function mapping(x,y){
+    imageZero(x,y);
+    imageAdd(1,0,0,0,2,4);
+    imageAdd(0.2,0,0.5,0,-0.5,12);
 }
