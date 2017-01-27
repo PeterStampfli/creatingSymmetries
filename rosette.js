@@ -184,8 +184,8 @@ var outputWidthChooser;
 var outputHeightChooser;
 
 // the table for the mapping function (same size as output canvas)
-var mapXTab = [];
-var mapYTab = [];
+var mapX = [];
+var mapY = [];
 //  with dimensions (part of the periodic unit cell)
 var mapWidth=0;
 var mapHeight=0;
@@ -216,8 +216,8 @@ function setOutputDimensions(newWidth,newHeight){
 function updateMapDimensions(){
     mapWidth = outputWidth;
     mapHeight = outputHeight;
-    mapXTab.length = mapWidth * mapHeight;
-    mapYTab.length = mapWidth * mapHeight;
+    mapX.length = mapWidth * mapHeight;
+    mapY.length = mapWidth * mapHeight;
     makeMapTables();
 }
 
@@ -779,7 +779,7 @@ function pixelInterpolationCubic(x, y, inData) {
 // The offset and the scaling are changed by dragging the mouse on the ouput image 
 // and by turning the mouse wheel.
 // Then a function mapping(x,y) gives image point coordinates (xImage,yImage).
-// The coordinates are put in the mapXTab and mapYTab arrays.
+// The coordinates are put in the mapX and mapY arrays.
 // The mapping(x,y) defines the symmetries of the image
 
 var xImage=0;
@@ -790,8 +790,8 @@ function makeMapTables() {
     var locMapOffsetI=Math.floor(mapOffsetI)+0.5;
     var locMapOffsetJ=Math.floor(mapOffsetJ)+0.5;
     var locMapScale=mapScale;
-    var locMapXTab=mapXTab;
-    var locMapYTab=mapYTab;
+    var locMapX=mapX;
+    var locMapY=mapY;
     //  this mapping function has to be defined depending on the desired image
     var locMapping=mapping;
     // do each pixel and store result of mapping
@@ -804,8 +804,8 @@ function makeMapTables() {
         for (i=0;i<mapWidth;i++){
             x=(i-locMapOffsetI)*locMapScale;
             locMapping(x,y);
-            locMapXTab[index] = xImage;
-            locMapYTab[index++] = yImage;          
+            locMapX[index] = xImage;
+            locMapY[index++] = yImage;          
         }
     }
 }
@@ -893,18 +893,18 @@ function drawing(){
     inputScaleSin = scaleOutputToInput * sinAngle;
     // make local references to speed up things
     // local reference to the mapping table
-    var locMapXTab = mapXTab;
-    var locMapYTab = mapYTab;
+    var locMapX = mapX;
+    var locMapY = mapY;
     var locOutputPixels=outputPixels;
     // function for making the color
     var locMakePixelColor=makePixelColor;
     // get the colors for each output pixel
     var outputIndex=0;
     var mapIndex=0;
-    var mapSize=mapXTab.length;
+    var mapSize=mapX.length;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
-        //sampleInput(locMapXTab[mapIndex],locMapYTab[mapIndex]);
-        locMakePixelColor(locMapXTab[mapIndex],locMapYTab[mapIndex]);
+        //sampleInput(locMapX[mapIndex],locMapY[mapIndex]);
+        locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex]);
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;
@@ -934,14 +934,15 @@ outsideRed = 100;
 outsideGreen = 100;
 outsideBlue = 100;
 
-// color inversion: subtler methods??
-/*
+// color inversion: subtler method
+
 function invertPixel(){
-    pixelRed=255-pixelRed;
-    pixelGreen=255-pixelGreen;
-    pixelBlue=255-pixelBlue;    
+    var pixMaxMin=Math.max(pixelRed,pixelGreen,pixelBlue)+Math.min(pixelRed,pixelGreen,pixelBlue);
+    pixelRed=pixMaxMin-pixelRed;
+    pixelGreen=pixMaxMin-pixelGreen;
+    pixelBlue=pixMaxMin-pixelBlue;    
 }
-*/
+
 
 
 //  make the mapping that defines the symmetry
@@ -959,15 +960,16 @@ function imageZero(x,y){
 // single parts
 function imageAdd(a,b,c,d,rPower,phiPower){
     var rk=fExp(rPower*logR);
-    var rkSinPhi=phiPower*phi;
-    var rkCosPhi=rk*fCos(rkSinPhi);
-    rkSinPhi=rk*fSin(rkSinPhi);
+    var rkCosPhi=rk*fCos(phiPower*phi);
+    var rkSinPhi=rk*fSin(phiPower*phi);
     xImage+=a*rkCosPhi+b*rkSinPhi;
     yImage+=c*rkCosPhi+d*rkSinPhi;
 }
 
 function mapping(x,y){
     imageZero(x,y);
-    imageAdd(1,0,0,0,2,4);
-    imageAdd(0.2,0,0.5,0,-0.5,12);
+    imageAdd(0,1,-1,0,2,4);
+    imageAdd(1,0,0,1,1,4);
+    imageAdd(0.5,0,0,0.5,8,12);
+
 }
