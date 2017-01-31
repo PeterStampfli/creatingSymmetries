@@ -353,6 +353,9 @@ function mouseUpHandler(event) {
 
 var changeSize = 1.1;
 
+var colorX=1;
+var colorY=1;
+
 function outputMouseWheelHandler(event) {
     stopEventPropagationAndDefaultAction(event);
     var factor = event.deltaY > 0 ? changeSize : 1 / changeSize;
@@ -366,6 +369,9 @@ function outputMouseWheelHandler(event) {
 
 function outputMouseDownHandler(event) {
     mouseDownHandler(event, outputCanvas);
+    colorX=1-mouseX/outputWidth*2;
+    colorY=1-mouseY/outputHeight*2;
+
     return false;
 }
 
@@ -376,7 +382,10 @@ function outputMouseMoveHandler(event) {
         mapOffsetI += mouseX - lastMouseX;
         mapOffsetJ += mouseY - lastMouseY;
         setLastMousePosition();
-        makeMapTables();
+       // makeMapTables();
+           colorX=1-mouseX/outputWidth*2;
+           colorY=1-mouseY/outputHeight*2;
+
         drawing();
     }
     return false;
@@ -838,6 +847,7 @@ function sampleInput(x,y){
     //  get the interpolated input pixel color components, write on output pixels
     //
     pixelInterpolation(x, y, inputData);
+    changeColors();
     // mark the reference image pixel, make it fully opaque
     var h = Math.round(scaleInputToReference * x);
     var k = Math.round(scaleInputToReference * y);
@@ -891,8 +901,8 @@ function drawing(){
     inputCenterX = referenceCenterX / scaleInputToReference;
     inputCenterY = referenceCenterY / scaleInputToReference;
     //  scaling and rotation: transformation matrix elements
-    inputScaleCos = scaleOutputToInput * cosAngle;
-    inputScaleSin = scaleOutputToInput * sinAngle;
+    inputScaleCos = scaleOutputToInput ;
+    inputScaleSin = 0;
     // make local references to speed up things
     // local reference to the mapping table
     var locMapX = mapX;
@@ -971,7 +981,78 @@ function imageAdd(a,b,c,d,rPower,phiPower){
 function mapping(x,y){
     imageZero(x,y);
   //  imageAdd(0,1,-1,0,2,4);
-    imageAdd(1,0,0,1,5,5);
+    imageAdd(1,0,0,1,1,1);
    // imageAdd(0.5,0,0,0.5,8,12);
 
 }
+
+
+//==============================================================================
+
+
+// experimental
+// use colorX,Y controlled by mouse drag on output
+function nix(){}
+
+function inversion(){
+    var x=0.5*(colorX+1);
+    var y=1-x;
+    pixelRed=y*(255-pixelRed)+x*pixelRed;
+    pixelGreen=y*(255-pixelGreen)+x*pixelGreen;
+    pixelBlue=y*(255-pixelBlue)+x*pixelBlue;    
+}
+
+function invertColor(){
+    var mean=(pixelRed+pixelGreen+pixelBlue)*0.33333;
+    if (colorX<0){
+        var pixMaxMin=Math.max(pixelRed,pixelGreen,pixelBlue)+Math.min(pixelRed,pixelGreen,pixelBlue);
+        pixelRed=pixMaxMin-pixelRed;
+        pixelGreen=pixMaxMin-pixelGreen;
+        pixelBlue=pixMaxMin-pixelBlue;        
+    }
+    var x=Math.abs(colorX);
+    var y=1-x;
+    pixelRed=x*pixelRed+y*mean;
+    pixelGreen=x*pixelGreen+y*mean;
+    pixelBlue=x*pixelBlue+y*mean;
+
+}
+
+// rotate color (hue, going from 0 to 6, cyclic)
+function rotateColor(){
+
+    
+    var grey=Math.min(pixelRed,pixelGreen,pixelBlue);
+    var intensity;
+    var hue;
+    pixelRed-=grey;
+    pixelGreen-=grey;
+    pixelBlue-=grey;
+    // analyze color part
+    if ((pixelRed>=pixelGreen)&&(pixelRed>=pixelBlue){  
+        if (pixelRed>0){
+            intensity=pixelRed;
+            hue=(pixelGreen>pixelBlue)?pixelGreen/pixelRed:-pixelBlue/pixelRed;
+        }
+        else {
+            intensity=0;
+            hue=0;
+        }
+    }
+    else if((pixelGreen>=pixelRed)&&(pixelGreen>=pixelBlue)){
+
+    }
+    else {
+
+    }
+    //  rotate hue
+
+    // compose color part
+    pixelRed+=grey;
+    pixelGreen+=grey;
+    pixelBlue+=grey;
+
+
+}
+
+var changeColors=invertColor;
