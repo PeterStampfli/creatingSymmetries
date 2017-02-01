@@ -1021,6 +1021,9 @@ function invertColor(){
 // rotate color (hue, going from 0 to 6, cyclic)
 function rotateColor(){
 
+  //  pixelRed=255;
+  //  pixelGreen=0;
+  //  pixelBlue=0;
     
     var grey=Math.min(pixelRed,pixelGreen,pixelBlue);
     var intensity;
@@ -1029,7 +1032,7 @@ function rotateColor(){
     pixelGreen-=grey;
     pixelBlue-=grey;
     // analyze color part
-    if ((pixelRed>=pixelGreen)&&(pixelRed>=pixelBlue){  
+    if ((pixelRed>=pixelGreen)&&(pixelRed>=pixelBlue)){  
         if (pixelRed>0){
             intensity=pixelRed;
             hue=(pixelGreen>pixelBlue)?pixelGreen/pixelRed:-pixelBlue/pixelRed;
@@ -1040,14 +1043,56 @@ function rotateColor(){
         }
     }
     else if((pixelGreen>=pixelRed)&&(pixelGreen>=pixelBlue)){
-
+        intensity=pixelGreen;
+        hue=(pixelBlue>pixelRed)?2+pixelBlue/pixelGreen:2 -pixelRed/pixelGreen;
     }
     else {
-
+        intensity=pixelBlue;
+        hue=(pixelRed>pixelGreen)?4+pixelRed/pixelBlue:4-pixelGreen/pixelBlue;
     }
     //  rotate hue
-
+    hue+=3*(1-colorX);
     // compose color part
+    var intHue=Math.floor(hue);
+    hue-=intHue;
+    intHue=intHue%6;
+    if (intHue<0) intHue+=6;
+    switch(intHue){
+        case 0: 
+            pixelRed=intensity;
+            pixelGreen=intensity*hue;
+            pixelBlue=0;
+            break;
+        case 1: 
+            pixelRed=intensity*(1-hue);
+            pixelGreen=intensity;
+            pixelBlue=0;
+            break;
+        case 2: 
+            pixelRed=0;
+            pixelGreen=intensity;
+            pixelBlue=intensity*hue;
+            break;
+        case 3: 
+            pixelRed=0;
+            pixelGreen=intensity*(1-hue);
+            pixelBlue=intensity;
+            break;
+        case 4: 
+            pixelRed=intensity*hue;
+            pixelGreen=0;
+            pixelBlue=intensity;
+            break;
+        case 5: 
+            pixelRed=intensity;
+            pixelGreen=0;
+            pixelBlue=intensity*(1-hue);
+            break;
+   }
+
+
+
+
     pixelRed+=grey;
     pixelGreen+=grey;
     pixelBlue+=grey;
@@ -1055,4 +1100,4 @@ function rotateColor(){
 
 }
 
-var changeColors=invertColor;
+var changeColors=rotateColor;
