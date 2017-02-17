@@ -1,0 +1,255 @@
+"use strict";
+
+
+
+/*
+  u   u    sss     eeee   rrrr        iii     aaa
+  u   u   s   s    e      r   r        i     a   a
+  u   u   s        e      r   r        i     a   a
+  u   u    sss     eee    rrrr         i     aaaaa
+  u   u       s    e      r  r         i     a   a
+  u   u       s    e      r   r        i     a   a
+   uuu    ssss     eeee   r   r       iii    a   a
+*/
+// User interaction
+//======================
+
+//  the startup function
+//==============================================================================
+
+var initialOutputSize=512;
+
+window.onload = function () {
+    console.log("hallo");
+    setupOutputCanvas();
+    makeInteractions();
+    setOutputDimensions(initialOutputSize, initialOutputSize);
+    setXYSliderLimits();
+    setX(Math.random()*(xMax-xMin)+xMin);
+    console.log("*"+xSlider.min);
+    xSlider.min=-1;
+    console.log("*"+xSlider.min);
+
+
+};
+
+
+// choosing output image sizes
+//=============================
+var outputCanvas;
+var outputImage;
+
+// image and pixel data of output canvas
+var outputData;
+var outputPixels;
+
+// size for generated image
+var outputWidth;
+var outputHeight;
+
+// the choosers
+var outputWidthChooser;
+var outputHeightChooser;
+
+// listeners for useCapture, acting in bottom down capturing phase
+//  they should return false to stop event propagation ...
+function setupOutputCanvas() {
+    outputCanvas = document.getElementById("outputCanvas");
+    outputImage = outputCanvas.getContext("2d");
+    outputCanvas.addEventListener("mousedown", outputMouseDownHandler, true);
+    outputCanvas.addEventListener("mouseup", mouseUpHandler, true);
+    outputCanvas.addEventListener("mousemove", outputMouseMoveHandler, true);
+    outputCanvas.addEventListener("mouseout", mouseUpHandler, true);
+    outputCanvas.addEventListener("wheel", outputMouseWheelHandler, true);
+}
+
+// set a new output width and height
+// makes a blue screen as output image, sets up outputPixels
+
+function setOutputDimensions(newWidth,newHeight){
+    outputWidthChooser.value = newWidth.toString();
+    outputHeightChooser.value = newHeight.toString();
+    outputWidth = newWidth;
+    outputHeight = newHeight;
+    outputCanvas.width = outputWidth;
+    outputCanvas.height = outputHeight;
+    // make the canvas opaque, blue screen of nothing if there is no input image
+    outputImage.fillStyle = "Blue";
+    outputImage.fillRect(0, 0, outputWidth, outputHeight);
+    // output canvas, get data of unit cell 
+    outputData = outputImage.getImageData(0, 0, outputWidth, outputHeight);
+    outputPixels = outputData.data;
+    // the new length of the dynamics accumultor
+    numbersDynamics.length=newWidth*newHeight;
+    console.log(numbersDynamics.length);
+
+}
+
+//  changing the size of the image: 
+function updateOutputDimensions(newWidth,newHeight) {
+    newWidth = Math.round(newWidth);
+    newHeight = Math.round(newHeight);
+    if ((newWidth != outputWidth) || (newHeight != outputHeight)) {
+        var oldWidth=outputWidth;
+        var oldHeight=outputHeight;
+        setOutputDimensions(newWidth,newHeight);
+     }
+}
+
+
+
+
+// make up interactions with html elements: adds event listeners
+function makeInteractions(){
+    // we need the choosers to write back the corrected data
+    outputWidthChooser = document.getElementById('outputWidthChooser');
+    outputWidthChooser.addEventListener('change',function(){
+            updateOutputDimensions(parseInt(outputWidthChooser.value,10),outputHeight);
+            //drawing();
+        },false);
+    outputHeightChooser = document.getElementById('outputHeightChooser');
+    outputHeightChooser.addEventListener('change',function(){
+            updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
+            //drawing();
+        },false);
+    xSlider=document.getElementById('xSlider');
+    		xSlider.addEventListener('change',function(){
+    		setX(parseFloat(xSlider.value,10));
+    	},false);
+    xNumber=document.getElementById('xNumber');
+    		xNumber.addEventListener('change',function(){
+    		setX(parseFloat(xNumber.value,10));
+    	},false);
+}
+
+
+//  the canvase and its interaction
+//============================================================================
+
+// override default mouse actions, especially important for the mouse wheel
+function stopEventPropagationAndDefaultAction(event) {
+    event.stopPropagation();
+    event.preventDefault();
+}
+
+// the mouse is only on one canvas at a time
+// current mouse data, with respect to the current canvas
+var mousePressed = false;
+var mouseX;
+var mouseY;
+var lastMouseX;
+var lastMouseY;
+
+
+//  set the mouse position from current event
+function setMousePosition(event, theCanvas) {
+    mouseX = event.pageX - theCanvas.offsetLeft;
+    mouseY = event.pageY - theCanvas.offsetTop;
+}
+
+//  set the last mouse position from current mouse position
+function setLastMousePosition() {
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+}
+
+// for all canvases: mouse down start interaction and sets last mouse position
+function mouseDownHandler(event, theCanvas) {
+    stopEventPropagationAndDefaultAction(event);
+    mousePressed = true;
+    setMousePosition(event, theCanvas);
+    setLastMousePosition();
+}
+
+// for all canvases: mouse up or mouse out stops mouse interaction
+function mouseUpHandler(event) {
+    stopEventPropagationAndDefaultAction(event);
+    mousePressed = false;
+    return false;
+}
+
+
+var changeSize = 1.1;
+
+function outputMouseWheelHandler(event) {
+    stopEventPropagationAndDefaultAction(event);
+    var factor = event.deltaY > 0 ? changeSize : 1 / changeSize;
+    var center;
+    var size;
+    center=0.5*(xMax+xMin);
+    size=factor*0.5*(xMax-xMin);
+    xMax=center+size;
+    xMin=center-size;
+    center=0.5*(xMax+xMin);
+    size=factor*0.5*(xMax-xMin);
+    yMax=center+size;
+    yMin=center-size;
+    console.log(xMin);
+    //drawing();
+    return false;
+}
+
+function outputMouseDownHandler(event) {
+    mouseDownHandler(event, outputCanvas);
+    return false;
+}
+
+function outputMouseMoveHandler(event) {
+    stopEventPropagationAndDefaultAction(event);
+    var d;
+    if (mousePressed) {
+        setMousePosition(event, outputCanvas);
+        d=(mouseX - lastMouseX)/outputWidth*(xMax-xMin);
+        xMin += d;
+        xMax += d;
+        d=(mouseY - lastMouseY)/outputHeight*(yMax-yMin);
+        yMin += d;
+        yMax += d;
+        setXYSliderLimits();
+        setLastMousePosition();
+        console.log(xMin);
+        //drawing();
+    }
+    return false;
+}
+
+//  the iteration
+//========================================================
+
+// storing the numbers from the dynamics
+var numbersDynamics=[];
+
+// parameters for the mapping between (x,y) space and indices (i,j)
+//==============================================================
+
+var xMin=-1;
+var xMax=1;
+var yMin=-1;
+var yMax=1;
+var xStart,yStart;
+
+
+//  the starting point
+//===================================================
+var xSlider,xNumber;
+var ySlider,yNumber;
+
+// the function parameters
+//=================================================
+var radius;
+var radiusSlider;
+var radiusNumber;
+
+function setX(value){
+	xStart=value;
+	xSlider.value=value;
+	xNumber.value=value;
+	//drawing();
+}
+
+function setXYSliderLimits(){
+	xSlider.min=xMin;
+	xSlider.max=xMax;
+	xSlider.step=0.01*(xMax-xMin);
+	console.log("++"+xSlider.min);
+}
