@@ -20,15 +20,13 @@
 var initialOutputSize=512;
 
 window.onload = function () {
-    console.log("hallo");
     setupOutputCanvas();
     makeInteractions();
     setOutputDimensions(initialOutputSize, initialOutputSize);
     setXYSliderLimits();
     setX(Math.random()*(xMax-xMin)+xMin);
-    console.log("*"+xSlider.min);
-    xSlider.min=-1;
-    console.log("*"+xSlider.min);
+    setY(Math.random()*(yMax-yMin)+yMin);
+    drawing();
 
 
 };
@@ -81,8 +79,6 @@ function setOutputDimensions(newWidth,newHeight){
     outputPixels = outputData.data;
     // the new length of the dynamics accumultor
     numbersDynamics.length=newWidth*newHeight;
-    console.log(numbersDynamics.length);
-
 }
 
 //  changing the size of the image: 
@@ -113,12 +109,24 @@ function makeInteractions(){
             //drawing();
         },false);
     xSlider=document.getElementById('xSlider');
-    		xSlider.addEventListener('change',function(){
+    xSlider.addEventListener('change',function(){
     		setX(parseFloat(xSlider.value,10));
+            //drawing();
     	},false);
     xNumber=document.getElementById('xNumber');
-    		xNumber.addEventListener('change',function(){
+    xNumber.addEventListener('change',function(){
     		setX(parseFloat(xNumber.value,10));
+            //drawing();
+    	},false);
+    ySlider=document.getElementById('ySlider');
+    ySlider.addEventListener('change',function(){
+    		setY(parseFloat(ySlider.value,10));
+            //drawing();
+    	},false);
+    yNumber=document.getElementById('yNumber');
+    yNumber.addEventListener('change',function(){
+    		setY(parseFloat(yNumber.value,10));
+            //drawing();
     	},false);
 }
 
@@ -216,9 +224,6 @@ function outputMouseMoveHandler(event) {
 //  the iteration
 //========================================================
 
-// storing the numbers from the dynamics
-var numbersDynamics=[];
-
 // parameters for the mapping between (x,y) space and indices (i,j)
 //==============================================================
 
@@ -226,30 +231,96 @@ var xMin=-1;
 var xMax=1;
 var yMin=-1;
 var yMax=1;
-var xStart,yStart;
+var xScale;
+var yScale;
 
 
 //  the starting point
 //===================================================
+var xStart,yStart;
 var xSlider,xNumber;
 var ySlider,yNumber;
-
-// the function parameters
-//=================================================
-var radius;
-var radiusSlider;
-var radiusNumber;
 
 function setX(value){
 	xStart=value;
 	xSlider.value=value;
 	xNumber.value=value;
-	//drawing();
+}
+
+function setY(value){
+	yStart=value;
+	ySlider.value=value;
+	yNumber.value=value;
 }
 
 function setXYSliderLimits(){
 	xSlider.min=xMin;
 	xSlider.max=xMax;
 	xSlider.step=0.01*(xMax-xMin);
-	console.log("++"+xSlider.min);
+	if (xStart<xMin){
+		setX(xMin);
+	}
+	if (xStart>xMax){
+		setX(xMax);
+	}
+	ySlider.min=yMin;
+	ySlider.max=yMax;
+	ySlider.step=0.01*(yMax-yMin);
+	if (yStart<yMin){
+		setY(yMin);
+	}
+	if (yStart>yMax){
+		setY(yMax);
+	}
 }
+
+//  the drawing and the iteration
+//=====================================================
+
+// storing the numbers from the dynamics
+var numbersDynamics=[];
+// the point
+var x,y;
+// number of iterations
+var initializationIterations=1000;
+var initialProductionIterations=1000000;
+var productionIterations;
+
+function startup(){
+	var i;
+	var length=numbersDynamics.length;
+	for (i=0;i<length;i++){
+		numbersDynamics[i]=0;
+	}
+	x=xStart;
+	y=yStart;
+	productionIterations=initialProductionIterations;
+	for (i=0;i<initializationIterations;i++){
+		mapping();
+	}
+	//  from space to indices
+	xScale=outputWidth/(xMax-xMin);
+	yScale=outputHeight/(yMax-yMin);
+
+}
+
+function production(){
+
+}
+
+function imageGeneration(){
+
+}
+
+function drawing(){
+	console.log("drawing");
+	startup();
+	production();
+	imageGeneration();
+
+}
+
+function mapping(){
+
+}
+
