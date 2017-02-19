@@ -970,9 +970,10 @@ function imageAdd(a,b,c,d,rPower,phiPower){
 
 function mapping(x,y){
     imageZero(x,y);
-    imageAdd(0.7,0,0,0,3,4);
-    imageAdd(0.7,0,0,0,-3,4);
-   imageAdd(0,0,0.5,0,4,8);
-   imageAdd(0,0,0.5,0,-4,8);
+    imageAdd(0.9,0,0,0.8,2,6);
+    imageAdd(-0.9,0,0,-0.8,-2,6);
+   imageAdd(0.2,0,0,0.3,1.5,12);
+    imageAdd(0.2,0,0,0.3,-1.5,12);
+ 
 
 }

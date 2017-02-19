@@ -26,6 +26,10 @@ window.onload = function () {
     setXYSliderLimits();
     setX(Math.random()*(xMax-xMin)+xMin);
     setY(Math.random()*(yMax-yMin)+yMin);
+    //iteration=circleIteration;
+    //shadesOfGrey();
+    iteration=threeIteration;
+    rainbow();
     drawing();
 
 
@@ -101,32 +105,32 @@ function makeInteractions(){
     outputWidthChooser = document.getElementById('outputWidthChooser');
     outputWidthChooser.addEventListener('change',function(){
             updateOutputDimensions(parseInt(outputWidthChooser.value,10),outputHeight);
-            //drawing();
+            drawing();
         },false);
     outputHeightChooser = document.getElementById('outputHeightChooser');
     outputHeightChooser.addEventListener('change',function(){
             updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
-            //drawing();
+            drawing();
         },false);
     xSlider=document.getElementById('xSlider');
     xSlider.addEventListener('change',function(){
     		setX(parseFloat(xSlider.value,10));
-            //drawing();
+            drawing();
     	},false);
     xNumber=document.getElementById('xNumber');
     xNumber.addEventListener('change',function(){
     		setX(parseFloat(xNumber.value,10));
-            //drawing();
+            drawing();
     	},false);
     ySlider=document.getElementById('ySlider');
     ySlider.addEventListener('change',function(){
     		setY(parseFloat(ySlider.value,10));
-            //drawing();
+            drawing();
     	},false);
     yNumber=document.getElementById('yNumber');
     yNumber.addEventListener('change',function(){
     		setY(parseFloat(yNumber.value,10));
-            //drawing();
+            drawing();
     	},false);
 }
 
@@ -193,7 +197,7 @@ function outputMouseWheelHandler(event) {
     yMax=center+size;
     yMin=center-size;
     console.log(xMin);
-    //drawing();
+    drawing();
     return false;
 }
 
@@ -208,15 +212,14 @@ function outputMouseMoveHandler(event) {
     if (mousePressed) {
         setMousePosition(event, outputCanvas);
         d=(mouseX - lastMouseX)/outputWidth*(xMax-xMin);
-        xMin += d;
-        xMax += d;
+        xMin -= d;
+        xMax -= d;
         d=(mouseY - lastMouseY)/outputHeight*(yMax-yMin);
-        yMin += d;
-        yMax += d;
+        yMin -= d;
+        yMax -= d;
         setXYSliderLimits();
         setLastMousePosition();
-        console.log(xMin);
-        //drawing();
+        drawing();
     }
     return false;
 }
@@ -227,10 +230,10 @@ function outputMouseMoveHandler(event) {
 // parameters for the mapping between (x,y) space and indices (i,j)
 //==============================================================
 
-var xMin=-1;
-var xMax=1;
-var yMin=-1;
-var yMax=1;
+var xMin=-2;
+var xMax=2;
+var yMin=-2;
+var yMax=2;
 var xScale;
 var yScale;
 
@@ -257,21 +260,9 @@ function setXYSliderLimits(){
 	xSlider.min=xMin;
 	xSlider.max=xMax;
 	xSlider.step=0.01*(xMax-xMin);
-	if (xStart<xMin){
-		setX(xMin);
-	}
-	if (xStart>xMax){
-		setX(xMax);
-	}
 	ySlider.min=yMin;
 	ySlider.max=yMax;
 	ySlider.step=0.01*(yMax-yMin);
-	if (yStart<yMin){
-		setY(yMin);
-	}
-	if (yStart>yMax){
-		setY(yMax);
-	}
 }
 
 //  the drawing and the iteration
@@ -281,46 +272,149 @@ function setXYSliderLimits(){
 var numbersDynamics=[];
 // the point
 var x,y;
+// and iterated
+var xNew,yNew;
+
 // number of iterations
-var initializationIterations=1000;
-var initialProductionIterations=1000000;
+var initializationIterations=100;
+var initialProductionIterations=10000000;
 var productionIterations;
 
 function startup(){
-	var i;
+	var iter;
 	var length=numbersDynamics.length;
-	for (i=0;i<length;i++){
-		numbersDynamics[i]=0;
+	for (iter=0;iter<length;iter++){
+		numbersDynamics[iter]=0;
 	}
 	x=xStart;
 	y=yStart;
 	productionIterations=initialProductionIterations;
-	for (i=0;i<initializationIterations;i++){
-		mapping();
+	for (iter=0;iter<initializationIterations;iter++){
+		iteration();
+		x=xNew;
+		y=yNew;
 	}
 	//  from space to indices
 	xScale=outputWidth/(xMax-xMin);
 	yScale=outputHeight/(yMax-yMin);
-
 }
 
 function production(){
-
+	var i,j;
+	var iter;
+	for (iter=0;iter<productionIterations;iter++){
+		iteration();
+		x=xNew;
+		y=yNew;
+		i=Math.round((x-xMin)*xScale);
+		if ((i>0)&&(i<outputWidth)){
+			j=Math.round((y-yMin)*yScale);
+			if ((j>0)&&(j<outputHeight)){
+				numbersDynamics[i+outputWidth*j]++;
+			}
+		}
+	}
 }
 
 function imageGeneration(){
-
+	var iter;
+	var length=numbersDynamics.length;
+	var maxNumber=0;
+	for (iter=0;iter<length;iter++){
+		maxNumber=Math.max(maxNumber, numbersDynamics[iter]);
+	}
+	console.log(maxNumber);
+	var pixelByteIndex=0;
+	var colorIndex;
+	var colorScale=(reds.length-0.1)/maxNumber;
+	for (iter=0;iter<length;iter++){
+		colorIndex=Math.floor(numbersDynamics[iter]*colorScale);
+		outputPixels[pixelByteIndex++]=reds[colorIndex];
+		outputPixels[pixelByteIndex++]=greens[colorIndex];
+		outputPixels[pixelByteIndex++]=blues[colorIndex];
+		outputPixels[pixelByteIndex++]=255;
+	}
 }
 
 function drawing(){
-	console.log("drawing");
 	startup();
 	production();
 	imageGeneration();
-
+	outputImage.putImageData(outputData,0, 0);
 }
 
-function mapping(){
+var iteration;
 
+function circleIteration(){
+	var d=0.01;
+	xNew=x-d*y;
+	yNew=y+d*x;
+	if (xNew<-1) xNew+=2;
+	if (xNew>1) xNew-=2;
+	if (yNew<-1) yNew+=2;
+	if (yNew>1) yNew-=2;
 }
 
+var lambda=-1.706;
+var alpha=1.506;
+var gamma=1.4;
+
+function threeIteration(){
+	var x2=x*x-y*y;
+	var y2=2*x*y;
+	var rsq=x*x+y*y;
+	xNew=(lambda+alpha*rsq)*x+gamma*x2;
+	yNew=(lambda+alpha*rsq)*y-gamma*y2;
+}
+
+// the color tables
+//=================================================
+
+var reds=[];
+var blues=[];
+var greens=[];
+
+function initColors(length){
+	var iter;
+	reds.length=length;
+	greens.length=length;
+	blues.length=length;
+	for (iter=0;iter<length;iter++){
+		reds[iter]=0;
+		greens[iter]=0;
+		blues[iter]=0;
+	}
+}
+
+function shadesOfGrey(){
+	var iter;
+	var length=256;
+	var grey;
+	initColors(length);
+	for (iter=0;iter<length;iter++){
+		grey=Math.round(iter*255.5/length);
+		reds[iter]=grey;
+		greens[iter]=grey;
+		blues[iter]=grey;
+	}
+}
+
+function rainbow(){
+	var i;
+	initColors(1152);
+	for (i=0;i<256;i++){
+		reds[i]=i;    // from black to red
+		reds[i+256]=255;   // from red to yellow
+		greens[i+256]=i;
+		reds[i+512]=255-i;    // from yellow to green
+		greens[512+i]=255;
+		if (i<128){
+			greens[768+i]=255;   // from green to cyan
+			blues[768+i]=2*i;
+			greens[896+i]=255-2*i;   // from cyan to blue
+			blues[896+i]=255;
+			blues[1024+i]=255;     // from blue to violett
+			reds[1024+i]=2*i;
+		}
+	}
+}
