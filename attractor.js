@@ -1,39 +1,53 @@
 "use strict";
 
 
-
-/*
-  u   u    sss     eeee   rrrr        iii     aaa
-  u   u   s   s    e      r   r        i     a   a
-  u   u   s        e      r   r        i     a   a
-  u   u    sss     eee    rrrr         i     aaaaa
-  u   u       s    e      r  r         i     a   a
-  u   u       s    e      r   r        i     a   a
-   uuu    ssss     eeee   r   r       iii    a   a
-*/
-// User interaction
-//======================
-
 //  the startup function
 //==============================================================================
 
 var initialOutputSize=512;
+ //initialOutputSize=40;
 
 window.onload = function () {
     setupOutputCanvas();
     makeInteractions();
     setOutputDimensions(initialOutputSize, initialOutputSize);
-    setXYSliderLimits();
-    setX(Math.random()*(xMax-xMin)+xMin);
-    setY(Math.random()*(yMax-yMin)+yMin);
+    
     //iteration=circleIteration;
-    //shadesOfGrey();
     iteration=threeIteration;
-    rainbow();
+
     drawing();
 
 
 };
+
+
+
+// make up interactions with html elements: adds event listeners
+function makeInteractions(){
+    // we need the choosers to write back the corrected data
+    outputWidthChooser = document.getElementById('outputWidthChooser');
+    outputWidthChooser.addEventListener('change',function(){
+            updateOutputDimensions(parseInt(outputWidthChooser.value,10),outputHeight);
+            drawing();
+        },false);
+    outputHeightChooser = document.getElementById('outputHeightChooser');
+    outputHeightChooser.addEventListener('change',function(){
+            updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
+            drawing();
+        },false);
+    var downloadImageButton = document.getElementById('downloadImageButton');
+    //  for image downloading, using jpeg image format, default quality=0.92
+    downloadImageButton.addEventListener('click', function () {
+            //  use correct data format and filename
+            downloadImageButton.href = outputCanvas.toDataURL("image/jpeg"); // the data URL is made at the time of the click
+            downloadImageButton.download = "theImage.jpg";
+        }, false);
+}
+
+
+
+//  the canvas and its interaction
+//============================================================================
 
 
 // choosing output image sizes
@@ -82,7 +96,8 @@ function setOutputDimensions(newWidth,newHeight){
     outputData = outputImage.getImageData(0, 0, outputWidth, outputHeight);
     outputPixels = outputData.data;
     // the new length of the dynamics accumultor
-    numbersDynamics.length=newWidth*newHeight;
+    divergingNumbers.length=newWidth*newHeight;
+    attractorNumbers.length=newWidth*newHeight;
 }
 
 //  changing the size of the image: 
@@ -96,47 +111,8 @@ function updateOutputDimensions(newWidth,newHeight) {
      }
 }
 
-
-
-
-// make up interactions with html elements: adds event listeners
-function makeInteractions(){
-    // we need the choosers to write back the corrected data
-    outputWidthChooser = document.getElementById('outputWidthChooser');
-    outputWidthChooser.addEventListener('change',function(){
-            updateOutputDimensions(parseInt(outputWidthChooser.value,10),outputHeight);
-            drawing();
-        },false);
-    outputHeightChooser = document.getElementById('outputHeightChooser');
-    outputHeightChooser.addEventListener('change',function(){
-            updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
-            drawing();
-        },false);
-    xSlider=document.getElementById('xSlider');
-    xSlider.addEventListener('change',function(){
-    		setX(parseFloat(xSlider.value,10));
-            drawing();
-    	},false);
-    xNumber=document.getElementById('xNumber');
-    xNumber.addEventListener('change',function(){
-    		setX(parseFloat(xNumber.value,10));
-            drawing();
-    	},false);
-    ySlider=document.getElementById('ySlider');
-    ySlider.addEventListener('change',function(){
-    		setY(parseFloat(ySlider.value,10));
-            drawing();
-    	},false);
-    yNumber=document.getElementById('yNumber');
-    yNumber.addEventListener('change',function(){
-    		setY(parseFloat(yNumber.value,10));
-            drawing();
-    	},false);
-}
-
-
-//  the canvase and its interaction
-//============================================================================
+// interaction with the mouse
+//-----------------------------------------------------------------
 
 // override default mouse actions, especially important for the mouse wheel
 function stopEventPropagationAndDefaultAction(event) {
@@ -224,197 +200,191 @@ function outputMouseMoveHandler(event) {
     return false;
 }
 
+
 //  the iteration
 //========================================================
+
+var iteration;
 
 // parameters for the mapping between (x,y) space and indices (i,j)
 //==============================================================
 
-var xMin=-2;
-var xMax=2;
-var yMin=-2;
-var yMax=2;
+var xMin=-1;
+var xMax=1;
+var yMin=-1;
+var yMax=1;
 var xScale;
 var yScale;
 
-
-//  the starting point
-//===================================================
-var xStart,yStart;
-var xSlider,xNumber;
-var ySlider,yNumber;
-
-function setX(value){
-	xStart=value;
-	xSlider.value=value;
-	xNumber.value=value;
-}
-
-function setY(value){
-	yStart=value;
-	ySlider.value=value;
-	yNumber.value=value;
-}
-
-function setXYSliderLimits(){
-	xSlider.min=xMin;
-	xSlider.max=xMax;
-	xSlider.step=0.01*(xMax-xMin);
-	ySlider.min=yMin;
-	ySlider.max=yMax;
-	ySlider.step=0.01*(yMax-yMin);
-}
-
-//  the drawing and the iteration
-//=====================================================
-
-// storing the numbers from the dynamics
-var numbersDynamics=[];
 // the point
-var x,y;
-// and iterated
-var xNew,yNew;
+var px,py;
 
-// number of iterations
-var initializationIterations=100;
-var initialProductionIterations=10000000;
-var productionIterations;
+//  for the attractor set
+var attractorInitialIterations=100;
+var attractorProductionIterations=1000000;
+var attractorNumbers=[];
 
-function startup(){
-	var iter;
-	var length=numbersDynamics.length;
-	for (iter=0;iter<length;iter++){
-		numbersDynamics[iter]=0;
-	}
-	x=xStart;
-	y=yStart;
-	productionIterations=initialProductionIterations;
-	for (iter=0;iter<initializationIterations;iter++){
-		iteration();
-		x=xNew;
-		y=yNew;
-	}
-	//  from space to indices
-	xScale=outputWidth/(xMax-xMin);
-	yScale=outputHeight/(yMax-yMin);
+
+// the iteration function
+//=============================
+var lambda=-1.706;
+var alpha=2.806;
+var gamma=1.55;
+
+
+function threeIteration(x,y){
+    var x2=x*x-y*y;
+    var y2=2*x*y;
+    var x4=x2*x2-y2*y2;
+    var y4=2*x2*y2;
+    var rsq=x*x+y*y;
+    px=(lambda+alpha*rsq)*x+gamma*x4/rsq;
+    py=(lambda+alpha*rsq)*y-gamma*y4/rsq;
 }
 
-function production(){
-	var i,j;
-	var iter;
-	for (iter=0;iter<productionIterations;iter++){
-		iteration();
-		x=xNew;
-		y=yNew;
-		i=Math.round((x-xMin)*xScale);
-		if ((i>0)&&(i<outputWidth)){
-			j=Math.round((y-yMin)*yScale);
-			if ((j>0)&&(j<outputHeight)){
-				numbersDynamics[i+outputWidth*j]++;
-			}
-		}
-	}
+// starting
+
+function background(red,green,blue){
+    var iter;
+    var length4=4*divergingNumbers.length;
+    var pixelByteIndex=0;
+    while (pixelByteIndex<length4){
+        outputPixels[pixelByteIndex++]=red;
+        outputPixels[pixelByteIndex++]=green;
+        outputPixels[pixelByteIndex++]=blue;
+        outputPixels[pixelByteIndex++]=255;
+    }
 }
 
-function imageGeneration(){
-	var iter;
-	var length=numbersDynamics.length;
-	var maxNumber=0;
-	for (iter=0;iter<length;iter++){
-		maxNumber=Math.max(maxNumber, numbersDynamics[iter]);
-	}
-	console.log(maxNumber);
-	var pixelByteIndex=0;
-	var colorIndex;
-	var colorScale=(reds.length-0.1)/maxNumber;
-	for (iter=0;iter<length;iter++){
-		colorIndex=Math.floor(numbersDynamics[iter]*colorScale);
-		outputPixels[pixelByteIndex++]=reds[colorIndex];
-		outputPixels[pixelByteIndex++]=greens[colorIndex];
-		outputPixels[pixelByteIndex++]=blues[colorIndex];
-		outputPixels[pixelByteIndex++]=255;
-	}
+//   study the diverging set
+//==========================================================
+var divergingRadius=8;
+var divergingIterationLimit=20;
+var divergingNumbers=[];
+
+
+function makeDivergingNumbers(){
+    //  from indices to space
+    xScale=(xMax-xMin)/outputWidth;
+    yScale=(yMax-yMin)/outputHeight;
+    var radius2=divergingRadius*divergingRadius;
+    var i,j,iter;
+    var jWidth=0;
+    var yStart;
+    var diverging;
+    for (j=0;j<outputHeight;j++){
+        jWidth=j*outputWidth;
+        yStart=yMin+j*yScale;
+        for (i=0;i<outputWidth; i++) {
+            px=xMin+xScale*i;
+            py=yStart;
+            iter=-1;
+            diverging=false;
+            while((iter<divergingIterationLimit)&&(!diverging)){
+                iter++;
+                iteration(px,py);
+                diverging=(px*px+py*py>radius2);
+            }
+            if (diverging){
+                divergingNumbers[i+jWidth]=iter;
+            }
+            else {
+                divergingNumbers[i+jWidth]=-1;
+            }
+  
+
+        } 
+
+    }
+
 }
+
+// the color table
+var divergingReds,divergingGreens,divergingBlues;
+
+function setDivergingColors(){
+    divergingReds=reds;
+    divergingGreens=greens;
+    divergingBlues=blues;
+}
+
+
+
+// for any color table
+//============================================================
+
+var reds,greens,blues;
+
+function resetColors(red,green,blue){
+    reds=[red];
+    greens=[green];
+    blues=[blue];
+}
+
+function addColors(red,green,blue,nSteps){
+    var start=reds.length-1;
+    reds.length=start+nSteps;
+    greens.length=start+nSteps;
+    blues.length=start+nSteps;
+    var redStart=reds[start];
+    var greenStart=greens[start];
+    var blueStart=blues[start];
+    var redSlope=(red-redStart)/nSteps;
+    var greenSlope=(green-greenStart)/nSteps;
+    var blueSlope=(blue-blueStart)/nSteps;
+    for (var i=1;i<=nSteps;i++){
+        reds[i+start]=Math.floor(redStart+i*redSlope);
+        greens[i+start]=Math.floor(greenStart+i*greenSlope);
+        blues[i+start]=Math.floor(blueStart+i*blueSlope);
+    }
+}
+
+
+
+function makeImage(numbers,colorAmp,reds,greens,blues){
+    var length=numbers.length;
+    var maxNumber=0;
+    for (var i=0;i<length;i++){
+        maxNumber=Math.max(maxNumber,numbers[i]);
+    }
+    var alpha=colorAmp* (reds.length-0.1)/maxNumber;
+    var b=(colorAmp-1)/maxNumber;
+    var pixelByteIndex=0;
+    var number,colorIndex;
+    for (var i=0;i<length;i++){
+        number=numbers[i];
+        if (number>=0){
+            //console.log("number "+number+" c "+colorIndex);
+            colorIndex=Math.floor(number*alpha/(1.0+b*number));
+
+            outputPixels[pixelByteIndex++]=reds[colorIndex];
+            outputPixels[pixelByteIndex++]=greens[colorIndex];
+            outputPixels[pixelByteIndex]=blues[colorIndex];
+            pixelByteIndex+=2;
+        }
+        else {
+            pixelByteIndex+=4
+        }
+    }
+
+}
+
 
 function drawing(){
-	startup();
-	production();
-	imageGeneration();
-	outputImage.putImageData(outputData,0, 0);
-}
+    background(100,0,0);
+    makeDivergingNumbers();
 
-var iteration;
+    resetColors(0,0,0);
 
-function circleIteration(){
-	var d=0.01;
-	xNew=x-d*y;
-	yNew=y+d*x;
-	if (xNew<-1) xNew+=2;
-	if (xNew>1) xNew-=2;
-	if (yNew<-1) yNew+=2;
-	if (yNew>1) yNew-=2;
-}
 
-var lambda=-1.706;
-var alpha=1.506;
-var gamma=1.4;
+    resetColors(100,100,100);
 
-function threeIteration(){
-	var x2=x*x-y*y;
-	var y2=2*x*y;
-	var rsq=x*x+y*y;
-	xNew=(lambda+alpha*rsq)*x+gamma*x2;
-	yNew=(lambda+alpha*rsq)*y-gamma*y2;
-}
+    addColors(200,255,255,100);
+    setDivergingColors();
 
-// the color tables
-//=================================================
+    makeImage(divergingNumbers,1,divergingReds,divergingGreens,divergingBlues);
 
-var reds=[];
-var blues=[];
-var greens=[];
+    outputImage.putImageData(outputData,0, 0);
 
-function initColors(length){
-	var iter;
-	reds.length=length;
-	greens.length=length;
-	blues.length=length;
-	for (iter=0;iter<length;iter++){
-		reds[iter]=0;
-		greens[iter]=0;
-		blues[iter]=0;
-	}
-}
 
-function shadesOfGrey(){
-	var iter;
-	var length=256;
-	var grey;
-	initColors(length);
-	for (iter=0;iter<length;iter++){
-		grey=Math.round(iter*255.5/length);
-		reds[iter]=grey;
-		greens[iter]=grey;
-		blues[iter]=grey;
-	}
-}
-
-function rainbow(){
-	var i;
-	initColors(1152);
-	for (i=0;i<256;i++){
-		reds[i]=i;    // from black to red
-		reds[i+256]=255;   // from red to yellow
-		greens[i+256]=i;
-		reds[i+512]=255-i;    // from yellow to green
-		greens[512+i]=255;
-		if (i<128){
-			greens[768+i]=255;   // from green to cyan
-			blues[768+i]=2*i;
-			greens[896+i]=255-2*i;   // from cyan to blue
-			blues[896+i]=255;
-			blues[1024+i]=255;     // from blue to violett
-			reds[1024+i]=2*i;
-		}
-	}
 }
