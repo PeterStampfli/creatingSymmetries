@@ -168,11 +168,10 @@ function outputMouseWheelHandler(event) {
     size=factor*0.5*(xMax-xMin);
     xMax=center+size;
     xMin=center-size;
-    center=0.5*(xMax+xMin);
-    size=factor*0.5*(xMax-xMin);
+    center=0.5*(yMax+yMin);
+    size=factor*0.5*(yMax-yMin);
     yMax=center+size;
     yMin=center-size;
-    console.log(xMin);
     drawing();
     return false;
 }
@@ -193,7 +192,6 @@ function outputMouseMoveHandler(event) {
         d=(mouseY - lastMouseY)/outputHeight*(yMax-yMin);
         yMin -= d;
         yMax -= d;
-        setXYSliderLimits();
         setLastMousePosition();
         drawing();
     }
@@ -218,11 +216,6 @@ var yScale;
 
 // the point
 var px,py;
-
-//  for the attractor set
-var attractorInitialIterations=100;
-var attractorProductionIterations=1000000;
-var attractorNumbers=[];
 
 
 // the iteration function
@@ -262,7 +255,6 @@ var divergingRadius=8;
 var divergingIterationLimit=20;
 var divergingNumbers=[];
 
-
 function makeDivergingNumbers(){
     //  from indices to space
     xScale=(xMax-xMin)/outputWidth;
@@ -291,12 +283,8 @@ function makeDivergingNumbers(){
             else {
                 divergingNumbers[i+jWidth]=-1;
             }
-  
-
         } 
-
     }
-
 }
 
 // the color table
@@ -308,6 +296,71 @@ function setDivergingColors(){
     divergingBlues=blues;
 }
 
+var divergingColorAmp=1;
+
+function makeDivergingImage(){
+    makeImage(divergingNumbers,divergingIterationLimit,divergingColorAmp,divergingReds,divergingGreens,divergingBlues);
+}
+
+//  study the attractor
+//=========================================
+// number of iterations
+
+var attractorInitialIterations=100;
+var attractorProductionIterations=1000000;
+var attractorNumbers=[];
+
+
+var maxTrials=50;
+
+
+function startAttractor(){
+    px=xMin+Math.random()*(xMax-xMin);
+    py=yMin+Math.random()*(yMax-yMin);
+    var radius2=divergingRadius*divergingRadius;
+    var i=0;
+    var diverging=false;
+    while ((i<attractorInitialIterations)&&!diverging){
+        i++;
+        iteration(px,py);
+        diverging=(px*px+py*py>radius2);
+    }
+    console.log(diverging+" "+i);
+    return diverging;
+}
+
+function runAttractor(){
+    var i,j;
+    var iter;
+    for (iter=0;iter<attractorProductionIterations;iter++){
+        iteration(px,py);
+        i=Math.round((px-xMin)*xScale);
+        if ((i>=0)&&(i<outputWidth)){
+            j=Math.round((py-yMin)*yScale);
+            if ((j>=0)&&(j<outputHeight)){
+                attractorNumbers[i+outputWidth*j]++;
+            }
+        }
+    }
+}
+
+function makeAttractorNumbers(){
+    var length=attractorNumbers.length;
+    for (var i=0;i<length;i++){
+        attractorNumbers[i]=-1;
+    }
+    var trial=0;
+    var diverging=true;
+    while(diverging&&(trial<maxTrials)){
+        trial++;
+        diverging=startAttractor();
+    }
+    if (diverging) return;
+    //  from space to indices
+    xScale=outputWidth/(xMax-xMin);
+    yScale=outputHeight/(yMax-yMin);
+    runAttractor();
+}
 
 
 // for any color table
@@ -339,14 +392,17 @@ function addColors(red,green,blue,nSteps){
     }
 }
 
-
-
-function makeImage(numbers,colorAmp,reds,greens,blues){
+function maxNumber(numbers){
     var length=numbers.length;
     var maxNumber=0;
     for (var i=0;i<length;i++){
         maxNumber=Math.max(maxNumber,numbers[i]);
     }
+    return maxNumber;
+}
+
+function makeImage(numbers,maxNumber,colorAmp,reds,greens,blues){
+    var length=numbers.length;
     var alpha=colorAmp* (reds.length-0.1)/maxNumber;
     var b=(colorAmp-1)/maxNumber;
     var pixelByteIndex=0;
@@ -366,13 +422,11 @@ function makeImage(numbers,colorAmp,reds,greens,blues){
             pixelByteIndex+=4
         }
     }
-
 }
 
 
 function drawing(){
-    background(100,0,0);
-    makeDivergingNumbers();
+
 
     resetColors(0,0,0);
 
@@ -382,9 +436,16 @@ function drawing(){
     addColors(200,255,255,100);
     setDivergingColors();
 
-    makeImage(divergingNumbers,1,divergingReds,divergingGreens,divergingBlues);
+    background(100,0,0);
+    makeDivergingNumbers();
+
+    makeDivergingImage();
 
     outputImage.putImageData(outputData,0, 0);
+    makeAttractorNumbers();
 
+    makeImage(attractorNumbers,maxNumber(attractorNumbers),divergingColorAmp,divergingReds,divergingGreens,divergingBlues);
+
+    outputImage.putImageData(outputData,0, 0);
 
 }
