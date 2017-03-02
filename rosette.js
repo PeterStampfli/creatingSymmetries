@@ -619,16 +619,9 @@ var pixelGreen;
 var pixelBlue;
 
 
-// the replacement color for outside pixels
-var outsideRed = 128;
-var outsideGreen = 128;
-var outsideBlue = 128;
-
-// default color for outside
+// default color for outside flag
 function defaultColor(){
-    pixelRed = outsideRed;
-    pixelGreen = outsideGreen;
-    pixelBlue = outsideBlue;
+    pixelRed = -1;
     return;
 }
 
@@ -833,6 +826,16 @@ var inputCenterY;
 var inputScaleSin;
 var inputScaleCos;
 
+
+// the replacement background color for outside pixels
+var outsideRed = 80;
+var outsideGreen = 80;
+var outsideBlue = 80;
+
+// width for background color for color inversion
+var transWidth=0.1;
+
+
 // sample input image at transformed coordinates
 // result in pixelRed, pixelGreen, pixelBlue
 function makePixelColor(x,y,z){
@@ -843,7 +846,14 @@ function makePixelColor(x,y,z){
     //  get the interpolated input pixel color components, write on output pixels
     //
     pixelInterpolation(x, y, inputData);
-    modifyColors(z);
+    if (pixelRed>=0){
+        modifyColors(z);
+    }
+    else {
+        pixelRed=outsideRed;
+        pixelGreen=outsideGreen;
+        pixelBlue=outsideBlue;
+    }
     // mark the reference image pixel, make it fully opaque
     var h = Math.round(scaleInputToReference * x);
     var k = Math.round(scaleInputToReference * y);
@@ -853,7 +863,13 @@ function makePixelColor(x,y,z){
     }
 }
 
-function doNothing(z){}
+function doNothing(z){
+        if(Math.abs(z)<transWidth){
+        pixelRed=outsideRed;
+        pixelGreen=outsideGreen;
+        pixelBlue=outsideBlue;
+    }
+}
 
 // default, no color inversion
 var modifyColors=doNothing;
@@ -861,22 +877,32 @@ var modifyColors=doNothing;
 // color inversion
 // simplest type of color change, overwrite if you want something better
 function simpleColorInversion(z){
-    if (z<0){
+    if (z<-transWidth){
         pixelRed=255-pixelRed;
         pixelGreen=255-pixelGreen;
         pixelBlue=255-pixelBlue;  
     }  
+    else if(z<transWidth){
+        pixelRed=outsideRed;
+        pixelGreen=outsideGreen;
+        pixelBlue=outsideBlue;
+    }
 }
 
 // color inversion: subtler method
 
 function improvedColorInversion(z){
-    if (z<0){
+    if (z<-transWidth){
         var pixMaxMin=Math.max(pixelRed,pixelGreen,pixelBlue)+Math.min(pixelRed,pixelGreen,pixelBlue);
         pixelRed=pixMaxMin-pixelRed;
         pixelGreen=pixMaxMin-pixelGreen;
         pixelBlue=pixMaxMin-pixelBlue;   
     } 
+        else if(z<transWidth){
+        pixelRed=outsideRed;
+        pixelGreen=outsideGreen;
+        pixelBlue=outsideBlue;
+    }
 }
 
 
@@ -931,14 +957,6 @@ function drawing(){
 // initial mapping scale
 //  (x,y) coordinates to pixels
 scaleOutputToInput = 200
-
-// the replacement color for outside pixels
-outsideRed = 100;
-outsideGreen = 100;
-outsideBlue = 100;
-
-
-
 
 //  make the mapping that defines the symmetry
 var logR=0;
