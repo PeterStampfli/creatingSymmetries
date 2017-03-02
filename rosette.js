@@ -186,6 +186,8 @@ var outputHeightChooser;
 // the table for the mapping function (same size as output canvas)
 var mapX = [];
 var mapY = [];
+var mapZ = [];
+
 //  with dimensions (part of the periodic unit cell)
 var mapWidth=0;
 var mapHeight=0;
@@ -218,6 +220,7 @@ function updateMapDimensions(){
     mapHeight = outputHeight;
     mapX.length = mapWidth * mapHeight;
     mapY.length = mapWidth * mapHeight;
+    mapZ.length = mapWidth * mapHeight;
     makeMapTables();
 }
 
@@ -279,21 +282,19 @@ function makeInteractions(){
             pixelInterpolation = pixelInterpolationCubic;
             drawing();
         },false);
-    /*
     var inversionChoosers=document.getElementsByClassName('inversion');
     inversionChoosers[0].addEventListener('click',function(){
-             makePixelColor = sampleInput;
+            modifyColors = doNothing;
             drawing();
         },false);
     inversionChoosers[1].addEventListener('click',function(){
-             makePixelColor = colorInversionMirror;
+            modifyColors = simpleColorInversion;
             drawing();
         },false);
     inversionChoosers[2].addEventListener('click',function(){
-             makePixelColor = colorInversionRotation;
+            modifyColors = improvedColorInversion;
             drawing();
         },false);
-        */
     var downloadImageButton = document.getElementById('downloadImageButton');
     //  for image downloading, using jpeg image format, default quality=0.92
     downloadImageButton.addEventListener('click', function () {
@@ -782,10 +783,12 @@ function pixelInterpolationCubic(x, y, inData) {
 // and by turning the mouse wheel.
 // Then a function mapping(x,y) gives image point coordinates (xImage,yImage).
 // The coordinates are put in the mapX and mapY arrays.
-// The mapping(x,y) defines the symmetries of the image
+// The mapping (x,y)->(xImage,yImage) defines the symmetries of the image
+// an addional function zImage(x,y) modifies the color
 
 var xImage=0;
 var yImage=0;
+var zImage=0;
 
 function makeMapTables() {
     // local variables and references to speed up access
@@ -794,6 +797,7 @@ function makeMapTables() {
     var locMapScale=mapScale;
     var locMapX=mapX;
     var locMapY=mapY;
+    var locMapZ=mapZ;
     //  this mapping function has to be defined depending on the desired image
     var locMapping=mapping;
     // do each pixel and store result of mapping
@@ -807,7 +811,8 @@ function makeMapTables() {
             x=(i-locMapOffsetI)*locMapScale;
             locMapping(x,y);
             locMapX[index] = xImage;
-            locMapY[index++] = yImage;          
+            locMapY[index] = yImage;          
+            locMapZ[index++] = zImage;          
         }
     }
 }
@@ -830,7 +835,7 @@ var inputScaleCos;
 
 // sample input image at transformed coordinates
 // result in pixelRed, pixelGreen, pixelBlue
-function sampleInput(x,y){
+function makePixelColor(x,y,z){
     // translation, rotation and scaling
     var newX = inputScaleCos * x - inputScaleSin * y + inputCenterX;
     y = inputScaleSin * x + inputScaleCos * y + inputCenterY;
@@ -838,6 +843,7 @@ function sampleInput(x,y){
     //  get the interpolated input pixel color components, write on output pixels
     //
     pixelInterpolation(x, y, inputData);
+    modifyColors(z);
     // mark the reference image pixel, make it fully opaque
     var h = Math.round(scaleInputToReference * x);
     var k = Math.round(scaleInputToReference * y);
@@ -847,38 +853,32 @@ function sampleInput(x,y){
     }
 }
 
+function doNothing(z){}
+
 // default, no color inversion
-var makePixelColor=sampleInput;
+var modifyColors=doNothing;
 
 // color inversion
 // simplest type of color change, overwrite if you want something better
-function invertPixel(){
-    pixelRed=255-pixelRed;
-    pixelGreen=255-pixelGreen;
-    pixelBlue=255-pixelBlue;    
+function simpleColorInversion(z){
+    if (z<0){
+        pixelRed=255-pixelRed;
+        pixelGreen=255-pixelGreen;
+        pixelBlue=255-pixelBlue;  
+    }  
 }
 
-// color inversion with mirroring at the y-axis
-function colorInversionMirror(x,y){
-    if (x<0){
-        sampleInput(x,y);
-    }
-    else {
-        sampleInput(-x,y);
-        invertPixel();
-    }
+// color inversion: subtler method
+
+function improvedColorInversion(z){
+    if (z<0){
+        var pixMaxMin=Math.max(pixelRed,pixelGreen,pixelBlue)+Math.min(pixelRed,pixelGreen,pixelBlue);
+        pixelRed=pixMaxMin-pixelRed;
+        pixelGreen=pixMaxMin-pixelGreen;
+        pixelBlue=pixMaxMin-pixelBlue;   
+    } 
 }
 
-// color inversion with a rotataion by 180 degrees
-function colorInversionRotation(x,y){
-    if (x<0){
-        sampleInput(x,y);
-    }
-    else {
-        sampleInput(-x,-y);
-        invertPixel();
-    }
-}
 
 function drawing(){
 	if (!inputLoaded){	
@@ -897,6 +897,7 @@ function drawing(){
     // local reference to the mapping table
     var locMapX = mapX;
     var locMapY = mapY;
+    var locMapZ = mapZ;
     var locOutputPixels=outputPixels;
     // function for making the color
     var locMakePixelColor=makePixelColor;
@@ -906,7 +907,7 @@ function drawing(){
     var mapSize=mapX.length;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
         //sampleInput(locMapX[mapIndex],locMapY[mapIndex]);
-        locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex]);
+        locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex],locMapZ[mapIndex]);
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;
@@ -936,20 +937,14 @@ outsideRed = 100;
 outsideGreen = 100;
 outsideBlue = 100;
 
-// color inversion: subtler method
-
-function invertPixel(){
-    var pixMaxMin=Math.max(pixelRed,pixelGreen,pixelBlue)+Math.min(pixelRed,pixelGreen,pixelBlue);
-    pixelRed=pixMaxMin-pixelRed;
-    pixelGreen=pixMaxMin-pixelGreen;
-    pixelBlue=pixMaxMin-pixelBlue;    
-}
 
 
 
 //  make the mapping that defines the symmetry
 var logR=0;
 var phi=0;
+var rkCosPhi;
+var rkSinPhi;
 
 // initialization
 function imageZero(x,y){
@@ -957,9 +952,28 @@ function imageZero(x,y){
     phi=Math.atan2(y,x);
     xImage=0;
     yImage=0;
+    zImage=0;
 }
 
 // single parts
+function imagePowers(rPower,phiPower){
+    var rk=fExp(rPower*logR);
+    rkCosPhi=rk*fCos(phiPower*phi);
+    rkSinPhi=rk*fSin(phiPower*phi);
+}
+
+function xImageAdd(a,b){
+    xImage+=a*rkCosPhi+b*rkSinPhi;
+}
+
+function yImageAdd(a,b){
+    yImage+=a*rkCosPhi+b*rkSinPhi;
+}
+
+function zImageAdd(a,b){
+    zImage+=a*rkCosPhi+b*rkSinPhi;
+}
+
 function imageAdd(a,b,c,d,rPower,phiPower){
     var rk=fExp(rPower*logR);
     var rkCosPhi=rk*fCos(phiPower*phi);
@@ -970,10 +984,10 @@ function imageAdd(a,b,c,d,rPower,phiPower){
 
 function mapping(x,y){
     imageZero(x,y);
-    imageAdd(0.9,0,0,0,2,6);
-    imageAdd(0.9,0,0,0,-2,6);
-   imageAdd(0,0,0,0.8,2,3);
-    imageAdd(0,0,0,-0.8,-2,3);
- 
+    imagePowers(2,6);
+    xImageAdd(1,0);
+    yImageAdd(0,1);
+    imagePowers(1,3);
+    zImageAdd(1,0);
 
 }

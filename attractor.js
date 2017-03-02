@@ -218,23 +218,6 @@ var yScale;
 var px,py;
 
 
-// the iteration function
-//=============================
-var lambda=-1.706;
-var alpha=2.806;
-var gamma=1.55;
-
-
-function threeIteration(x,y){
-    var x2=x*x-y*y;
-    var y2=2*x*y;
-    var x4=x2*x2-y2*y2;
-    var y4=2*x2*y2;
-    var rsq=x*x+y*y;
-    px=(lambda+alpha*rsq)*x+gamma*x4/rsq;
-    py=(lambda+alpha*rsq)*y-gamma*y4/rsq;
-}
-
 // starting
 
 function background(red,green,blue){
@@ -307,7 +290,8 @@ function makeDivergingImage(){
 // number of iterations
 
 var attractorInitialIterations=100;
-var attractorProductionIterations=1000000;
+var millions=1000000;
+var attractorProductionIterations=millions;
 var attractorNumbers=[];
 
 
@@ -362,6 +346,21 @@ function makeAttractorNumbers(){
     runAttractor();
 }
 
+// the color table
+var attractorReds,attractorGreens,attractorBlues;
+
+function setAttractorColors(){
+    attractorReds=reds;
+    attractorGreens=greens;
+    attractorBlues=blues;
+}
+
+var attractorColorAmp=40;
+
+function makeAttractorImage(){
+    makeImage(attractorNumbers,maxNumber(attractorNumbers),attractorColorAmp,attractorReds,attractorGreens,attractorBlues);
+  
+}
 
 // for any color table
 //============================================================
@@ -390,6 +389,22 @@ function addColors(red,green,blue,nSteps){
         greens[i+start]=Math.floor(greenStart+i*greenSlope);
         blues[i+start]=Math.floor(blueStart+i*blueSlope);
     }
+}
+
+function greyColors(start,end){
+    resetColors(start,start,start);
+    addColors(end,end,end,Math.abs(end-start));
+}
+
+function redBlueColors(){
+    resetColors(0,0,0);
+    addColors(128,128,128,128);
+    addColors(255,0,0,128);
+    addColors(255,0,255,255);
+    addColors(0,255,255,255);
+    addColors(255,255,0,255);
+    addColors(255,255,255,255);
+    console.log(reds.length);
 }
 
 function maxNumber(numbers){
@@ -425,15 +440,28 @@ function makeImage(numbers,maxNumber,colorAmp,reds,greens,blues){
 }
 
 
+// the iteration function
+//=============================
+var lambda=-1.906;
+var alpha=3.1506;
+var gamma=1.805055;
+
+
+function threeIteration(x,y){
+    var x2=x*x-y*y;
+    var y2=2*x*y;
+    var x4=x2*x2-y2*y2;
+    var y4=2*x2*y2;
+    var rsq=x*x+y*y;
+    px=(lambda+alpha*rsq)*x+gamma*x4;
+    py=(lambda+alpha*rsq)*y+gamma*y4;
+}
+
 function drawing(){
 
+    attractorProductionIterations=5*millions;
 
-    resetColors(0,0,0);
-
-
-    resetColors(100,100,100);
-
-    addColors(200,255,255,100);
+    greyColors(64,255);
     setDivergingColors();
 
     background(100,0,0);
@@ -444,7 +472,9 @@ function drawing(){
     outputImage.putImageData(outputData,0, 0);
     makeAttractorNumbers();
 
-    makeImage(attractorNumbers,maxNumber(attractorNumbers),divergingColorAmp,divergingReds,divergingGreens,divergingBlues);
+    redBlueColors();
+    setAttractorColors();
+    makeAttractorImage();
 
     outputImage.putImageData(outputData,0, 0);
 
