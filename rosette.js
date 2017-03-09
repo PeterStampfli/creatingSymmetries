@@ -108,6 +108,7 @@ window.onload = function () {
     setupOutputCanvas();
     setupOrientationCanvas(200);
     makeInteractions();
+    prepareWavevectors(8);
     initialOutputDimensions(initialOutputSize, initialOutputSize);
     drawing();
 };
@@ -999,13 +1000,119 @@ function imageAdd(a,b,c,d,rPower,phiPower){
     xImage+=a*rkCosPhi+b*rkSinPhi;
     yImage+=c*rkCosPhi+d*rkSinPhi;
 }
-
+/*
 function mapping(x,y){
     imageZero(x,y);
-    imagePowers(2,6);
+    imagePowers(2,4);
     xImageAdd(1,0);
-    yImageAdd(0,1);
-    imagePowers(1,3);
-    zImageAdd(1,0);
+        zImageAdd(0,4);
 
+    imagePowers(3,8)
+    yImageAdd(1.5,0);
+
+}
+*/
+var p=0;
+var kx,ky;
+var kx1,ky1;
+var kx2,ky2;
+var k=3;
+
+function prepareWavevectors(pp){
+    p=pp;
+    kx=Array(p);
+    ky=Array(p);
+    kx1=Array(p);
+    ky1=Array(p);
+    kx2=Array(p);
+    ky2=Array(p);
+    var angle=0;
+    var deltaAngle=2*Math.PI/p;
+    for (var i=0;i<p;i++){
+        kx[i]=k*fCos(angle);
+        ky[i]=k*fSin(angle);
+
+        angle+=deltaAngle;
+    }
+    for (var i=0;i<p;i++){
+        kx1[i]=kx[i]+kx[(i+1)%p];
+        ky1[i]=ky[i]+ky[(i+1)%p];
+        kx2[i]=kx1[i]+kx[(i+2)%p];
+        ky2[i]=ky1[i]+ky[(i+2)%p];
+
+    }
+
+}
+
+/*
+function mapping(x,y){
+
+    zImage=1;
+    var sinSum=0;
+    var cosSum=0;
+    var sinSum1=0;
+    var cosSum1=0;
+    var sinSum2=0;
+    var cosSum2=0;
+    var phase;
+  
+    
+    for (var i=0;i<p;i++){
+        phase=kx[i]*x+ky[i]*y;
+        sinSum+=fSin(phase);
+        cosSum+=fCos(phase);
+        phase=kx1[i]*x+ky1[i]*y;
+        sinSum1+=fSin(phase);
+        cosSum1+=fCos(phase);
+        phase=kx2[i]*x+ky2[i]*y;
+        sinSum2+=fSin(phase);
+        cosSum2+=fCos(phase);
+    }
+
+    xImage=0.4*cosSum;
+    yImage=0.4*sinSum;
+    //zImage=sinSum;
+
+}
+*/
+/*
+function mapping(x,y){
+    zImage=1;
+    xImage=fCos(x)+fCos(y);
+    yImage=fCos(x)*fCos(y);
+}
+*/
+
+function mapping(x,y){
+
+    zImage=1;
+    var sinSum=0;
+    var cosSum=0;
+    var sinSum1=0;
+    var cosSum1=0;
+    var sinSum2=0;
+    var cosSum2=0;
+    var phase;
+  
+    var p2=p/2;
+    var factor=1;
+    var alterSum=0;
+    
+    for (var i=0;i<p2;i++){
+        factor*=-1;
+        phase=kx[i]*x+ky[i]*y;
+        sinSum+=fSin(phase);
+        cosSum+=fCos(phase);
+        alterSum+=factor*fCos(phase);
+        phase=kx1[i]*x+ky1[i]*y;
+        sinSum1+=fSin(phase);
+        cosSum1+=fCos(phase);
+        phase=kx2[i]*x+ky2[i]*y;
+        sinSum2+=fSin(phase);
+        cosSum2+=fCos(phase);
+    }
+
+    xImage=cosSum;
+    yImage=cosSum1;
+    zImage=alterSum;
 }
