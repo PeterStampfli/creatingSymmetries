@@ -108,7 +108,7 @@ window.onload = function () {
     setupOutputCanvas();
     setupOrientationCanvas(200);
     makeInteractions();
-    prepareWavevectors(8);
+    prepareWavevectors(12);
     initialOutputDimensions(initialOutputSize, initialOutputSize);
     drawing();
 };
@@ -1112,7 +1112,59 @@ function mapping(x,y){
         cosSum2+=fCos(phase);
     }
 
-    xImage=cosSum;
-    yImage=cosSum1;
+    xImage=cosSum1;
+    yImage=cosSum;
     zImage=alterSum;
+    zImage=cosSum2;
 }
+
+
+
+function makePixelColorFromNodes(x,y,z){
+    if (Math.abs(x)<transWidth){
+        pixelRed=0;
+    }
+    else {
+        pixelRed=255;
+    }
+   if (Math.abs(y)<transWidth){
+        pixelGreen=0;
+    }
+    else {
+        pixelGreen=255;
+    }
+   if (Math.abs(z)<transWidth){
+        pixelBlue=0;
+        pixelRed=Math.max(pixelRed-20,0);
+        pixelGreen=Math.max(pixelGreen-20,0);
+    }
+    else {
+        pixelBlue=255;
+    } 
+}
+
+function makePixelColorFromMax(x,y,z){
+    if (x>transWidth){
+        pixelRed=0;
+    }
+    else {
+        pixelRed=255;
+    }
+   if (y>transWidth){
+        pixelGreen=0;
+    }
+    else {
+        pixelGreen=255;
+    }
+   if (z>transWidth){
+        pixelBlue=0;
+        pixelRed=Math.max(pixelRed-20,0);
+        pixelGreen=Math.max(pixelGreen-20,0);
+    }
+    else {
+        pixelBlue=255;
+    } 
+}
+
+makePixelColor=makePixelColorFromMax;
+transWidth=0.9;

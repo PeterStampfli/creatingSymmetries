@@ -12,61 +12,10 @@
 		With a decent browser you can save this page on your own computer. Edit it and make your own experiments.
 	</p>
 </body>
-<script src="fastFunctions.js"></script>
+<script src="fastInterpolatedFunctions.js"></script>
 
 <script>
 "use strict";
-
-// some utilies
-//==============================================================================
-
-function time(){
-	return new Date().getTime();
-}
-
-function powerOf2(n){
-	return Math.round(Math.pow(2,n));
-}
-
-function errorCheck(start,end,step,trueFunction,approximateFunction){
-	var x=start;
-	var absError=0;
-	var relError=0;
-	var trueValue=0;
-	var approximateValue=0;
-	while (x<end){
-		trueValue=trueFunction(x);
-		approximateValue=approximateFunction(x);
-		absError=Math.max(absError,Math.abs(trueValue-approximateValue));
-		x+=step;
-	}
-	console.log("max absolute error: "+absError);
-}
-
-function compare(start,end,step,trueFunction,approximateFunction){
-	var x=start;
-	var error=0;
-	console.log("compare:  x, true function, approximation, error");
-	while (x<end){
-		console.log(x+" "+trueFunction(x)+" "+approximateFunction(x)+" "+(approximateFunction(x)-trueFunction(x)));
-		x+=step;
-	}
-}
-
-function makeFunctionTable(length,start,delta,theFunction){
-	var table=new Array(length);
-	for (var i = 0;i<length;i++){
-		table[i]=theFunction(start+i*delta);
-	}
-	return table;
-}
-
-// the sine (and cosine) function
-//======================================================================
-
-
-//  the sine function
-//------------------------------------------------
 
 
 // using a table of 4097 elements
@@ -77,78 +26,29 @@ setupSinCosTable(12);
 // checking the error of approximations
 //=============================================================
 
-console.log("fast sinus approximation error: ");
-errorCheck(-20,20,0.01,Math.sin,fastSin);
 
 console.log("interpolated sinus approximation error: ");
-errorCheck(-10,20,0.01,Math.sin,fastInterpolatedSin);
+absErrorCheck(-10,20,0.01,Math.sin,sin);
 
-console.log("improved interpolated sinus approximation error: ");
-errorCheck(-10,20,0.01,Math.sin,fastImprovedInterpolatedSin);
-
-console.log("cosinus approximation error: ");
-errorCheck(-10,20,0.01,Math.cos,fastCos);
 
 // checking the speed
 //===================================================0
 
 var nChecks=10000000;
 
-var x=0;
-var y=0;
 var range=63;
-var dx=range/nChecks;
-var start=0;
-x=0;
-start=time();
 
-while(x<range){
-	y=Math.sin(x);
-	x+=dx;
-}
-console.log("using the sin function: "+(time()-start)/1000);
+console.log("using the sin function: ");
 
-x=0;
-start=time();
-while(x<range){
-	y=fastImprovedInterpolatedSin(x);
-	x+=dx;
-}
-console.log("using the 'quadratic' interpolated sin function: "+(time()-start)/1000);
+timing(0,range,nChecks,Math.sin);
 
-x=0;
-start=time();
-while(x<range){
-	y=fastInterpolatedSin(x);
-	x+=dx;
-}
-console.log("using the fast interpolated sin function: "+(time()-start)/1000);
+console.log("using the interpolated sin function: ");
 
-x=0;
-start=time();
-while(x<range){
-	y=fastSin(x);
-
-	x+=dx;
-}
-console.log("using the fast sin function: "+(time()-start)/1000);
-
+timing(0,range,nChecks,sin);
 //  for reference - the empty loop
-x=0;
-start=time();
-while(x<range){
-	x+=dx;
-}
-console.log("the empty loop: "+(time()-start)/1000);
 
-//  for reference - the empty loop
-x=0;
-start=time();
-while(x<range){
-	y=Math.log(x);
-	x+=dx;
-}
-console.log("the log : "+(time()-start)/1000);
+console.log("the empty loop: ");
+emptyTiming(0,range,nChecks);
 
 </script>
 </html>
