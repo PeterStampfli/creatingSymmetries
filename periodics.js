@@ -108,6 +108,7 @@ window.onload = function () {
     setupOutputCanvas();
     setupOrientationCanvas(200);
     makeInteractions();
+    prepareWavevectors(8);
     initialOutputDimensions(initialOutputSize, initialOutputSize);
     drawing();
 };
@@ -827,6 +828,15 @@ var inputScaleSin;
 var inputScaleCos;
 
 
+// the replacement background color for outside pixels
+var outsideRed = 80;
+var outsideGreen = 80;
+var outsideBlue = 80;
+
+// width for background color for color inversion
+var transWidth=0.1;
+
+
 // sample input image at transformed coordinates
 // result in pixelRed, pixelGreen, pixelBlue
 function makePixelColor(x,y,z){
@@ -964,7 +974,7 @@ function imageZero(x,y){
     zImage=0;
 }
 
-// precompute powers (exponents) for r and phi
+// single parts
 function imagePowers(rPower,phiPower){
     var rk=fExp(rPower*logR);
     rkCosPhi=rk*fCos(phiPower*phi);
@@ -983,7 +993,6 @@ function zImageAdd(a,b){
     zImage+=a*rkCosPhi+b*rkSinPhi;
 }
 
-
 function imageAdd(a,b,c,d,rPower,phiPower){
     var rk=fExp(rPower*logR);
     var rkCosPhi=rk*fCos(phiPower*phi);
@@ -991,31 +1000,182 @@ function imageAdd(a,b,c,d,rPower,phiPower){
     xImage+=a*rkCosPhi+b*rkSinPhi;
     yImage+=c*rkCosPhi+d*rkSinPhi;
 }
-
+/*
 function mapping(x,y){
-     imageZero(x,y);
+    imageZero(x,y);
     imagePowers(2,4);
     xImageAdd(1,0);
-    zImageAdd(0,1);
-    imagePowers(-2,4);
-    xImageAdd(1,0);
-    zImageAdd(0,-1);
-    /*imagePowers(2,8);
-    yImageAdd(1,0);
-    imagePowers(-2,8);
-    yImageAdd(-1,0);*/
-    imageAdd(0,0,1,0,3,8);
-    imageAdd(0,0,1,0,-3,8);
+        zImageAdd(0,4);
 
+    imagePowers(3,8)
+    yImageAdd(1.5,0);
+
+}
+*/
+
+
+/*
+function mapping(x,y){
+
+    zImage=1;
+    var sinSum=0;
+    var cosSum=0;
+    var sinSum1=0;
+    var cosSum1=0;
+    var sinSum2=0;
+    var cosSum2=0;
+    var phase;
+  
+    
+    for (var i=0;i<p;i++){
+        phase=kx[i]*x+ky[i]*y;
+        sinSum+=fSin(phase);
+        cosSum+=fCos(phase);
+        phase=kx1[i]*x+ky1[i]*y;
+        sinSum1+=fSin(phase);
+        cosSum1+=fCos(phase);
+        phase=kx2[i]*x+ky2[i]*y;
+        sinSum2+=fSin(phase);
+        cosSum2+=fCos(phase);
+    }
+
+    xImage=0.4*cosSum;
+    yImage=0.4*sinSum;
+    //zImage=sinSum;
+
+}
+*/
+/*
+function mapping(x,y){
+    zImage=1;
+    xImage=fCos(x)+fCos(y);
+    yImage=fCos(x)*fCos(y);
+}
+*/
+
+var p=0;
+var odd;
+var kx,ky;
+var k=10;
+var sines,cosines;
+
+
+function prepareWavevectors(pp){
+    odd=(pp%2==1);
+    if (odd){
+        p=pp;  
+    }
+    else {
+        p=pp/2;
+    }
+    kx=Array(p);
+    ky=Array(p);
+    sines=Array(p);
+    cosines=Array(p);
+    var angle=0;
+    var deltaAngle=2*Math.PI/pp;
+    for (var i=0;i<p;i++){
+        kx[i]=k*fCos(angle);
+        ky[i]=k*fSin(angle);
+        angle+=deltaAngle;
+    }
+}
+
+function mapping(x,y){
+
+    zImage=1;
+
+    var phase;
+    var i;
+    var fc=0;
+    var fs=0;
+    var ps=1;
+    var pc=1;
+    for (i=0;i<p;i++){
+        phase=x*kx[i]+y*ky[i];
+        cosines[i]=fCos(phase);
+        sines[i]=fSin(phase);
+        fc+=cosines[i];
+        fs+=sines[i];
+        pc*=cosines[i];
+        ps*=sines[i];
+    }
+    var fcs=cosines[p-1]*sines[0];
+    var fsc=sines[p-1]*cosines[0];
+    var fcc=cosines[p-1]*cosines[0];
+    var fss=sines[p-1]*sines[0];
+    if (!odd){
+        fss=-fss;
+    }
+    for (i=1;i<p;i++){
+        fcs+=cosines[i-1]*sines[i];
+        fsc+=sines[i-1]*cosines[i];
+        fcc+=cosines[i-1]*cosines[i];
+        fss+=sines[i-1]*sines[i];
+    }
+    var fcss=cosines[p-2]*sines[p-1]*sines[0];
+    if (!odd){
+        fcss=-fcss;
+    }
+    fcss+=cosines[p-1]*sines[0]*sines[1];
+
+
+    for (i=2;i<p;i++){
+        fcss+=cosines[i-2]*sines[i-1]*sines[i];
+    }
+
+    xImage=fss;
+    yImage=fcss;
+    //zImage=cosSum2;
 }
 
 
 
+function makePixelColorFromNodes(x,y,z){
+    if (Math.abs(x)<transWidth){
+        pixelRed=0;
+    }
+    else {
+        pixelRed=255;
+    }
+   if (Math.abs(y)<transWidth){
+        pixelGreen=0;
+    }
+    else {
+        pixelGreen=255;
+    }
+   if (Math.abs(z)<transWidth){
+        pixelBlue=0;
+        pixelRed=Math.max(pixelRed-20,0);
+        pixelGreen=Math.max(pixelGreen-20,0);
+    }
+    else {
+        pixelBlue=255;
+    } 
+}
 
-// the replacement background color for outside pixels
-var outsideRed = 40;
-var outsideGreen = 40;
-var outsideBlue = 40;
+function makePixelColorFromMax(x,y,z){
+    if (x>transWidth){
+        pixelRed=0;
+    }
+    else {
+        pixelRed=255;
+    }
+   if (y>transWidth){
+        pixelGreen=0;
+    }
+    else {
+        pixelGreen=255;
+    }
+   if (z>transWidth){
+        pixelBlue=0;
+        pixelRed=Math.max(pixelRed-20,0);
+        pixelGreen=Math.max(pixelGreen-20,0);
+    }
+    else {
+        pixelBlue=255;
+    } 
+}
 
-// width for background color for color inversion
-var transWidth=0.1;
+//makePixelColor=makePixelColorFromMax;
+transWidth=0.9;
