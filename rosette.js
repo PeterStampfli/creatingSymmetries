@@ -855,11 +855,7 @@ function makePixelColor(x,y,z){
 }
 
 function doNothing(z){
-        if(Math.abs(z)<transWidth){
-        pixelRed=outsideRed;
-        pixelGreen=outsideGreen;
-        pixelBlue=outsideBlue;
-    }
+    
 }
 
 // default, no color inversion
@@ -874,25 +870,27 @@ function simpleColorInversion(z){
         pixelBlue=255-pixelBlue;  
     }  
     else if(z<transWidth){
-        pixelRed=outsideRed;
-        pixelGreen=outsideGreen;
-        pixelBlue=outsideBlue;
+        var x=0.5*(1-z/transWidth);
+        pixelRed=x*(255-pixelRed)+(1-x)*pixelRed;
+        pixelGreen=x*(255-pixelGreen)+(1-x)*pixelGreen;
+        pixelBlue=x*(255-pixelBlue)+(1-x)*pixelBlue;
     }
 }
 
 // color inversion: subtler method
 
 function improvedColorInversion(z){
+    var pixMaxMin=Math.max(pixelRed,pixelGreen,pixelBlue)+Math.min(pixelRed,pixelGreen,pixelBlue);
     if (z<-transWidth){
-        var pixMaxMin=Math.max(pixelRed,pixelGreen,pixelBlue)+Math.min(pixelRed,pixelGreen,pixelBlue);
         pixelRed=pixMaxMin-pixelRed;
         pixelGreen=pixMaxMin-pixelGreen;
         pixelBlue=pixMaxMin-pixelBlue;   
     } 
         else if(z<transWidth){
-        pixelRed=outsideRed;
-        pixelGreen=outsideGreen;
-        pixelBlue=outsideBlue;
+        var x=0.5*(1-z/transWidth);
+        pixelRed=x*(pixMaxMin-pixelRed)+(1-x)*pixelRed;
+        pixelGreen=x*(pixMaxMin-pixelGreen)+(1-x)*pixelGreen;
+        pixelBlue=x*(pixMaxMin-pixelBlue)+(1-x)*pixelBlue;
     }
 }
 
