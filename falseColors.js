@@ -1100,4 +1100,11 @@ function rotateColor(){
 
 }
 
+function both(){
+    inversion();
+    invertColor();
+}
+
 var changeColors=rotateColor;
+changeColors=inversion;
+changeColors=both;

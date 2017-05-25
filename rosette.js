@@ -186,7 +186,7 @@ var outputHeightChooser;
 // the table for the mapping function (same size as output canvas)
 var mapX = [];
 var mapY = [];
-var mapZ = [];
+var mapW = [];
 
 //  with dimensions (part of the periodic unit cell)
 var mapWidth=0;
@@ -220,7 +220,7 @@ function updateMapDimensions(){
     mapHeight = outputHeight;
     mapX.length = mapWidth * mapHeight;
     mapY.length = mapWidth * mapHeight;
-    mapZ.length = mapWidth * mapHeight;
+    mapW.length = mapWidth * mapHeight;
     makeMapTables();
 }
 
@@ -777,11 +777,11 @@ function pixelInterpolationCubic(x, y, inData) {
 // Then a function mapping(x,y) gives image point coordinates (xImage,yImage).
 // The coordinates are put in the mapX and mapY arrays.
 // The mapping (x,y)->(xImage,yImage) defines the symmetries of the image
-// an addional function zImage(x,y) modifies the color
+// an addional function wImage(x,y) modifies the color (two-color symmetry)
 
 var xImage=0;
 var yImage=0;
-var zImage=0;
+var wImage=0;
 
 function makeMapTables() {
     // local variables and references to speed up access
@@ -790,7 +790,7 @@ function makeMapTables() {
     var locMapScale=mapScale;
     var locMapX=mapX;
     var locMapY=mapY;
-    var locMapZ=mapZ;
+    var locMapW=mapW;
     //  this mapping function has to be defined depending on the desired image
     var locMapping=mapping;
     // do each pixel and store result of mapping
@@ -805,7 +805,7 @@ function makeMapTables() {
             locMapping(x,y);
             locMapX[index] = xImage;
             locMapY[index] = yImage;          
-            locMapZ[index++] = zImage;          
+            locMapW[index++] = wImage;          
         }
     }
 }
@@ -912,7 +912,7 @@ function drawing(){
     // local reference to the mapping table
     var locMapX = mapX;
     var locMapY = mapY;
-    var locMapZ = mapZ;
+    var locMapW = mapW;
     var locOutputPixels=outputPixels;
     // function for making the color
     var locMakePixelColor=makePixelColor;
@@ -922,7 +922,7 @@ function drawing(){
     var mapSize=mapX.length;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
         //sampleInput(locMapX[mapIndex],locMapY[mapIndex]);
-        locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex],locMapZ[mapIndex]);
+        locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex],locMapW[mapIndex]);
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;
@@ -959,10 +959,10 @@ function imageZero(x,y){
     phi=Math.atan2(y,x);
     xImage=0;
     yImage=0;
-    zImage=0;
+    wImage=0;
 }
 
-// precompute powers (exponents) for r and phi
+// precompute powers (exponents) for r and sine and cosine for phi
 function imagePowers(rPower,phiPower){
     var rk=fExp(rPower*logR);
     rkCosPhi=rk*fCos(phiPower*phi);
@@ -977,8 +977,8 @@ function yImageAdd(a,b){
     yImage+=a*rkCosPhi+b*rkSinPhi;
 }
 
-function zImageAdd(a,b){
-    zImage+=a*rkCosPhi+b*rkSinPhi;
+function wImageAdd(a,b){
+    wImage+=a*rkCosPhi+b*rkSinPhi;
 }
 
 
@@ -992,19 +992,11 @@ function imageAdd(a,b,c,d,rPower,phiPower){
 
 function mapping(x,y){
      imageZero(x,y);
-    imagePowers(2,4);
+    imagePowers(3,6);
     xImageAdd(1,0);
-    zImageAdd(0,1);
-    imagePowers(-2,4);
-    xImageAdd(1,0);
-    zImageAdd(0,-1);
-    /*imagePowers(2,8);
-    yImageAdd(1,0);
-    imagePowers(-2,8);
-    yImageAdd(-1,0);*/
-    imageAdd(0,0,1,0,3,8);
-    imageAdd(0,0,1,0,-3,8);
-
+    yImageAdd(0,1);
+    imagePowers(3,3);
+    wImageAdd(1,0);
 }
 
 
