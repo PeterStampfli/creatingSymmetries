@@ -1,4 +1,3 @@
-
 //===============================================================================
 //===============================================================================
 //
@@ -23,7 +22,8 @@ function imageZero(x,y){
     phi=Math.atan2(y,x);
     xImage=0;
     yImage=0;
-    wImage=0;
+    uImage=0;
+    vImage=0;
 }
 
 // precompute powers (exponents) for r and sine and cosine for phi
@@ -41,26 +41,19 @@ function yImageAdd(a,b){
     yImage+=a*rkCosPhi+b*rkSinPhi;
 }
 
-function wImageAdd(a,b){
-    wImage+=a*rkCosPhi+b*rkSinPhi;
+function uImageAdd(a,b){
+    uImage+=a*rkCosPhi+b*rkSinPhi;
 }
 
-
-function imageAdd(a,b,c,d,rPower,phiPower){
-    var rk=fExp(rPower*logR);
-    var rkCosPhi=rk*fCos(phiPower*phi);
-    var rkSinPhi=rk*fSin(phiPower*phi);
-    xImage+=a*rkCosPhi+b*rkSinPhi;
-    yImage+=c*rkCosPhi+d*rkSinPhi;
+function vImageAdd(a,b){
+    vImage+=a*rkCosPhi+b*rkSinPhi;
 }
 
 function mapping(x,y){
-     imageZero(x,y);
+    imageZero(x,y);
     imagePowers(3,6);
     xImageAdd(1,0);
     yImageAdd(0,1);
     imagePowers(3,3);
-    wImageAdd(1,0);
+    uImageAdd(1,0);
 }
-
-

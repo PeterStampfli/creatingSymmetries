@@ -186,7 +186,8 @@ var outputHeightChooser;
 // the table for the mapping function (same size as output canvas)
 var mapX = [];
 var mapY = [];
-var mapW = [];
+var mapU = [];
+var mapV = [];
 
 //  with dimensions (part of the periodic unit cell)
 var mapWidth=0;
@@ -220,7 +221,8 @@ function updateMapDimensions(){
     mapHeight = outputHeight;
     mapX.length = mapWidth * mapHeight;
     mapY.length = mapWidth * mapHeight;
-    mapW.length = mapWidth * mapHeight;
+    mapU.length = mapWidth * mapHeight;
+    mapV.length = mapWidth * mapHeight;
     makeMapTables();
 }
 
@@ -781,7 +783,8 @@ function pixelInterpolationCubic(x, y, inData) {
 
 var xImage=0;
 var yImage=0;
-var wImage=0;
+var uImage=0;
+var vImage=0;
 
 function makeMapTables() {
     // local variables and references to speed up access
@@ -790,7 +793,8 @@ function makeMapTables() {
     var locMapScale=mapScale;
     var locMapX=mapX;
     var locMapY=mapY;
-    var locMapW=mapW;
+    var locMapU=mapU;
+    var locMapV=mapV;
     //  this mapping function has to be defined depending on the desired image
     var locMapping=mapping;
     // do each pixel and store result of mapping
@@ -805,7 +809,8 @@ function makeMapTables() {
             locMapping(x,y);
             locMapX[index] = xImage;
             locMapY[index] = yImage;          
-            locMapW[index++] = wImage;          
+            locMapU[index] = uImage;          
+            locMapV[index++] = vImage;          
         }
     }
 }
@@ -829,7 +834,7 @@ var inputScaleCos;
 
 // sample input image at transformed coordinates
 // result in pixelRed, pixelGreen, pixelBlue
-function makePixelColor(x,y,w){
+function makePixelColor(x,y,u,v){
     // translation, rotation and scaling
     var newX = inputScaleCos * x - inputScaleSin * y + inputCenterX;
     y = inputScaleSin * x + inputScaleCos * y + inputCenterY;
@@ -838,7 +843,7 @@ function makePixelColor(x,y,w){
     //
     pixelInterpolation(x, y, inputData);
     if (pixelRed>=0){
-        modifyColors(w);
+        modifyColors(u,v);
     }
     else {
         pixelRed=outsideRed;
@@ -879,7 +884,8 @@ function drawing(){
     // local reference to the mapping table
     var locMapX = mapX;
     var locMapY = mapY;
-    var locMapW = mapW;
+    var locMapU = mapU;
+    var locMapV = mapV;
     var locOutputPixels=outputPixels;
     // function for making the color
     var locMakePixelColor=makePixelColor;
@@ -889,7 +895,7 @@ function drawing(){
     var mapSize=mapX.length;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
         //sampleInput(locMapX[mapIndex],locMapY[mapIndex]);
-        locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex],locMapW[mapIndex]);
+        locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex],locMapU[mapIndex],locMapV[mapIndex]);
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;

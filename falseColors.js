@@ -915,6 +915,9 @@ function drawing(){
     var mapIndex=0;
     var mapSize=mapX.length;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
+
+        colorX=mapIndex/mapSize;
+
         //sampleInput(locMapX[mapIndex],locMapY[mapIndex]);
         locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex]);
         outputPixels[outputIndex++]=pixelRed;
@@ -1019,23 +1022,28 @@ function invertColor(){
 }
 
 // rotate color (hue, going from 0 to 6, cyclic)
-function rotateColor(){
 
-  //  pixelRed=255;
-  //  pixelGreen=0;
-  //  pixelBlue=0;
-    
-    var grey=Math.min(pixelRed,pixelGreen,pixelBlue);
-    var intensity;
-    var hue;
+
+var hue,intensity,grey;
+
+// analyze color
+// get grey, intensity and hue from standard rgb
+// hue =0 for red, 2 for green and 4 for blue
+function higFromRgb(){
+    // get and subtract grey 
+    // integer grey between 0 and 255
+    grey=Math.min(pixelRed,pixelGreen,pixelBlue);
     pixelRed-=grey;
     pixelGreen-=grey;
     pixelBlue-=grey;
-    // analyze color part
+    // analyze color part, integer pixels!
+    // integer intensity (of color) between 0 and 255
+    // float hue between 0 and 6
+    // javascript always makes float division
     if ((pixelRed>=pixelGreen)&&(pixelRed>=pixelBlue)){  
         if (pixelRed>0){
             intensity=pixelRed;
-            hue=(pixelGreen>pixelBlue)?pixelGreen/pixelRed:-pixelBlue/pixelRed;
+            hue=(pixelGreen>pixelBlue)?pixelGreen/pixelRed:6-pixelBlue/pixelRed;
         }
         else {
             intensity=0;
@@ -1050,13 +1058,14 @@ function rotateColor(){
         intensity=pixelBlue;
         hue=(pixelRed>pixelGreen)?4+pixelRed/pixelBlue:4-pixelGreen/pixelBlue;
     }
-    //  rotate hue
-    hue+=3*(1-colorX);
-    // compose color part
+}
+
+// compose color
+// standard rgb color from hig, hue goes from 0 to 6
+function rgbFromHig(){
+    hue=hue-6*Math.floor(hue/6);   //reduce to range 0..6
     var intHue=Math.floor(hue);
     hue-=intHue;
-    intHue=intHue%6;
-    if (intHue<0) intHue+=6;
     switch(intHue){
         case 0: 
             pixelRed=intensity;
@@ -1089,14 +1098,110 @@ function rotateColor(){
             pixelBlue=intensity*(1-hue);
             break;
    }
-
-
-
-
     pixelRed+=grey;
     pixelGreen+=grey;
     pixelBlue+=grey;
+}
 
+// compose color
+//  rygb color from hig, hue goes from 0 to 8
+function rygbFromHig(){
+    hue=hue-8*Math.floor(hue/8);   //reduce to range 0..8
+    var intHue=Math.floor(hue);
+    hue-=intHue;
+    intHue=intHue%8;
+    if (intHue<0) {
+        intHue+=8;
+    }
+    switch(intHue){
+        case 0:                          
+            pixelRed=intensity;
+            pixelGreen=intensity*hue*0.5;
+            pixelBlue=0;
+            break;
+        case 1:                          
+            pixelRed=intensity;
+            pixelGreen=intensity*(hue+1)*0.5;
+            pixelBlue=0;
+            break;
+        case 2: 
+            pixelRed=intensity*(2-hue)*0.5;
+            pixelGreen=intensity;
+            pixelBlue=0;
+            break;
+        case 3: 
+            pixelRed=intensity*(1-hue)*0.5;
+            pixelGreen=intensity;
+            pixelBlue=0;
+            break;
+        case 4: 
+            pixelRed=0;
+            pixelGreen=intensity;
+            pixelBlue=intensity*hue;
+            break;
+        case 5: 
+            pixelRed=0;
+            pixelGreen=intensity*(1-hue);
+            pixelBlue=intensity;
+            break;
+        case 6: 
+            pixelRed=intensity*hue;
+            pixelGreen=0;
+            pixelBlue=intensity;
+            break;
+        case 7: 
+            pixelRed=intensity;
+            pixelGreen=0;
+            pixelBlue=intensity*(1-hue);
+            break;
+   }
+    pixelRed+=grey;
+    pixelGreen+=grey;
+    pixelBlue+=grey;
+   
+}
+
+// transform hue without changing colors
+// hue from rgb with range 0...6 to hue of rygb with range 0...8
+function rygbFromRgb(){
+    hue=hue-6*Math.floor(hue/6);   //reduce to range 0..6
+    if (hue>2){
+        hue+=2;
+    }
+    else {
+        hue*=2;
+    }
+}
+
+// increase range of warm colors to give same weight as for cool colors
+//  for rgb hue, 
+function moreYellowForRgb(){
+    hue=hue-6*Math.floor(hue/6);   //reduce to range 0..6
+    if (hue>5.5){
+        hue-=6;
+    }
+    if (hue<2.5){
+        hue=0.33333+0.66666*hue;
+    }
+    else {
+        hue=1.3333*(hue-1);
+    }
+}
+
+
+function rotateColor(){
+
+    higFromRgb();
+    //  rotate hue
+    //hue+=3*(1-colorX);
+    //hue+=7*colorX;
+    // compose color part
+    //hue*=8/6;
+
+    //rygbFromHig();
+    //moreYellowForRgb();
+
+    rgbFromHig();
 
 }
 
@@ -1106,5 +1211,4 @@ function both(){
 }
 
 var changeColors=rotateColor;
-changeColors=inversion;
-changeColors=both;
+

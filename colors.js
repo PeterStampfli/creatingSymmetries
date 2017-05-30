@@ -1,13 +1,13 @@
 // color inversion
 // simplest type of color change, overwrite if you want something better
-function simpleColorInversion(w){
-    if (w<-transWidth){
+function simpleColorInversion(u,v){
+    if (u<-transWidth){
         pixelRed=255-pixelRed;
         pixelGreen=255-pixelGreen;
         pixelBlue=255-pixelBlue;  
     }  
-    else if(w<transWidth){
-        var x=0.5*(1-w/transWidth);
+    else if(u<transWidth){
+        var x=0.5*(1-u/transWidth);
         pixelRed=x*(255-pixelRed)+(1-x)*pixelRed;
         pixelGreen=x*(255-pixelGreen)+(1-x)*pixelGreen;
         pixelBlue=x*(255-pixelBlue)+(1-x)*pixelBlue;
@@ -16,15 +16,15 @@ function simpleColorInversion(w){
 
 // color inversion: subtler method
 
-function improvedColorInversion(w){
+function improvedColorInversion(u,v){
     var pixMaxMin=Math.max(pixelRed,pixelGreen,pixelBlue)+Math.min(pixelRed,pixelGreen,pixelBlue);
-    if (w<-transWidth){
+    if (u<-transWidth){
         pixelRed=pixMaxMin-pixelRed;
         pixelGreen=pixMaxMin-pixelGreen;
         pixelBlue=pixMaxMin-pixelBlue;   
     } 
-        else if(w<transWidth){
-        var x=0.5*(1-w/transWidth);
+        else if(u<transWidth){
+        var x=0.5*(1-u/transWidth);
         pixelRed=x*(pixMaxMin-pixelRed)+(1-x)*pixelRed;
         pixelGreen=x*(pixMaxMin-pixelGreen)+(1-x)*pixelGreen;
         pixelBlue=x*(pixMaxMin-pixelBlue)+(1-x)*pixelBlue;
