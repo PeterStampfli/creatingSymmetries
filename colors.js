@@ -136,3 +136,16 @@ function test4(u,v){
         pixelGreen=255;
     }
 }
+
+function colorModChoice(u,v){
+
+    switch (nColorMod){
+        case 1: test3(u,v);
+            break;
+        case 2: test4(u,v);
+            break;
+    }
+
+}
+
+modifyColors=colorModChoice;

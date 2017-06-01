@@ -286,15 +286,15 @@ function makeInteractions(){
         },false);
     var inversionChoosers=document.getElementsByClassName('inversion');
     inversionChoosers[0].addEventListener('click',function(){
-            modifyColors = doNothing;
+            nColorMod = 0;
             drawing();
         },false);
     inversionChoosers[1].addEventListener('click',function(){
-            modifyColors = simpleColorInversion;
+            nColorMod = 1;
             drawing();
         },false);
     inversionChoosers[2].addEventListener('click',function(){
-            modifyColors = improvedColorInversion;
+            nColorMod = 2;
             drawing();
         },false);
     var downloadImageButton = document.getElementById('downloadImageButton');
@@ -859,12 +859,9 @@ function makePixelColor(x,y,u,v){
     }
 }
 
-function doNothing(w){
-    
-}
 
-// default, no color inversion
-var modifyColors=doNothing;
+// choice of color modification
+var nColorMod=0;
 
 
 function drawing(){
