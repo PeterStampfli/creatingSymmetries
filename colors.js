@@ -1,6 +1,6 @@
 // color inversion
 // simplest type of color change, overwrite if you want something better
-function simpleColorInversion(u,v){
+function simpleColorInversion(colorSector,colorAmplitude){
     if (u<-transWidth){
         pixelRed=255-pixelRed;
         pixelGreen=255-pixelGreen;
@@ -107,8 +107,13 @@ var outsideRed = 40;
 var outsideGreen = 40;
 var outsideBlue = 40;
 
-// width for background color for color inversion
-var transWidth=0.1;
+// width for background color between color sectors
+transWidth=0.1;
+// width of smoothing between background and image
+transSmoothing=0.02;
+
+makeColorSymmetry=make2ColorSymmetry;
+
 
 // modifyColors= ....
 modifyColors=test4;
@@ -137,13 +142,37 @@ function test4(u,v){
     }
 }
 
-function colorModChoice(u,v){
+
+function threeColorRotation(u,v){
+    switch (threeSectors(u,v)){
+        case -1: 
+            pixelRed=outsideRed;
+            pixelGreen=outsideGreen;
+            pixelBlue=outsideBlue;
+            break;
+        case 1:
+            var h=pixelRed;
+            pixelRed=pixelGreen;
+            pixelGreen=pixelBlue;
+            pixelBlue=h;
+            break;
+        case 2:
+            var h=pixelRed;
+            pixelRed=pixelBlue;
+            pixelBlue=pixelGreen;
+            pixelGreen=h;
+            break;
+    };
+}
+
+
+function colorModChoice(colorSector,colorAmplitude){
 
     switch (nColorMod){
-        case 1: test3(u,v);
+        case 1: simpleColorInversion(colorSector,colorAmplitude);
             break;
-        case 2: test4(u,v);
-            break;
+  //      case 2: test4(u,v);
+   //         break;
     }
 
 }

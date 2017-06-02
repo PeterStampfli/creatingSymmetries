@@ -54,7 +54,8 @@ function mapping(x,y){
     imagePowers(3,6);
     xImageAdd(1,0);
     yImageAdd(0,1);
-    imagePowers(1,1);
+    imagePowers(1,3);
     uImageAdd(1,0);
     vImageAdd(0,1);
+    
 }

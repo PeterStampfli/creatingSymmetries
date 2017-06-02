@@ -186,8 +186,11 @@ var outputHeightChooser;
 // the table for the mapping function (same size as output canvas)
 var mapX = [];
 var mapY = [];
-var mapU = [];
-var mapV = [];
+// and the color changing : colorSector and colorAmplitude
+// colorSector is number for interchanges, 0 changes nothing
+// colorAmplitude=0 - outsideColor, colorAmplitude=1 - full image color
+var mapColorSector = [];
+var mapColorAmplitude = [];
 
 //  with dimensions (part of the periodic unit cell)
 var mapWidth=0;
@@ -221,8 +224,8 @@ function updateMapDimensions(){
     mapHeight = outputHeight;
     mapX.length = mapWidth * mapHeight;
     mapY.length = mapWidth * mapHeight;
-    mapU.length = mapWidth * mapHeight;
-    mapV.length = mapWidth * mapHeight;
+    mapColorSector.length = mapWidth * mapHeight;
+    mapColorAmplitude.length = mapWidth * mapHeight;
     makeMapTables();
 }
 
@@ -785,6 +788,38 @@ var xImage=0;
 var yImage=0;
 var uImage=0;
 var vImage=0;
+var colorSector=0;
+var colorAmplitude=0;
+var transWidth;
+var transSmooting;
+
+// the different color symmetries,choose ..
+
+function makeColorAmplitude(d){
+    d=Math.abs(d)-transWidth;
+    if (d>transSmooting){
+        colorAmplitude=1;
+    }
+    else if (d<0){
+        colorAmplitude=0;
+    }
+    else {
+        colorAmplitude=d/transSmooting;
+    }
+}
+
+function make2ColorSymmetry(){
+    if (uImage>0){
+        colorSector=0;
+    }
+    else {
+        colorSector=1;
+    }
+    makeColorAmplitude(uImage);
+}
+
+// default
+var makeColorSymmetry=make2ColorSymmetry;
 
 function makeMapTables() {
     // local variables and references to speed up access
@@ -793,8 +828,8 @@ function makeMapTables() {
     var locMapScale=mapScale;
     var locMapX=mapX;
     var locMapY=mapY;
-    var locMapU=mapU;
-    var locMapV=mapV;
+    var locMapColorSector=mapColorSector;
+    var locMapColorAmplitude=mapColorAmplitude;
     //  this mapping function has to be defined depending on the desired image
     var locMapping=mapping;
     // do each pixel and store result of mapping
@@ -808,9 +843,13 @@ function makeMapTables() {
             x=(i-locMapOffsetI)*locMapScale;
             locMapping(x,y);
             locMapX[index] = xImage;
-            locMapY[index] = yImage;          
-            locMapU[index] = uImage;          
-            locMapV[index++] = vImage;          
+            locMapY[index] = yImage;  
+
+            // get colorSector and colorAmplitude from uImage and vImage
+            makeColorSymmetry();
+
+            locMapColorSector[index] = colorSector;          
+            locMapColorAmplitude[index++] = colorAmplitude;          
         }
     }
 }
@@ -881,8 +920,8 @@ function drawing(){
     // local reference to the mapping table
     var locMapX = mapX;
     var locMapY = mapY;
-    var locMapU = mapU;
-    var locMapV = mapV;
+    var locMapColorSector = mapColorSector;
+    var locMapColorAmplitude = mapColorAmplitude;
     var locOutputPixels=outputPixels;
     // function for making the color
     var locMakePixelColor=makePixelColor;
@@ -892,7 +931,7 @@ function drawing(){
     var mapSize=mapX.length;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
         //sampleInput(locMapX[mapIndex],locMapY[mapIndex]);
-        locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex],locMapU[mapIndex],locMapV[mapIndex]);
+        locMakePixelColor(locMapX[mapIndex],locMapY[mapIndex],locMapColorSector[mapIndex],locMapColorAmplitude[mapIndex]);
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;
