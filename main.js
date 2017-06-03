@@ -1,5 +1,7 @@
 "use strict";
 
+var RT3HALF=Math.sqrt(3)/2;
+
 //=================================================================================================
 // fast approximations of functions
 //=====================================================================================
@@ -97,20 +99,7 @@ function fExp(x){
 // User interaction
 //======================
 
-//  the startup function
-//==============================================================================
 
-var initialOutputSize=512;
-
-window.onload = function () {
-    connectNewInputImage();
-    setupReferenceCanvas();
-    setupOutputCanvas();
-    setupOrientationCanvas(200);
-    makeInteractions();
-    initialOutputDimensions(initialOutputSize, initialOutputSize);
-    drawing();
-};
 
 //  choose and load the input image file
 //=================================================
@@ -790,24 +779,17 @@ var uImage=0;
 var vImage=0;
 var colorSector=0;
 var colorAmplitude=0;
-var transWidth;
-var transSmooting;
+var transWidth=0;
+var transSmoothing=0;
 
 // the different color symmetries,choose ..
 
+// colorAmplitude: d<0 - background, d>1 imagecolor (transformed), 0<d<1 - interpolation
 function makeColorAmplitude(d){
-    d=Math.abs(d)-transWidth;
-    if (d>transSmooting){
-        colorAmplitude=1;
-    }
-    else if (d<0){
-        colorAmplitude=0;
-    }
-    else {
-        colorAmplitude=d/transSmooting;
-    }
+    colorAmplitude=Math.max(0,(Math.abs(d)-transWidth)/transSmoothing);
 }
 
+// two color symmetry, depending only on u
 function make2ColorSymmetry(){
     if (uImage>0){
         colorSector=0;
@@ -816,6 +798,76 @@ function make2ColorSymmetry(){
         colorSector=1;
     }
     makeColorAmplitude(uImage);
+}
+
+// three color symmetry, transitions at angles 0,120 and 240 degrees
+function make3ColorSymmetry(){
+    if (uImage>0){
+        if (vImage>0){
+            colorSector=0;
+            if (uImage>2*(transWidth+transSmoothing)) {
+                makeColorAmplitude(vImage);
+            }
+            else {
+                makeColorAmplitude(Math.min(vImage,RT3HALF*uImage+0.5*vImage));
+            }
+        }
+        else {
+            colorSector=2;
+            if (uImage>2*(transWidth+transSmoothing)) {
+                makeColorAmplitude(-vImage);
+            }
+            else {
+                makeColorAmplitude(Math.min(-vImage,RT3HALF*uImage-0.5*vImage));
+            }        
+        }
+    }
+    else {
+        var d;
+        if (vImage>0){
+            d=RT3HALF*uImage+0.5*vImage;
+            if (d>0){
+                colorSector=0;
+            }
+            else {
+                colorSector=1;
+            }
+        }
+        else {
+            d=RT3HALF*uImage-0.5*vImage;
+            if (d>0){
+                colorSector=2;
+            }
+            else {
+                colorSector=1;
+            }           
+        }
+        makeColorAmplitude(d);
+    }
+}
+
+// 4 color symmetry, transitions near the x- ynd y- axis, whatever is closer
+function make4ColorSymmetry(){
+    if (uImage>0){
+        if (vImage>0){
+            colorSector=0;
+            makeColorAmplitude(Math.min(uImage,vImage));
+        }
+        else {
+            colorSector=1;
+            makeColorAmplitude(Math.min(uImage,-vImage));
+        }
+    }
+    else {
+        if (vImage>0){
+            colorSector=2;
+            makeColorAmplitude(Math.min(-uImage,vImage));
+        }
+        else {
+            colorSector=3;
+            makeColorAmplitude(Math.min(-uImage,-vImage));
+        }
+    }
 }
 
 // default
@@ -852,6 +904,7 @@ function makeMapTables() {
             locMapColorAmplitude[index++] = colorAmplitude;          
         }
     }
+
 }
 
 // The image point coordinates (xImage,yImage) are not directly addresses for the pixels of the input image.
@@ -879,7 +932,8 @@ function makePixelColor(x,y,u,v){
     y = inputScaleSin * x + inputScaleCos * y + inputCenterY;
     x = newX;
     //  get the interpolated input pixel color components, write on output pixels
-    //
+    // if colorAmplitude<0: background color 
+
     pixelInterpolation(x, y, inputData);
     if (pixelRed>=0){
         modifyColors(u,v);
