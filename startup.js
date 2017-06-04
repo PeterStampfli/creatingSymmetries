@@ -11,8 +11,4 @@ window.onload = function () {
     setupOrientationCanvas(200);
     makeInteractions();
     initialOutputDimensions(initialOutputSize, initialOutputSize);
-    drawing();
 };
-
-
-    console.log("start "+transSmoothing);

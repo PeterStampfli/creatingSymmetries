@@ -8,7 +8,7 @@
 //===============================================================================
 
 // initial mapping scale
-//  (x,y) coordinates to pixels
+//  (x,y) plane length unit to pixels
 scaleOutputToInput = 200
 
 //  make the mapping that defines the symmetry
