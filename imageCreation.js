@@ -94,17 +94,17 @@ function make4ColorSymmetry(){
             makeColorAmplitude(Math.min(uImage,vImage));
         }
         else {
-            colorSector=1;
+            colorSector=3;
             makeColorAmplitude(Math.min(uImage,-vImage));
         }
     }
     else {
         if (vImage>0){
-            colorSector=2;
+            colorSector=1;
             makeColorAmplitude(Math.min(-uImage,vImage));
         }
         else {
-            colorSector=3;
+            colorSector=2;
             makeColorAmplitude(Math.min(-uImage,-vImage));
         }
     }
