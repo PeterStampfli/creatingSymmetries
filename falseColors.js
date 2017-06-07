@@ -1114,7 +1114,7 @@ function rygbFromHig(){
         intHue+=8;
     }
     switch(intHue){
-        case 0:                          
+        case 0:                          //                       
             pixelRed=intensity;
             pixelGreen=intensity*hue*0.5;
             pixelBlue=0;

@@ -18,13 +18,17 @@ var rkCosPhi;
 var rkSinPhi;
 
 // initialization
-function imageZero(x,y){
-    logR=0.5*Math.log(y*y+x*x);
-    phi=Math.atan2(y,x);
+function imageZero(){
     xImage=0;
     yImage=0;
     uImage=0;
     vImage=0;
+}
+
+// multiple calls for smoothing ???
+function rAndPhi(x,y){
+    logR=0.5*Math.log(y*y+x*x);
+    phi=Math.atan2(y,x);
 }
 
 // precompute powers (exponents) for r and sine and cosine for phi
@@ -51,12 +55,16 @@ function vImageAdd(a,b){
 }
 
 function mapping(x,y){
-    imageZero(x,y);
-    imagePowers(3,6);
+    imageZero();
+    rAndPhi(x,y);
+    imagePowers(2,6);
     xImageAdd(1,0);
     yImageAdd(0,1);
     imagePowers(1,2);
     uImageAdd(1,0);
     vImageAdd(0,1);
-    
+    imagePowers(2,-4);
+  //  uImageAdd(0,-3);
+  //  vImageAdd(3,0);
+
 }
