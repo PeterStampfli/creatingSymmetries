@@ -247,12 +247,27 @@ modifyColors=modify3ColorSymmetry;
 makeColorSymmetry=make3ColorSymmetry;
 
 
+//  modification of colors for 2-color symmetry
+function test2ColorSymmetry(colorSector){
+    pixelRed=255;
+    pixelGreen=0;
+    pixelBlue=0;
+    if (colorSector==1){
+        simpleColorInversion(1);
+    }
+}
+
+
+modifyColors=modify2ColorSymmetry;
+
+makeColorSymmetry=make2ColorSymmetry;
+
 // the replacement background color for outside pixels
 var outsideRed = 40;
 var outsideGreen = 40;
 var outsideBlue = 40;
 
 // width for background color between color sectors
-transWidth=0.03;
+transWidth=0.003;
 // width of smoothing between background and image
-transSmoothing=0.005;
+transSmoothing=0.0005;

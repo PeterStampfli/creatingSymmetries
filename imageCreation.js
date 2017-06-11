@@ -24,7 +24,7 @@ var transSmoothing=0;
 
 // the different color symmetries,choose ..
 
-// colorAmplitude: d<0 - background, d>1 imagecolor (transformed), 0<d<1 - interpolation
+// colorAmplitude: d<0 - background, d>1 imagecolor (transformed), 0<d<1 - interpolation between background color and pixel color
 function makeColorAmplitude(d){
     colorAmplitude=Math.max(0,(Math.abs(d)-transWidth)/transSmoothing);
 }
