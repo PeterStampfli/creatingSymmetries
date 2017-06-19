@@ -34,7 +34,7 @@ function pixelInterpolationNearest(x, y, inData) {
     var h = Math.round(x);
     var k = Math.round(y);
     if ((h<1)||(h+2>=inWidth)||(k<1)||(k+2>=inHeight)){
-    	pixelRed = -1;
+    	pixelRed = -10000;
         return;
     }
     var inIndex = 4 * (inWidth * k + h);
@@ -54,7 +54,7 @@ function pixelInterpolationLinear(x, y, inData) {
     var k = Math.floor(y);
      //  catch the case that the point is outside, we use there a solid color
     if ((h<1)||(h+2>=inWidth)||(k<1)||(k+2>=inHeight)){
-    	pixelRed = -1;
+    	pixelRed = -10000;
         return;
     }
     var dx = x - h;
@@ -94,7 +94,7 @@ function pixelInterpolationCubic(x, y, inData) {
     var h = Math.floor(x);
     var k = Math.floor(y);
     if ((h<1)||(h+2>=inWidth)||(k<1)||(k+2>=inHeight)){
-    	pixelRed = -1;
+    	pixelRed = -10000;
         return;
     }
     var dx = x - h;

@@ -88,10 +88,6 @@ function oddUnitvectors(p){
     }
 }
 
-var p=5;
-oddUnitvectors(p);
- console.log(ex);
-        console.log(ey);
 
 function xTimesUnitvectors(x,y){
 
@@ -119,8 +115,8 @@ function sumSines(k){
     return sum;
 }
 
-/*
-function sumCosines(k1,k2){
+
+function sumCosines2(k1,k2){
     var sum=fCos(k1*xTimesE[p-1]+k2*xTimesE[0]);
      for (var i=1;i<p;i++){
         sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
@@ -128,14 +124,14 @@ function sumCosines(k1,k2){
     return sum;
 }
 
-function sumSines(k1,k2){
+function sumSines2(k1,k2){
     var sum=fSin(k1*xTimesE[p-1]+k2*xTimesE[0]);
      for (var i=1;i<p;i++){
         sum+=fSin(k1*xTimesE[i-1]+k2*xTimesE[i]);
     }
     return sum;
 }
-*/
+
 function prodCosines(k){
     var prod=1;
     for (var i=0;i<p;i++){
@@ -147,11 +143,15 @@ function prodCosines(k){
 function quasiperiodicMapping(x,y){
     xTimesUnitvectors(x,y);
     imageZero();
-    xImage+=sumCosines(2);
-    yImage+=sumSines(2);
-    uImage=prodCosines(1);
+    xImage+=sumCosines(1);
+    yImage+=sumSines2(1,1);
+   // uImage=prodCosines(1);
 
 }
+
+var p=3;
+oddUnitvectors(p);
+
 
 //=====================================
 var mapping=quasiperiodicMapping;

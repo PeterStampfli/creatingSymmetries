@@ -144,6 +144,7 @@ function makeMapTables() {
     }
 }
 
+
 // The image point coordinates (xImage,yImage) are not directly addresses for the pixels of the input image.
 
 // For each output pixel we look up (xImage,yImage).
@@ -157,9 +158,26 @@ function makeMapTables() {
 // choice of color modification, default simple color symmetry
 var nColorMod=0;
 var modifyColors;
+var inputScaleCos,inputScaleSin,inputCenterX,inputCenterY;
+
+function doOnePixel(xMap,yMap){
+    var x = inputScaleCos * xMap - inputScaleSin * yMap + inputCenterX;
+    var y = inputScaleSin * xMap + inputScaleCos * yMap + inputCenterY;
+    //  get the interpolated input pixel color components, write on output pixels
+    // if colorAmplitude<0: background color 
+    pixelInterpolation(x, y, inputData);
+
+    // mark the reference image pixel, make it fully opaque
+    x = Math.round(scaleInputToReference * x);
+    y = Math.round(scaleInputToReference * y);
+    // but check if we are on the reference canvas
+    if ((x >= 0) && (x < referenceWidth) && (y >= 0) && (y < referenceHeight)) {
+        referencePixels[4 * (referenceWidth * y + x) + 3] = 255;
+    }
+}
 
 
-function drawing(){
+function basicDrawing(){
 	if (!inputLoaded){	
 		return;
 	}
@@ -167,11 +185,11 @@ function drawing(){
 	setAlphaReferenceImagePixels(128);
 	// make the symmetries on the output image
     // setting up the parameters for the transformation of the image coordinates
-    var inputCenterX = referenceCenterX / scaleInputToReference;
-    var inputCenterY = referenceCenterY / scaleInputToReference;
+    inputCenterX = referenceCenterX / scaleInputToReference;
+    inputCenterY = referenceCenterY / scaleInputToReference;
     //  scaling and rotation: transformation matrix elements
-    var inputScaleCos = scaleOutputToInput * cosAngle;
-    var inputScaleSin = scaleOutputToInput * sinAngle;
+    inputScaleCos = scaleOutputToInput * cosAngle;
+    inputScaleSin = scaleOutputToInput * sinAngle;
     // make local references to speed up things
     // local reference to the mapping table
     var locMapX = mapX;
@@ -187,16 +205,10 @@ function drawing(){
     var colorAmplitude;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
         // translation, rotation and scaling
-        xMap=locMapX[mapIndex];
-        yMap=locMapY[mapIndex];
-        x = inputScaleCos * xMap - inputScaleSin * yMap + inputCenterX;
-        y = inputScaleSin * xMap + inputScaleCos * yMap + inputCenterY;
-        //  get the interpolated input pixel color components, write on output pixels
-        // if colorAmplitude<0: background color 
-        pixelInterpolation(x, y, inputData);
+        doOnePixel(locMapX[mapIndex],locMapY[mapIndex]);
         // modify color if not outside input image
         if (pixelRed>=0){
-            modifyColors(locMapColorSector[mapIndex]);
+            modifyColors(mapColorSector[mapIndex]);
             colorAmplitude=locMapColorAmplitude[mapIndex];
             if ((nColorMod>0)&&(colorAmplitude<1)){
                 pixelRed=(1-colorAmplitude)*outsideRed+colorAmplitude*pixelRed;
@@ -209,13 +221,6 @@ function drawing(){
             pixelGreen=outsideGreen;
             pixelBlue=outsideBlue;
         }
-        // mark the reference image pixel, make it fully opaque
-        x = Math.round(scaleInputToReference * x);
-        y = Math.round(scaleInputToReference * y);
-        // but check if we are on the reference canvas
-        if ((x >= 0) && (x < referenceWidth) && (y >= 0) && (y < referenceHeight)) {
-            referencePixels[4 * (referenceWidth * y + x) + 3] = 255;
-        }
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;
@@ -226,3 +231,118 @@ function drawing(){
 	// put the reference image
     referenceImage.putImageData(referenceData, 0, 0);
 }
+
+
+function smoothedDrawing(){
+    if (!inputLoaded){  
+        return;
+    }
+    // make the reference image semitransparent
+    setAlphaReferenceImagePixels(128);
+    // make the symmetries on the output image
+    // setting up the parameters for the transformation of the image coordinates
+    inputCenterX = referenceCenterX / scaleInputToReference;
+    inputCenterY = referenceCenterY / scaleInputToReference;
+    //  scaling and rotation: transformation matrix elements
+    inputScaleCos = scaleOutputToInput * cosAngle;
+    inputScaleSin = scaleOutputToInput * sinAngle;
+    // make local references to speed up things
+    // local reference to the mapping table
+    var locMapX = mapX;
+    var locMapY = mapY;
+    var locMapColorSector = mapColorSector;
+    var locMapColorAmplitude = mapColorAmplitude;
+    var locOutputPixels=outputPixels;
+    // get the colors for each output pixel
+    var outputIndex=0;
+    var mapIndex=0;
+    var mapSize=mapX.length;
+    var xMap,yMap,x,y;
+    var colorAmplitude;
+ 
+
+    var i,j;
+    var x=0;
+    var y=0;
+    var index=0;
+    var pixSumRed,pixSumGreen,pixSumBlue;
+    var mapIndexPlusX,mapIndexPlusY,mapIndexPlusXY;
+    for (j=0;j<mapHeight;j++){
+        for (i=0;i<mapWidth;i++){
+            mapIndexPlusX=mapIndex;
+            mapIndexPlusY=mapIndex;
+            mapIndexPlusXY=mapIndex;
+            if (i<mapWidth-1){
+                mapIndexPlusX++;
+                mapIndexPlusXY++;
+            }    
+            if (j<mapHeight-1){
+                mapIndexPlusY+=mapWidth;
+                mapIndexPlusXY+=mapWidth;
+            }
+            
+            // translation, rotation and scaling
+            doOnePixel(locMapX[mapIndex],locMapY[mapIndex]);
+            pixSumRed=pixelRed;
+            pixSumGreen=pixelGreen;
+            pixSumBlue=pixelBlue;
+
+            doOnePixel(0.5*(locMapX[mapIndex]+locMapX[mapIndexPlusX]),
+                        0.5*(locMapY[mapIndex]+locMapY[mapIndexPlusX]));
+
+            pixSumRed+=pixelRed;
+            pixSumGreen+=pixelGreen;
+            pixSumBlue+=pixelBlue;
+
+
+            doOnePixel(0.5*(locMapX[mapIndex]+locMapX[mapIndexPlusY]),
+                        0.5*(locMapY[mapIndex]+locMapY[mapIndexPlusY]));
+
+
+            pixSumRed+=pixelRed;
+            pixSumGreen+=pixelGreen;
+            pixSumBlue+=pixelBlue;
+
+
+            doOnePixel(0.5*(locMapX[mapIndex]+locMapX[mapIndexPlusXY]),
+                        0.5*(locMapY[mapIndex]+locMapY[mapIndexPlusXY]));
+
+
+            pixSumRed+=pixelRed;
+            pixSumGreen+=pixelGreen;
+            pixSumBlue+=pixelBlue;
+
+
+            pixelRed=Math.round(0.25*pixSumRed);
+            pixelGreen=Math.round(0.25*pixSumGreen);
+            pixelBlue=Math.round(0.25*pixSumBlue);
+            // modify color if not outside input image
+            if (pixelRed>=0){
+                modifyColors(mapColorSector[mapIndex]);
+                colorAmplitude=locMapColorAmplitude[mapIndex];
+                if ((nColorMod>0)&&(colorAmplitude<1)){
+                    pixelRed=(1-colorAmplitude)*outsideRed+colorAmplitude*pixelRed;
+                    pixelGreen=(1-colorAmplitude)*outsideGreen+colorAmplitude*pixelGreen;
+                    pixelBlue=(1-colorAmplitude)*outsideBlue+colorAmplitude*pixelBlue;
+                }
+            }
+            else {
+                pixelRed=outsideRed;
+                pixelGreen=outsideGreen;
+                pixelBlue=outsideBlue;
+            }
+            outputPixels[outputIndex++]=pixelRed;
+            outputPixels[outputIndex++]=pixelGreen;
+            outputPixels[outputIndex]=pixelBlue;
+            outputIndex += 2;
+            mapIndex++;
+        }
+    }
+    // put the image on the output canvas
+    outputImage.putImageData(outputData,0, 0);
+    // put the reference image
+    referenceImage.putImageData(referenceData, 0, 0);
+}
+
+var drawing=basicDrawing;
+

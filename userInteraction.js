@@ -168,6 +168,17 @@ function makeInteractions(){
             updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
             drawing();
         },false);
+    var smoothingChoosers=document.getElementsByClassName('smoothing');
+   smoothingChoosers[0].addEventListener('click',function(){
+            drawing=basicDrawing;
+            drawing();
+        },false);
+   smoothingChoosers[1].addEventListener('click',function(){
+            drawing=smoothedDrawing;
+            drawing();
+        },false);
+
+
     var interpolationChoosers=document.getElementsByClassName('interpolation');
     interpolationChoosers[0].addEventListener('click',function(){
             pixelInterpolation = pixelInterpolationNearest;
