@@ -151,6 +151,10 @@ function updateOutputDimensions(newWidth,newHeight) {
     }
 }
 
+var progressDiv;
+var interpolation="nearest";
+var colorMod="none";
+
 // make up interactions with html elements: adds event listeners
 function makeInteractions(){
     var imageInputButton = document.getElementById('imageInput')
@@ -182,29 +186,37 @@ function makeInteractions(){
     var interpolationChoosers=document.getElementsByClassName('interpolation');
     interpolationChoosers[0].addEventListener('click',function(){
             pixelInterpolation = pixelInterpolationNearest;
+            interpolation="nearest";
             drawing();
         },false);
     interpolationChoosers[1].addEventListener('click',function(){
             pixelInterpolation = pixelInterpolationLinear;
+            interpolation="linear";
             drawing();
         },false);
     interpolationChoosers[2].addEventListener('click',function(){
             pixelInterpolation = pixelInterpolationCubic;
+            interpolation="cubic";
             drawing();
         },false);
     var inversionChoosers=document.getElementsByClassName('inversion');
     inversionChoosers[0].addEventListener('click',function(){
             nColorMod = 0;
+            colorMod="none";
             drawing();
         },false);
     inversionChoosers[1].addEventListener('click',function(){
             nColorMod = 1;
+            colorMod="first";
             drawing();
         },false);
     inversionChoosers[2].addEventListener('click',function(){
             nColorMod = 2;
+            colorMod="second";
             drawing();
         },false);
+    progressDiv=document.getElementById("progress");
+
     var downloadImageButton = document.getElementById('downloadImageButton');
     //  for image downloading, using jpeg image format, default quality=0.92
     downloadImageButton.addEventListener('click', function () {

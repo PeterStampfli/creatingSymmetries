@@ -144,12 +144,12 @@ function quasiperiodicMapping(x,y){
     xTimesUnitvectors(x,y);
     imageZero();
     xImage+=sumCosines(1);
-    yImage+=sumSines2(1,1);
+    yImage+=sumCosines2(1,1);
    // uImage=prodCosines(1);
 
 }
 
-var p=3;
+var p=5;
 oddUnitvectors(p);
 
 
