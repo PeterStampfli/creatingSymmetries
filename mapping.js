@@ -77,14 +77,23 @@ var ex=[];
 var ey=[];
 var xTimesE=[];
 
-function oddUnitvectors(p){
+function unitvectors(p){
     ex.length=p;
     ey.length=p;
     xTimesE.length=p;
-    var q=Math.floor(p/2);
-    for (var i=0;i<p;i++){
-        ex[i]=fCos(2*Math.PI*(i-q)/p);
-        ey[i]=fSin(2*Math.PI*(i-q)/p);
+    if (p&1==1){
+        var q=(p-1)/2;
+        for (var i=0;i<p;i++){
+            ex[i]=fCos(2*Math.PI*(i-q)/p);
+            ey[i]=fSin(2*Math.PI*(i-q)/p);
+        }
+    }
+    else {
+        var q=p/2;
+        for (var i=0;i<p;i++){
+            ex[i]=fCos(Math.PI*(i-q+0.5)/p);
+            ey[i]=fSin(Math.PI*(i-q+0.5)/p);
+        }
     }
 }
 
@@ -116,7 +125,7 @@ function sumSines(k){
 }
 
 
-function sumCosines2(k1,k2){
+function sumCosines2Odd(k1,k2){
     var sum=fCos(k1*xTimesE[p-1]+k2*xTimesE[0]);
      for (var i=1;i<p;i++){
         sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
@@ -124,7 +133,15 @@ function sumCosines2(k1,k2){
     return sum;
 }
 
-function sumSines2(k1,k2){
+function sumCosines2Even(k1,k2){
+    var sum=fCos(-k1*xTimesE[p-1]+k2*xTimesE[0]);
+     for (var i=1;i<p;i++){
+        sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
+    }
+    return sum;
+}
+
+function sumSines2Odd(k1,k2){
     var sum=fSin(k1*xTimesE[p-1]+k2*xTimesE[0]);
      for (var i=1;i<p;i++){
         sum+=fSin(k1*xTimesE[i-1]+k2*xTimesE[i]);
@@ -144,15 +161,15 @@ function quasiperiodicMapping(x,y){
     xTimesUnitvectors(x,y);
     imageZero();
     xImage+=sumCosines(1);
-    yImage+=sumCosines2(1,1);
+    yImage+=sumCosines2Even(1,-1);
    // uImage=prodCosines(1);
 
 }
 
-var p=5;
-oddUnitvectors(p);
+var p=4;
+unitvectors(p);
 
 
 //=====================================
 var mapping=quasiperiodicMapping;
-scaleOutputToInput = 200
+scaleOutputToInput = 100
