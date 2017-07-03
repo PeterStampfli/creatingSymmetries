@@ -125,6 +125,7 @@ function makeMapTables() {
     //  this mapping function has to be defined depending on the desired image
     var locMapping=mapping;
     // do each pixel and store result of mapping
+    startMapping();
     var i,j;
     var x=0;
     var y=0;

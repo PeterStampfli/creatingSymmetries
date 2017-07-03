@@ -131,7 +131,7 @@ function initialOutputDimensions(width,height){
     setOutputDimensions(width, height);
     mapOffsetI=width/2;
     mapOffsetJ=height/2;
-    mapScale=4.0/Math.sqrt(width*width+height*height);
+    mapScale=20.0/Math.sqrt(width*width+height*height);
     updateMapDimensions();
 }
 

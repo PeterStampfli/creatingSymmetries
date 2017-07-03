@@ -218,9 +218,6 @@ function modify2ColorSymmetry(colorSector){
 
 //  modification of colors for 3-color symmetry
 function modify3ColorSymmetry(colorSector){
-     //pixelRed=255;
-    //pixelGreen=0;
-    //pixelBlue=0;
   switch (nColorMod){
         case 1: threeColorRotation(colorSector);
             break;
@@ -242,11 +239,6 @@ function modify4ColorSymmetry(colorSector){
     }
 }
 
-modifyColors=modify3ColorSymmetry;
-
-makeColorSymmetry=make3ColorSymmetry;
-
-
 //  modification of colors for 2-color symmetry
 function test2ColorSymmetry(colorSector){
     pixelRed=255;
@@ -257,10 +249,21 @@ function test2ColorSymmetry(colorSector){
     }
 }
 
+if (nColors==2){
+    modifyColors=modify2ColorSymmetry;
+    makeColorSymmetry=make2ColorSymmetry;
+}
 
-modifyColors=modify2ColorSymmetry;
+if (nColors==3){
+    modifyColors=modify3ColorSymmetry;
+    makeColorSymmetry=make3ColorSymmetry;
+}
 
-makeColorSymmetry=make2ColorSymmetry;
+if (nColors==4){
+    modifyColors=modify4ColorSymmetry;
+    makeColorSymmetry=make4ColorSymmetry;
+}
+
 
 // the replacement background color for outside pixels
 var outsideRed = 40;
@@ -268,6 +271,6 @@ var outsideGreen = 40;
 var outsideBlue = 40;
 
 // width for background color between color sectors
-transWidth=0.003;
+transWidth=0.0001;
 // width of smoothing between background and image
-transSmoothing=0.0005;
+transSmoothing=0.00002;
