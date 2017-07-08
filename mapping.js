@@ -76,12 +76,14 @@ function rosetteMapping(x,y){
 var ex=[];
 var ey=[];
 var xTimesE=[];
+var wavevector=[];
 
 // unit vectors for odd number of rotational symmetry (odd p)
 function unitvectorsOdd(p){
     ex.length=p;
     ey.length=p;
     xTimesE.length=p;
+    wavevector.length=p;
     var q=(p-1)/2;
     for (var i=0;i<p;i++){
         ex[i]=fCos(2*Math.PI*(i-q)/p);
@@ -94,11 +96,48 @@ function unitvectorsEven(p){
     ex.length=p;
     ey.length=p;
     xTimesE.length=p;
+    wavevector.length=p;
     var q=p/2;
     for (var i=0;i<p;i++){
         ex[i]=fCos(Math.PI*(i-q+0.5)/p);
         ey[i]=fSin(Math.PI*(i-q+0.5)/p);
     }
+}
+
+//  rotate the wavevector
+
+// set the wavevector: setWaveVector(kArray);
+
+function setWavevector(kValues){
+    var i;
+    var limit=Math.min(kValues.length,wavevector.length);
+    for (i=0;i<limit;i++) {
+        wavevector[i]=kValues[i];
+    } 
+    for (i=kValues.length;i<wavevector.length;i++){
+        wavevector[i]=0;
+    }
+}
+
+// for odd dimensional space: straight rotation
+
+function shiftWavevectorDown(){
+    for (var i = 1; i < p; i++) {
+        wavevector[i-1]=wavevector[i];
+    }
+}
+
+function rotateWavevectorOdd(){
+    var h=wavevector[0];
+    shiftWavevectorDown();
+    wavevector[p-1]=h;
+}
+
+// for even dimensional space (or even rotational symmetry from odd dimensional space): rotation with change of sign
+function rotateWavevectorEven(){
+    var h=wavevector[0];
+    shiftWavevectorDown();
+    wavevector[p-1]=-h;
 }
 
 // calculate scalar products between x and unit vectors
@@ -127,11 +166,34 @@ function normalizeUV(){
     vImage*=norm;
 }
 
+
+// wavepakets
+
+// sum of the argument for a single wave
+function sumKTimesXTimesE(){
+    var kTimesXTimesE=0;
+    for (var j = 0; j < p; j++) {
+        kTimesXTimesE+=wavevector[j]*xTimesE[j];
+    }
+    return kTimesXTimesE;
+}
+
+//making the pakets
+function sumCosinesWavevectorOdd(args){
+    setWavevector(arguments);
+    var sum=0;
+    for (var i=0;i<p;i++){
+        sum+=fCos(sumKTimesXTimesE());
+        rotateWavevectorOdd();
+    }
+    return sum;
+}
+
 // single wavevectors, sine or cosine
 
 function sumCosines(k){
     var sum=0;
-     for (var i=0;i<p;i++){
+    for (var i=0;i<p;i++){
         sum+=fCos(k*xTimesE[i]);
     }
     return sum;
@@ -212,7 +274,7 @@ function sumPhasedSines(k){
 
 // prepare things that are same for each point
 function startMapping(){
-    p=9;
+    p=3;
     sinCosPhases();
     unitvectorsOdd(p);
 }
@@ -221,7 +283,7 @@ function startMapping(){
 function quasiperiodicMapping(x,y){
     xTimesUnitvectors(x,y);
     imageZero();
-    xImage+=sumCosines(1);
+    xImage+=sumCosinesWavevectorOdd(1,3);
     yImage+=sumSines(1);
     uImage=sumPhasedCosines(1);
     vImage=sumPhasedSines(1);

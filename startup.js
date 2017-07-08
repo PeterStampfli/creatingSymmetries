@@ -11,4 +11,7 @@ window.onload = function () {
     setupOrientationCanvas(200);
     makeInteractions();
     initialOutputDimensions(initialOutputSize, initialOutputSize);
+
+
+
 };
