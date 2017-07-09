@@ -170,7 +170,7 @@ function normalizeUV(){
 // wavepakets
 
 // sum of the argument for a single wave
-function sumKTimesXTimesE(){
+function sumKtimesXE(){
     var kTimesXTimesE=0;
     for (var j = 0; j < p; j++) {
         kTimesXTimesE+=wavevector[j]*xTimesE[j];
@@ -183,13 +183,33 @@ function sumCosinesWavevectorOdd(args){
     setWavevector(arguments);
     var sum=0;
     for (var i=0;i<p;i++){
-        sum+=fCos(sumKTimesXTimesE());
+        sum+=fCos(sumKtimesXE());
         rotateWavevectorOdd();
     }
     return sum;
 }
 
-// single wavevectors, sine or cosine
+function sumSinesWavevectorOdd(args){
+    setWavevector(arguments);
+    var sum=0;
+    for (var i=0;i<p;i++){
+        sum+=fSin(sumKtimesXE());
+        rotateWavevectorOdd();
+    }
+    return sum;
+}
+
+function sumCosinesWavevectorEven(args){
+    setWavevector(arguments);
+    var sum=0;
+    for (var i=0;i<p;i++){
+        sum+=fCos(sumKtimesXE());
+        rotateWavevectorEven();
+    }
+    return sum;
+}
+
+// single wavevector components, sine or cosine
 
 function sumCosines(k){
     var sum=0;
@@ -242,13 +262,7 @@ function sumSines2Odd(k1,k2){
     return sum;
 }
 
-function prodCosines(k){
-    var prod=1;
-    for (var i=0;i<p;i++){
-        prod*=fCos(k*xTimesE[i]);
-    }
-    return prod;
-}
+
 
 function sumPhasedCosines(k){
     var sum=0;
@@ -276,15 +290,15 @@ function sumPhasedSines(k){
 function startMapping(){
     p=3;
     sinCosPhases();
-    unitvectorsOdd(p);
+    unitvectorsEven(p);
 }
 
 // depends on each point
 function quasiperiodicMapping(x,y){
     xTimesUnitvectors(x,y);
     imageZero();
-    xImage+=sumCosinesWavevectorOdd(1,3);
-    yImage+=sumSines(1);
+    xImage+=sumCosinesWavevectorEven(1,3);
+    yImage+=sumCosinesWavevectorEven(1,-1);
     uImage=sumPhasedCosines(1);
     vImage=sumPhasedSines(1);
     //normalizeUV();
