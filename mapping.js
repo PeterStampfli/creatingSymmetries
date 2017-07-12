@@ -178,136 +178,74 @@ function sumKtimesXE(){
     return kTimesXTimesE;
 }
 
+
 //making the pakets
-function sumCosinesWavevectorOdd(args){
+
+var sumSines;
+var sumCosines;
+var sumColorSines;
+var sumColorCosines;
+
+function sumWavevectorOdd(kValues){
     setWavevector(arguments);
-    var sum=0;
-    for (var i=0;i<p;i++){
-        sum+=fCos(sumKtimesXE());
-        rotateWavevectorOdd();
-    }
-    return sum;
-}
-
-function sumSinesWavevectorOdd(args){
-    setWavevector(arguments);
-    var sum=0;
-    for (var i=0;i<p;i++){
-        sum+=fSin(sumKtimesXE());
-        rotateWavevectorOdd();
-    }
-    return sum;
-}
-
-function sumCosinesWavevectorEven(args){
-    setWavevector(arguments);
-    var sum=0;
-    for (var i=0;i<p;i++){
-        sum+=fCos(sumKtimesXE());
-        rotateWavevectorEven();
-    }
-    return sum;
-}
-
-// single wavevector components, sine or cosine
-
-function sumCosines(k){
-    var sum=0;
-    for (var i=0;i<p;i++){
-        sum+=fCos(k*xTimesE[i]);
-    }
-    return sum;
-}
-
-function sumAlternatingCosines(k){
-    var sum=0;
-    var factor=1;
-     for (var i=0;i<p;i++){
-        sum+=factor*fCos(k*xTimesE[i]);
-        factor=-factor;
-    }
-    return sum;
-}
-
-function sumSines(k){
-    var sum=0;
-     for (var i=0;i<p;i++){
-        sum+=fSin(k*xTimesE[i]);
-    }
-    return sum;
-}
-
-
-function sumCosines2Odd(k1,k2){
-    var sum=fCos(k1*xTimesE[p-1]+k2*xTimesE[0]);
-     for (var i=1;i<p;i++){
-        sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
-    }
-    return sum;
-}
-
-function sumCosines2Even(k1,k2){
-    var sum=fCos(-k1*xTimesE[p-1]+k2*xTimesE[0]);
-     for (var i=1;i<p;i++){
-        sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
-    }
-    return sum;
-}
-
-function sumSines2Odd(k1,k2){
-    var sum=fSin(k1*xTimesE[p-1]+k2*xTimesE[0]);
-     for (var i=1;i<p;i++){
-        sum+=fSin(k1*xTimesE[i-1]+k2*xTimesE[i]);
-    }
-    return sum;
-}
-
-
-
-function sumPhasedCosines(k){
-    var sum=0;
     var deltaPhase=2*Math.PI/nColors;
     var phase=0;
+    var sumKXE=0;
+    sumSines=0;
+    sumCosines=0;
+    sumColorSines=0;
+    sumColorCosines=0;
     for (var i=0;i<p;i++){
-        sum+=fCos(phase+k*xTimesE[i]);
+        sumKXE=sumKtimesXE();
+        sumCosines+=fCos(sumKXE);
+        sumSines+=fSin(sumKXE);
+        sumColorCosines+=fCos(phase+sumKXE);
+        sumColorSines+=fSin(phase+sumKXE);
+        rotateWavevectorOdd();
         phase+=deltaPhase;
     }
-    return sum;    
 }
 
-function sumPhasedSines(k){
-    var sum=0;
-    var deltaPhase=2*Math.PI/nColors;
-    var phase=0;
-    for (var i=0;i<p;i++){
-        sum+=fSin(phase+k*xTimesE[i]);
-        phase+=deltaPhase;
-    }
-    return sum;    
+function xImageAdd(a,b){
+    xImage+=a*sumSines+b*sumCosines;
 }
+
+function yImageAdd(a,b){
+    yImage+=a*sumSines+b*sumCosines;
+}
+
+function wImageAddOdd(a,b){
+    uImage+=a*sumColorCosines-b*sumColorSines;
+    vImage+=b*sumColorCosines+a*sumColorSines;
+}
+
+
 
 // prepare things that are same for each point
 function startMapping(){
     p=3;
+    nColors=3;
+    chooseColorSymmetry();
     sinCosPhases();
-    unitvectorsEven(p);
+    unitvectorsOdd(p);
 }
 
 // depends on each point
 function quasiperiodicMapping(x,y){
     xTimesUnitvectors(x,y);
     imageZero();
-    xImage+=sumCosinesWavevectorEven(1,3);
-    yImage+=sumCosinesWavevectorEven(1,-1);
-    uImage=sumPhasedCosines(1);
-    vImage=sumPhasedSines(1);
+    sumWavevectorOdd(1);
+    
+    xImageAdd(1,0);
+    yImageAdd(0,1);
+    wImageAddOdd(1,0);
     //normalizeUV();
  //  uImage=sumAlternatingCosines(1);
 
 }
 
 var p;
-var nColors=3;
+var nColors;
 
 
 //=====================================

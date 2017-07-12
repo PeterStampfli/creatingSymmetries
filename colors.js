@@ -249,21 +249,22 @@ function test2ColorSymmetry(colorSector){
     }
 }
 
-if (nColors==2){
-    modifyColors=modify2ColorSymmetry;
-    makeColorSymmetry=make2ColorSymmetry;
-}
+function chooseColorSymmetry(){
+    if (nColors==2){
+        modifyColors=modify2ColorSymmetry;
+        makeColorSymmetry=make2ColorSymmetry;
+    }
 
-if (nColors==3){
-    modifyColors=modify3ColorSymmetry;
-    makeColorSymmetry=make3ColorSymmetry;
-}
+    if (nColors==3){
+        modifyColors=modify3ColorSymmetry;
+        makeColorSymmetry=make3ColorSymmetry;
+    }
 
-if (nColors==4){
-    modifyColors=modify4ColorSymmetry;
-    makeColorSymmetry=make4ColorSymmetry;
+    if (nColors==4){
+        modifyColors=modify4ColorSymmetry;
+        makeColorSymmetry=make4ColorSymmetry;
+    }
 }
-
 
 // the replacement background color for outside pixels
 var outsideRed = 40;
