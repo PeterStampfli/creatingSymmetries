@@ -206,6 +206,8 @@ function sumWavevectorOdd(kValues){
     }
 }
 
+// for image symmetry mapping
+
 function xImageAdd(a,b){
     xImage+=a*sumSines+b*sumCosines;
 }
@@ -214,9 +216,16 @@ function yImageAdd(a,b){
     yImage+=a*sumSines+b*sumCosines;
 }
 
+// for color symmetry mapping
+// rotational color symmetry
 function wImageAddOdd(a,b){
     uImage+=a*sumColorCosines-b*sumColorSines;
     vImage+=b*sumColorCosines+a*sumColorSines;
+}
+
+//  for mirror symmetry
+function uImageAdd(a,b){
+    uImage+=a*sumSines+b*sumCosines;
 }
 
 
