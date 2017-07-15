@@ -150,8 +150,10 @@ function xTimesUnitvectors(x,y){
 // for color symmetry: sines and cosines of phases
 var cos2PiHDivN=[];
 var sin2PiHDivN=[];
+var p2DivNOdd;
 
 function sinCosPhases(){
+    p2DivNOdd=(2*p/nColors)%2==1;
     cos2PiHDivN.length=p;
     sin2PiHDivN.length=p;
     for (var h=0;h<p;h++){
@@ -183,8 +185,9 @@ function sumKtimesXE(){
 
 var sumSines;
 var sumCosines;
-var sumColorSines;
-var sumColorCosines;
+// for color symmetry
+var sumImColor;
+var sumReColor;
 
 function sumWavevectorOdd(kValues){
     setWavevector(arguments);
@@ -193,61 +196,169 @@ function sumWavevectorOdd(kValues){
     var sumKXE=0;
     sumSines=0;
     sumCosines=0;
-    sumColorSines=0;
-    sumColorCosines=0;
+    sumImColor=0;
+    sumReColor=0;
     for (var i=0;i<p;i++){
         sumKXE=sumKtimesXE();
         sumCosines+=fCos(sumKXE);
         sumSines+=fSin(sumKXE);
-        sumColorCosines+=fCos(phase+sumKXE);
-        sumColorSines+=fSin(phase+sumKXE);
+        sumReColor+=fCos(phase+sumKXE);
+        sumImColor+=fSin(phase+sumKXE);
         rotateWavevectorOdd();
         phase+=deltaPhase;
+    }
+}
+
+function sumWavevectorEven(kValues){
+    setWavevector(arguments);
+    var sumKXE=0;
+    sumSines=0;
+    sumCosines=0;
+    sumImColor=0;
+    sumReColor=0;
+    for (var i=0;i<p;i++){
+        sumKXE=sumKtimesXE();
+        sumCosines+=fCos(sumKXE);
+        if (p2DivNOdd){
+            var sinSumKXE=fSin(sumKXE);
+            sumReColor+=-sin2PiHDivN[i]*sinSumKXE;
+            sumImColor+=cos2PiHDivN[i]*sinSumKXE;
+        }
+        else {
+            var cosSumKXE=fCos(sumKXE);
+            sumReColor+=cos2PiHDivN[i]*cosSumKXE;
+            sumImColor+=sin2PiHDivN[i]*cosSumKXE;
+        }
+         rotateWavevectorEven();
     }
 }
 
 // for image symmetry mapping
 
 function xImageAdd(a,b){
-    xImage+=a*sumSines+b*sumCosines;
+    xImage+=a*sumCosines+b*sumSines;
 }
 
 function yImageAdd(a,b){
-    yImage+=a*sumSines+b*sumCosines;
+    yImage+=a*sumCosines+b*sumSines;
 }
 
 // for color symmetry mapping
 // rotational color symmetry
 function wImageAddOdd(a,b){
-    uImage+=a*sumColorCosines-b*sumColorSines;
-    vImage+=b*sumColorCosines+a*sumColorSines;
+    uImage+=a*sumReColor-b*sumImColor;
+    vImage+=b*sumReColor+a*sumImColor;
 }
 
-//  for mirror symmetry
+//  for mirror symmetry and 2-color symmetry???
 function uImageAdd(a,b){
     uImage+=a*sumSines+b*sumCosines;
 }
 
+// for faster special cases
+
+// only one wavevector component
+
+// for image mapping (odd p and even 2p rotational symmetry)
+function makeSumCosines(k){
+    var sum=0;
+    for (var i=0;i<p;i++){
+        sum+=fCos(k*xTimesE[i]);
+    }
+    return sum;
+}
+
+// for image mapping (odd p rotational symmetry) 
+// and 2-color symmetry (2p-rotational symmetry, odd p)
+function makeSumSines(k){
+    var sum=0;
+     for (var i=0;i<p;i++){
+        sum+=fSin(k*xTimesE[i]);
+    }
+    return sum;
+}
+
+//  image mapping: making sums for wavevectors with two neighboring non-zero coefficients
+
+//  for odd-p rotational symmetry
+function makeSumCosinesOdd(k1,k2){
+    var sum=fCos(k1*xTimesE[p-1]+k2*xTimesE[0]);
+     for (var i=1;i<p;i++){
+        sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
+    }
+    return sum;
+}
+
+function makeSumSinesOdd(k1,k2){
+    var sum=fSin(k1*xTimesE[p-1]+k2*xTimesE[0]);
+     for (var i=1;i<p;i++){
+        sum+=fSin(k1*xTimesE[i-1]+k2*xTimesE[i]);
+    }
+    return sum;
+}
+
+// for even 2p-rotational symmetry
+
+function makeSumCosinesEven(k1,k2){
+    var sum=fCos(-k1*xTimesE[p-1]+k2*xTimesE[0]);
+     for (var i=1;i<p;i++){
+        sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
+    }
+    return sum;
+}
+
+
+//  color symmetries
+// for 2-color symmetry (2p-rotational symmetry with even p)
+function makeSumAlternatingCosines(k){
+    var sum=0;
+    var factor=1;
+     for (var i=0;i<p;i++){
+        sum+=factor*fCos(k*xTimesE[i]);
+        factor=-factor;
+    }
+    return sum;
+}
+
+// for color symmetry with odd-p rotational symmetry
+// calculate basic w-wave
+
+function colorsumPhased(k){
+    var deltaPhase=2*Math.PI/nColors;
+    var phase=0;
+    sumReColor=0;
+    sumImColor=0;
+    for (var i=0;i<p;i++){
+        sumReColor+=fCos(phase+k*xTimesE[i]);
+        sumImColor+=fSin(phase+k*xTimesE[i]);
+        phase+=deltaPhase;
+    }
+    return sum;    
+}
 
 
 // prepare things that are same for each point
 function startMapping(){
-    p=3;
-    nColors=3;
+    p=5;
+    nColors=2;
     chooseColorSymmetry();
     sinCosPhases();
-    unitvectorsOdd(p);
+  //  unitvectorsOdd(p);
+    unitvectorsEven(p);
 }
 
 // depends on each point
 function quasiperiodicMapping(x,y){
     xTimesUnitvectors(x,y);
     imageZero();
-    sumWavevectorOdd(1);
+   // sumWavevectorOdd(1);
+    //sumWavevectorEven(1);
     
-    xImageAdd(1,0);
-    yImageAdd(0,1);
-    wImageAddOdd(1,0);
+    xImage=makeSumCosines(1);
+    sumWavevectorEven(1,1);
+
+    yImageAdd(1,0);
+ //   wImageAddOdd(1,0);
     //normalizeUV();
  //  uImage=sumAlternatingCosines(1);
 
