@@ -78,30 +78,29 @@ var ey=[];
 var xTimesE=[];
 var wavevector=[];
 
-// unit vectors for odd number of rotational symmetry (odd p)
-function unitvectorsOdd(p){
+function unitVectors(p,deltaAngle){
     ex.length=p;
     ey.length=p;
     xTimesE.length=p;
-    wavevector.length=p;
-    var q=(p-1)/2;
+    wavevector.length=p;  
+    var angle=0;
     for (var i=0;i<p;i++){
-        ex[i]=fCos(2*Math.PI*(i-q)/p);
-        ey[i]=fSin(2*Math.PI*(i-q)/p);
+        ex[i]=fCos(angle);
+        ey[i]=fSin(angle);
+        angle+=deltaAngle;
     }
 }
 
+// unit vectors for odd number of rotational symmetry (odd p)
+// simplified unit vectors
+function unitvectorsOdd(p){
+    unitVectors(p,2*Math.PI/p);
+}
+
 // unit vectors for even number of rottaional symmetry (even or odd p)
+// simplified unit vectors
 function unitvectorsEven(p){
-    ex.length=p;
-    ey.length=p;
-    xTimesE.length=p;
-    wavevector.length=p;
-    var q=p/2;
-    for (var i=0;i<p;i++){
-        ex[i]=fCos(Math.PI*(i-q+0.5)/p);
-        ey[i]=fSin(Math.PI*(i-q+0.5)/p);
-    }
+    unitVectors(p,Math.PI/p);
 }
 
 //  rotate the wavevector
@@ -255,88 +254,6 @@ function uImageAdd(a,b){
     uImage+=a*sumSines+b*sumCosines;
 }
 
-// for faster special cases
-
-// only one wavevector component
-
-// for image mapping (odd p and even 2p rotational symmetry)
-function makeSumCosines(k){
-    var sum=0;
-    for (var i=0;i<p;i++){
-        sum+=fCos(k*xTimesE[i]);
-    }
-    return sum;
-}
-
-// for image mapping (odd p rotational symmetry) 
-// and 2-color symmetry (2p-rotational symmetry, odd p)
-function makeSumSines(k){
-    var sum=0;
-     for (var i=0;i<p;i++){
-        sum+=fSin(k*xTimesE[i]);
-    }
-    return sum;
-}
-
-//  image mapping: making sums for wavevectors with two neighboring non-zero coefficients
-
-//  for odd-p rotational symmetry
-function makeSumCosinesOdd(k1,k2){
-    var sum=fCos(k1*xTimesE[p-1]+k2*xTimesE[0]);
-     for (var i=1;i<p;i++){
-        sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
-    }
-    return sum;
-}
-
-function makeSumSinesOdd(k1,k2){
-    var sum=fSin(k1*xTimesE[p-1]+k2*xTimesE[0]);
-     for (var i=1;i<p;i++){
-        sum+=fSin(k1*xTimesE[i-1]+k2*xTimesE[i]);
-    }
-    return sum;
-}
-
-// for even 2p-rotational symmetry
-
-function makeSumCosinesEven(k1,k2){
-    var sum=fCos(-k1*xTimesE[p-1]+k2*xTimesE[0]);
-     for (var i=1;i<p;i++){
-        sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
-    }
-    return sum;
-}
-
-
-//  color symmetries
-// for 2-color symmetry (2p-rotational symmetry with even p)
-function makeSumAlternatingCosines(k){
-    var sum=0;
-    var factor=1;
-     for (var i=0;i<p;i++){
-        sum+=factor*fCos(k*xTimesE[i]);
-        factor=-factor;
-    }
-    return sum;
-}
-
-// for color symmetry with odd-p rotational symmetry
-// calculate basic w-wave
-
-function colorsumPhased(k){
-    var deltaPhase=2*Math.PI/nColors;
-    var phase=0;
-    sumReColor=0;
-    sumImColor=0;
-    for (var i=0;i<p;i++){
-        sumReColor+=fCos(phase+k*xTimesE[i]);
-        sumImColor+=fSin(phase+k*xTimesE[i]);
-        phase+=deltaPhase;
-    }
-    return sum;    
-}
-
-
 // prepare things that are same for each point
 function startMapping(){
     p=5;
@@ -355,9 +272,8 @@ function quasiperiodicMapping(x,y){
     //sumWavevectorEven(1);
     
     xImage=makeSumCosines(1);
-    sumWavevectorEven(1,1);
 
-    yImageAdd(1,0);
+    yImage=makeSumCosinesEven2(1,1);
  //   wImageAddOdd(1,0);
     //normalizeUV();
  //  uImage=sumAlternatingCosines(1);
