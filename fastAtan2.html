@@ -10,18 +10,18 @@
 	</p>
 </body>
 <script src="fastInterpolatedFunctions.js"></script>
+<script src="fastMaths.js"></script>
 
 <script>
 
 
-setupAtanTable(1000);
 
-compare(-3,3,0.25,function(x){return Math.atan2(x,1.1)},function(x){return atan2(x,1.1)});
-compare(-3,3,0.25,function(x){return Math.atan2(x,-1.1)},function(x){return atan2(x,-1.1)});
+compare(-3,3,0.25,function(x){return Math.atan2(x,1.1)},function(x){return fAtan2(x,1.1)});
+compare(-3,3,0.25,function(x){return Math.atan2(x,-1.1)},function(x){return fAtan2(x,-1.1)});
 
 var n=1000000
 timing(-5,5,n,function(x){return Math.atan2(x,1.0)})
-timing(-5,5,n,function(x){return atan2(x,1.0)})
+timing(-5,5,n,function(x){return fAtan2(x,1.0)})
 
 </script>
 </html>

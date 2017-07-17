@@ -35,11 +35,12 @@ function emptyTiming(start,end,nChecks){
 }
 
 //  checking the absolute error of an approximate funstion
-function absErrorCheck(start,end,step,trueFunction,approximateFunction){
+function absErrorCheck(start,end,nSteps,trueFunction,approximateFunction){
 	var x=start;
 	var xMax=0;
 	var absError=0;
 	var absErrorMax=-1;
+	var step=(end-start)/nSteps;
 	while (x<=end){
 		absError=Math.abs(trueFunction(x)-approximateFunction(x));
 		if (absError>absErrorMax){
@@ -251,7 +252,7 @@ function specialFastInterpolatedAtan(x){
 //===============================================================================
 // limited part of the logarithm
 //--------------------------------------------
-
+/*
 var logTab=[];
 var logTabFactor=0;
 var logTabXMin=0;
@@ -264,7 +265,7 @@ function setupLogTable(n,xMin,xMax){
 	logTabFactor=n/(xMax-xMin);
 	logTab=makeFunctionTable(n+2,xMin,1.0/logTabFactor,Math.log);   // plus 2 because includes upper limit and one data point for linbear interpolation
 }
-
+*/
 function specialFastLog(x){
 	if (x<logTabXMin){
 		return Math.log(x);

@@ -180,7 +180,7 @@ function exp(x){
 //=============================================================================================
 //  part of the inverse tangent
 //-------------------------------------------------------------------------------
-
+/*
 var atanTab=[];
 var atanTabFactor=0;
 
@@ -190,8 +190,9 @@ function setupAtanTable(n){
 	atanTab=makeFunctionTable(n+2,0,1.0/atanTabFactor,Math.atan);
 }
 
-
-function atan2(y,x){
+*/
+/*
+function fAtan2(y,x){
 	var index;
 	if (x>=0){
 		if (y>0) {
@@ -255,7 +256,7 @@ function atan2(y,x){
 	}
 }
 
-
+*/
 //===============================================================================
 // limited part of the logarithm
 //--------------------------------------------
