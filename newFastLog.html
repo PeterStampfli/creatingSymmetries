@@ -9,7 +9,7 @@
 		Activate javascript and check the console !
 	</p>
 </body>
-<script src="fastFunctions.js"></script>
+<script src="checkFunctions.js"></script>
 <script src="fastMaths.js"></script>
 
 <script>
@@ -17,31 +17,14 @@
 // some utilies
 //==============================================================================
 
-
-setupLogTable(10000,0.5,5);
-
-console.log("speciasl fast log")
-absErrorCheck(0.1,10,777,Math.log,specialFastLog);
-absErrorCheck(0.1,10,777,Math.log,specialFastInterpolatedLog);
-
 var nChecks=1000000;
-var x=0;
-
-x=emptyTiming(0.5,5,nChecks);
-console.log("simple approximation");
-x=timing(0.5,5,nChecks,specialFastLog);
-console.log("linear interpolation");
-x=timing(0.5,5,nChecks,specialFastInterpolatedLog);
-console.log("Math.log");
-x=timing(0.5,5,nChecks,Math.log);
-
-console.log("new fast log");
 
 setupLogTable(1000,1,2.718281828);
 
 absErrorCheck(0.1,10,777,Math.log,fLog);
 
-x=timing(0.5,5,nChecks,fLog);
+timing(0.5,5,nChecks,fLog);
+timing(0.5,5,nChecks,Math.log);
 
 </script>
 </html>

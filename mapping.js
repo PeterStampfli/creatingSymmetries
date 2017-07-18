@@ -29,16 +29,26 @@ function imageZero(){
 function rAndPhi(x,y){
     logR=0.5*Math.log(y*y+x*x);
     phi=Math.atan2(y,x);
+        console.log("phi "+phi);
+        console.log("logR "+logR);
+
 }
 
 // precompute powers (exponents) for r and sine and cosine for phi
 function imagePowers(rPower,phiPower){
     var rk=fExp(rPower*logR);
+            console.log("rk "+rk);
+
     rkCosPhi=rk*fCos(phiPower*phi);
     rkSinPhi=rk*fSin(phiPower*phi);
+
+                console.log("rkCosPhi "+rkCosPhi);
+                console.log("rkSinPhi "+rkSinPhi);
+
 }
 
 function xImageAdd(a,b){
+    console.log(xImage);
     xImage+=a*rkCosPhi+b*rkSinPhi;
 }
 
@@ -56,16 +66,17 @@ function vImageAdd(a,b){
 
 function rosetteMapping(x,y){
     imageZero();
-    rAndPhi(x,y);
+     console.log(x+" "+y);
+   rAndPhi(x,y);
     imagePowers(2,6);
-    xImageAdd(1,0);
-    yImageAdd(0,1);
+     console.log("xImage bef "+xImage);
+   xImageAdd(1,0);
+    console.log("xImage "+xImage);
+  //  yImageAdd(0,1);
     imagePowers(1,2);
     uImageAdd(1,0);
     vImageAdd(0,1);
-    imagePowers(2,-4);
-  //  uImageAdd(0,-3);
-  //  vImageAdd(3,0);
+ 
 }
 
   //========================================================================================
@@ -286,4 +297,7 @@ var nColors;
 
 //=====================================
 var mapping=quasiperiodicMapping;
+
+var mapping=rosetteMapping;
+
 scaleOutputToInput = 100
