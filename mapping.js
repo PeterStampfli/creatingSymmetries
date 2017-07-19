@@ -213,20 +213,25 @@ function sumWavevectorEven(kValues){
     sumCosines=0;
     sumImColor=0;
     sumReColor=0;
-    for (var i=0;i<p;i++){
-        sumKXE=sumKtimesXE();
-        sumCosines+=fCos(sumKXE);
-        if (p2DivNOdd){
+    if (p2DivNOdd){
+        for (var i=0;i<p;i++){
+            sumKXE=sumKtimesXE();
+            sumCosines+=fCos(sumKXE);
             var sinSumKXE=fSin(sumKXE);
             sumReColor+=-sin2PiHDivN[i]*sinSumKXE;
             sumImColor+=cos2PiHDivN[i]*sinSumKXE;
+            rotateWavevectorEven();
         }
-        else {
+    }
+    else {
+        for (var i=0;i<p;i++){
+            sumKXE=sumKtimesXE();
             var cosSumKXE=fCos(sumKXE);
+            sumCosines+=cosSumKXE;
             sumReColor+=cos2PiHDivN[i]*cosSumKXE;
             sumImColor+=sin2PiHDivN[i]*cosSumKXE;
+            rotateWavevectorEven();
         }
-         rotateWavevectorEven();
     }
 }
 
