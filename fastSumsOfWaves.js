@@ -68,16 +68,34 @@ function makeSumAlternatingCosines(k){
 // for color symmetry with odd-p rotational symmetry
 // calculate basic w-wave
 
-function colorsumPhased(k){
+function colorsumOdd(k){
     var deltaPhase=2*Math.PI/nColors;
     var phase=0;
+    var sumKXE;
     sumReColor=0;
     sumImColor=0;
     for (var i=0;i<p;i++){
-        sumReColor+=fCos(phase+k*xTimesE[i]);
-        sumImColor+=fSin(phase+k*xTimesE[i]);
+        sumKXE=phase+k*xTimesE[i];
+        sumReColor+=fCos(sumKXE);
+        sumImColor+=fSin(sumKXE);
         phase+=deltaPhase;
     }
-    return sum;    
 }
 
+
+
+
+//  for odd-p rotational symmetry
+function colorSumOdd2(k1,k2){
+    var deltaPhase=2*Math.PI/nColors;
+    var phase=0;
+    var sumKXE=k1*xTimesE[p-1]+k2*xTimesE[0];
+    sumReColor=fCos(sumKXE);
+    sumImColor=fSin(sumKXE);
+    for (var i=1;i<p;i++){
+        sumKXE=phase+k1*xTimesE[i-1]+k2*xTimesE[i];
+        sumReColor+=fCos(sumKXE);
+        sumImColor+=fSin(sumKXE);
+        phase+=deltaPhase;
+    }
+}
