@@ -118,7 +118,6 @@ function makeMapTables() {
     var locMapOffsetI=Math.floor(mapOffsetI)+0.5;
     var locMapOffsetJ=Math.floor(mapOffsetJ)+0.5;
     var locMapScale=mapScale;
-    console.log(mapScale);
     var locMapX=mapX;
     var locMapY=mapY;
     var locMapColorSector=mapColorSector;
