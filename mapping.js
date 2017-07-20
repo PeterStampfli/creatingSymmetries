@@ -27,15 +27,16 @@ function imageZero(){
 
 // multiple calls for smoothing ???
 function rAndPhi(x,y){
-    logR=0.5*Math.log(y*y+x*x);
-    phi=Math.atan2(y,x);
+    logR=0.5*fLog(y*y+x*x);
+    phi=fAtan2(y,x);
 }
 
 // precompute powers (exponents) for r and sine and cosine for phi
 function imagePowers(rPower,phiPower){
     var rk=fExp(rPower*logR);
-    rkCosPhi=rk*fCos(phiPower*phi);
-    rkSinPhi=rk*fSin(phiPower*phi);
+    fCosSinValues(phiPower*phi);
+    rkCosPhi=rk*cosValue;
+    rkSinPhi=rk*sinValue;
 }
 
 function xImageAddRosette(a,b){
@@ -83,8 +84,9 @@ function unitVectors(p,deltaAngle){
     wavevector.length=p;  
     var angle=0;
     for (var i=0;i<p;i++){
-        ex[i]=fCos(angle);
-        ey[i]=fSin(angle);
+        fCosSinValues(angle);
+        ex[i]=cosValue;
+        ey[i]=sinValue;
         angle+=deltaAngle;
     }
 }
@@ -154,8 +156,9 @@ function sinCosPhases(){
     cos2PiHDivN.length=p;
     sin2PiHDivN.length=p;
     for (var h=0;h<p;h++){
-        cos2PiHDivN[h]=fCos(2*Math.PI*h/nColors);
-        sin2PiHDivN[h]=fSin(2*Math.PI*h/nColors);
+        fCosSinValues(2*Math.PI*h/nColors);
+        cos2PiHDivN[h]=cosValue;
+        sin2PiHDivN[h]=sinValue;
     }
 }
 
@@ -164,7 +167,6 @@ function normalizeUV(){
     uImage*=norm;
     vImage*=norm;
 }
-
 
 // wavepakets
 
@@ -176,7 +178,6 @@ function sumKtimesXE(){
     }
     return kTimesXTimesE;
 }
-
 
 //making the pakets
 
@@ -197,10 +198,12 @@ function sumWavevectorOdd(kValues){
     sumReColor=0;
     for (var i=0;i<p;i++){
         sumKXE=sumKtimesXE();
-        sumCosines+=fCos(sumKXE);
-        sumSines+=fSin(sumKXE);
-        sumReColor+=fCos(phase+sumKXE);
-        sumImColor+=fSin(phase+sumKXE);
+        fCosSinValues(sumKXE);
+        sumCosines+=cosValue;
+        sumSines+=sinValue;
+        fCosSinValues(phase+sumKXE);
+        sumReColor+=cosValue;
+        sumImColor+=sinValue;
         rotateWavevectorOdd();
         phase+=deltaPhase;
     }
@@ -216,10 +219,10 @@ function sumWavevectorEven(kValues){
     if (p2DivNOdd){
         for (var i=0;i<p;i++){
             sumKXE=sumKtimesXE();
-            sumCosines+=fCos(sumKXE);
-            var sinSumKXE=fSin(sumKXE);
-            sumReColor+=-sin2PiHDivN[i]*sinSumKXE;
-            sumImColor+=cos2PiHDivN[i]*sinSumKXE;
+            fCosSinValues(sumKXE);
+            sumCosines+=cosValue;
+            sumReColor+=-sin2PiHDivN[i]*sinValue;
+            sumImColor+=cos2PiHDivN[i]*sinValue;
             rotateWavevectorEven();
         }
     }
@@ -247,7 +250,7 @@ function yImageAdd(a,b){
 
 // for color symmetry mapping
 // rotational color symmetry
-function wImageAddOdd(a,b){
+function wImageAdd(a,b){
     uImage+=a*sumReColor-b*sumImColor;
     vImage+=b*sumReColor+a*sumImColor;
 }
@@ -259,12 +262,12 @@ function uImageAdd(a,b){
 
 // prepare things that are same for each point
 function startMapping(){
-    p=5;
-    nColors=2;
+    p=2;
+    nColors=4;
     chooseColorSymmetry();
     sinCosPhases();
   //  unitvectorsOdd(p);
-    unitvectorsOdd(p);
+    unitvectorsEven(p);
 }
 
 // depends on each point
@@ -274,10 +277,13 @@ function quasiperiodicMapping(x,y){
    // sumWavevectorOdd(1);
     //sumWavevectorEven(1);
     
-    xImage=makeSumCosines(1);
+   // xImage=makeSumCosines(1);
 
-    yImage=makeSumSinesOdd2(1,1);
- //   wImageAddOdd(1,0);
+   // yImage=makeSumSinesOdd2(1,1);
+   colorSumEven2(1,-1);
+    wImageAdd(1,0);
+    colorSumEven2(3,-1);
+    wImageAdd(0.5,0);
     //normalizeUV();
  //  uImage=sumAlternatingCosines(1);
 
@@ -290,6 +296,6 @@ var nColors;
 //=====================================
 var mapping=quasiperiodicMapping;
 
-//var mapping=rosetteMapping;
+//mapping=rosetteMapping;
 
 scaleOutputToInput = 100

@@ -56,7 +56,7 @@ function makeSumCosinesEven2(k1,k2){
     var sum=0;
     var lastXTimesE=-xTimesE[p-1];
     var newXTimesE;
-     for (var i=0;i<p;i++){
+    for (var i=0;i<p;i++){
         newXTimesE=xTimesE[i];
         sum+=fCos(k1*lastXTimesE+k2*newXTimesE);
         lastXTimesE=newXTimesE;
@@ -64,14 +64,29 @@ function makeSumCosinesEven2(k1,k2){
     return sum;
 }
 
-
 //  color symmetries
 // for 2-color symmetry (2p-rotational symmetry with even p)
 function makeSumAlternatingCosines(k){
     var sum=0;
     var factor=1;
-     for (var i=0;i<p;i++){
+    for (var i=0;i<p;i++){
         sum+=factor*fCos(k*xTimesE[i]);
+        factor=-factor;
+    }
+    return sum;
+}
+
+//  color symmetries
+// for 2-color symmetry (2p-rotational symmetry with even p)
+function makeSumAlternatingCosines2(k1,k2){
+    var sum=0;
+    var lastXTimesE=-xTimesE[p-1];
+    var newXTimesE;
+    var factor=1;
+    for (var i=0;i<p;i++){
+        newXTimesE=xTimesE[i];
+        sum+=factor*fCos(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
         factor=-factor;
     }
     return sum;
@@ -79,16 +94,15 @@ function makeSumAlternatingCosines(k){
 
 // for color symmetry with odd-p rotational symmetry
 // calculate basic w-wave
-function colorsumOdd(k){
+function colorSumOdd(k){
     var deltaPhase=2*Math.PI/nColors;
     var phase=0;
-    var sumKXE;
     sumReColor=0;
     sumImColor=0;
     for (var i=0;i<p;i++){
-        sumKXE=phase+k*xTimesE[i];
-        sumReColor+=fCos(sumKXE);
-        sumImColor+=fSin(sumKXE);
+        fCosSinValues(phase+k*xTimesE[i]);
+        sumReColor+=cosValue;
+        sumImColor+=sinValue;
         phase+=deltaPhase;
     }
 }
@@ -99,15 +113,64 @@ function colorSumOdd2(k1,k2){
     var phase=0;
     var lastXTimesE=xTimesE[p-1];
     var newXTimesE;
-    var sumKXE;
     sumReColor=0;
     sumImColor=0;
     for (var i=0;i<p;i++){
         newXTimesE=xTimesE[i];
-        sumKXE=phase+k1*lastXTimesE+k2*newXTimesE;
-        sumReColor+=fCos(sumKXE);
-        sumImColor+=fSin(sumKXE);
+        fCosSinValues(phase+k1*lastXTimesE+k2*newXTimesE);
+        sumReColor+=cosValue;
+        sumImColor+=sinValue;
         lastXTimesE=newXTimesE;
         phase+=deltaPhase;
+    }
+}
+
+// for color symmetry with even-2p rotational symmetry
+// calculate basic w-wave
+function colorSumEven(k){
+    sumReColor=0;
+    sumImColor=0;
+    var h;
+    if (p2DivNOdd){
+        for (var i=0;i<p;i++){
+            h=fSin(k*xTimesE[i]);
+            sumReColor+=-sin2PiHDivN[i]*h;
+            sumImColor+=cos2PiHDivN[i]*h;
+        }
+    }
+    else {
+        for (var i=0;i<p;i++){
+            h=fCos(k*xTimesE[i]);
+            sumReColor+=cos2PiHDivN[i]*h;
+            sumImColor+=sin2PiHDivN[i]*h;
+        }
+    }
+}
+
+// for color symmetry with even-2p rotational symmetry
+// calculate basic w-wave
+function colorSumEven2(k1,k2){
+    sumReColor=0;
+    sumImColor=0;
+    var lastXTimesE=-xTimesE[p-1];
+    var newXTimesE;
+    var h;
+    if (p2DivNOdd){
+        for (var i=0;i<p;i++){
+            newXTimesE=xTimesE[i];
+            h=fSin(k1*lastXTimesE+k2*newXTimesE);
+            sumReColor+=-sin2PiHDivN[i]*h;
+            sumImColor+=cos2PiHDivN[i]*h;
+           lastXTimesE=newXTimesE;
+        }
+    }
+    else {
+        for (var i=0;i<p;i++){
+            newXTimesE=xTimesE[i];
+            h=fCos(k1*lastXTimesE+k2*newXTimesE);
+            sumReColor+=cos2PiHDivN[i]*h;
+            sumImColor+=sin2PiHDivN[i]*h;
+            lastXTimesE=newXTimesE;
+        }
     }
 }

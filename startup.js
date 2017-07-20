@@ -2,9 +2,9 @@
 //  the startup function
 //==============================================================================
 
-var initialOutputWidth=700;
+var initialOutputWidth=512;
 var initialOutputHeight=512;
-var initialXRange=30;
+var initialXRange=10;
 
 window.onload = function () {
     connectNewInputImage();

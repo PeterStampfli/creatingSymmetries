@@ -25,6 +25,7 @@ function makeFunctionTable(length,start,delta,theFunction){
 //  the sine and cosine function
 //-------------------------------------------------------------------------------------------
 var sinTab=[];
+var cosTab=[];
 var sinTabLengthM1=0;
 var sinTabFactor=1;
 
@@ -34,11 +35,11 @@ function setupSinCosTable(p) {
     sinTabLengthM1=sinTabLength-1;
     sinTabFactor = 0.5*sinTabLength/Math.PI;
     sinTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,Math.sin);
+    cosTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,Math.cos);
 }
 
 setupSinCosTable(12);
 
-//  using linear interpolation
 function fSin(x){
     x*=sinTabFactor;
     var index=Math.floor(x);
@@ -47,13 +48,25 @@ function fSin(x){
     return sinTab[index]*(1-x)+sinTab[index+1]*x;
 }
 
-//  using linear interpolation
 function fCos(x){
-    x=sinTabFactor*(x+PIHALF);
+    x*=sinTabFactor;
     var index=Math.floor(x);
-    var dx=x-index;
+    x-=index;
     index=index&sinTabLengthM1;
-    return sinTab[index]*(1-dx)+sinTab[index+1]*dx;
+    return cosTab[index]*(1-x)+cosTab[index+1]*x;
+}
+
+// both in parallel
+var sinValue;
+var cosValue;
+
+function fCosSinValues(x){
+    x*=sinTabFactor;
+    var index=Math.floor(x);
+    x-=index;
+    index=index&sinTabLengthM1;
+    cosValue=cosTab[index]*(1-x)+cosTab[index+1]*x;
+    sinValue=sinTab[index]*(1-x)+sinTab[index+1]*x;
 }
 
 //  the exponential function
