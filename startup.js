@@ -4,7 +4,7 @@
 
 var initialOutputWidth=700;
 var initialOutputHeight=512;
-var initialXRange=3;
+var initialXRange=30;
 
 window.onload = function () {
     connectNewInputImage();

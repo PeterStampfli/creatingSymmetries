@@ -264,7 +264,7 @@ function startMapping(){
     chooseColorSymmetry();
     sinCosPhases();
   //  unitvectorsOdd(p);
-    unitvectorsEven(p);
+    unitvectorsOdd(p);
 }
 
 // depends on each point
@@ -276,7 +276,7 @@ function quasiperiodicMapping(x,y){
     
     xImage=makeSumCosines(1);
 
-    yImage=makeSumCosinesEven2(1,1);
+    yImage=makeSumSinesOdd2(1,1);
  //   wImageAddOdd(1,0);
     //normalizeUV();
  //  uImage=sumAlternatingCosines(1);

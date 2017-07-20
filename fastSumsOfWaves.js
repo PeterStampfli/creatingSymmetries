@@ -27,17 +27,25 @@ function makeSumSines(k){
 
 //  for odd-p rotational symmetry
 function makeSumCosinesOdd2(k1,k2){
-    var sum=fCos(k1*xTimesE[p-1]+k2*xTimesE[0]);
-     for (var i=1;i<p;i++){
-        sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
+    var sum=0;
+    var lastXTimesE=xTimesE[p-1];
+    var newXTimesE;
+    for (var i=0;i<p;i++){
+        newXTimesE=xTimesE[i];
+        sum+=fCos(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
     }
     return sum;
 }
 
 function makeSumSinesOdd2(k1,k2){
-    var sum=fSin(k1*xTimesE[p-1]+k2*xTimesE[0]);
-     for (var i=1;i<p;i++){
-        sum+=fSin(k1*xTimesE[i-1]+k2*xTimesE[i]);
+    var sum=0;
+    var lastXTimesE=xTimesE[p-1];
+    var newXTimesE;
+    for (var i=0;i<p;i++){
+        newXTimesE=xTimesE[i];
+        sum+=fSin(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
     }
     return sum;
 }
@@ -45,9 +53,13 @@ function makeSumSinesOdd2(k1,k2){
 // for even 2p-rotational symmetry
 
 function makeSumCosinesEven2(k1,k2){
-    var sum=fCos(-k1*xTimesE[p-1]+k2*xTimesE[0]);
-     for (var i=1;i<p;i++){
-        sum+=fCos(k1*xTimesE[i-1]+k2*xTimesE[i]);
+    var sum=0;
+    var lastXTimesE=-xTimesE[p-1];
+    var newXTimesE;
+     for (var i=0;i<p;i++){
+        newXTimesE=xTimesE[i];
+        sum+=fCos(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
     }
     return sum;
 }
@@ -67,7 +79,6 @@ function makeSumAlternatingCosines(k){
 
 // for color symmetry with odd-p rotational symmetry
 // calculate basic w-wave
-
 function colorsumOdd(k){
     var deltaPhase=2*Math.PI/nColors;
     var phase=0;
@@ -82,20 +93,21 @@ function colorsumOdd(k){
     }
 }
 
-
-
-
 //  for odd-p rotational symmetry
 function colorSumOdd2(k1,k2){
     var deltaPhase=2*Math.PI/nColors;
     var phase=0;
-    var sumKXE=k1*xTimesE[p-1]+k2*xTimesE[0];
-    sumReColor=fCos(sumKXE);
-    sumImColor=fSin(sumKXE);
-    for (var i=1;i<p;i++){
-        sumKXE=phase+k1*xTimesE[i-1]+k2*xTimesE[i];
+    var lastXTimesE=xTimesE[p-1];
+    var newXTimesE;
+    var sumKXE;
+    sumReColor=0;
+    sumImColor=0;
+    for (var i=0;i<p;i++){
+        newXTimesE=xTimesE[i];
+        sumKXE=phase+k1*lastXTimesE+k2*newXTimesE;
         sumReColor+=fCos(sumKXE);
         sumImColor+=fSin(sumKXE);
+        lastXTimesE=newXTimesE;
         phase+=deltaPhase;
     }
 }
