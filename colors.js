@@ -237,10 +237,9 @@ function modify4ColorSymmetry(colorSector){
 }
 
 function chooseColorSymmetry(){
-    if (nColors==2){
+    
         modifyColors=modify2ColorSymmetry;
         makeColorSymmetry=make2ColorSymmetry;
-    }
 
     if (nColors==3){
         modifyColors=modify3ColorSymmetry;

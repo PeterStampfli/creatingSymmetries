@@ -262,12 +262,12 @@ function uImageAdd(a,b){
 
 // prepare things that are same for each point
 function startMapping(){
-    p=2;
-    nColors=4;
+    p=5;
+    nColors=5;
     chooseColorSymmetry();
     sinCosPhases();
-  //  unitvectorsOdd(p);
-    unitvectorsEven(p);
+    unitvectorsOdd(p);
+   // unitvectorsEven(p);
 }
 
 // depends on each point
@@ -280,10 +280,13 @@ function quasiperiodicMapping(x,y){
    // xImage=makeSumCosines(1);
 
    // yImage=makeSumSinesOdd2(1,1);
-   colorSumEven2(1,-1);
+   //colorSumEven2(1,-1);
+   colorSumOdd(1);
     wImageAdd(1,0);
-    colorSumEven2(3,-1);
-    wImageAdd(0.5,0);
+ //   colorSumEven2(3,-1);
+  //  wImageAdd(0.5,0);
+  xImage=uImage;
+  yImage=vImage;
     //normalizeUV();
  //  uImage=sumAlternatingCosines(1);
 
