@@ -258,6 +258,6 @@ var outsideGreen = 40;
 var outsideBlue = 40;
 
 // width for background color between color sectors
-transWidth=0.000000001;
+transWidth=-0.00011000000001;
 // width of smoothing between background and image
-transSmoothing=0.0000000002;
+transSmoothing=0.000103000000002;512

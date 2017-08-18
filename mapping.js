@@ -260,14 +260,35 @@ function uImageAdd(a,b){
     uImage+=a*sumSines+b*sumCosines;
 }
 
+// transform the color map to warp the input image
+// with full symmetry. requires 3rd power for 3 colors
+function xyFromUV3(){
+    var u2=uImage*uImage;
+    var v2=vImage*vImage;
+    var r2=u2+v2+0.0000001;
+    xImage=uImage*(u2-3*v2)/r2;
+    yImage=vImage*(3*u2-v2)/r2;
+}
+
+// transform the color map to warp the input image
+// with full symmetry. requires 2nd power for 2 colors
+function xyFromUV2(){
+    var u2=uImage*uImage;
+    var v2=vImage*vImage;
+    var r=Math.sqrt(u2+v2+0.0000001);
+    xImage=(u2-v2)/r;
+    yImage=2*vImage*uImage/r;
+}
+
+
 // prepare things that are same for each point
 function startMapping(){
-    p=5;
-    nColors=5;
+    p=4;
+    nColors=2;
     chooseColorSymmetry();
     sinCosPhases();
-    unitvectorsOdd(p);
-   // unitvectorsEven(p);
+    //unitvectorsOdd(p);
+    unitvectorsEven(p);
 }
 
 // depends on each point
@@ -275,20 +296,30 @@ function quasiperiodicMapping(x,y){
     xTimesUnitvectors(x,y);
     imageZero();
    // sumWavevectorOdd(1);
-    //sumWavevectorEven(1);
     
-   // xImage=makeSumCosines(1);
+ //   xImage=makeSumCosines(1);
 
-   // yImage=makeSumSinesOdd2(1,1);
+ //   yImage=makeSumCosinesEven2(1,2);
    //colorSumEven2(1,-1);
-   colorSumOdd(1);
-    wImageAdd(1,0);
- //   colorSumEven2(3,-1);
-  //  wImageAdd(0.5,0);
-  xImage=uImage;
-  yImage=vImage;
-    //normalizeUV();
- //  uImage=sumAlternatingCosines(1);
+   //colorSumEven2(1,-1);
+   //colorSumEven(1);
+   // wImageAdd(1,0.2);
+   // colorSumEven2(1,2);
+   // wImageAdd(1.2,-0.2);
+    //colorSumOdd2(2,1);
+   // wImageAdd(1.2,0.3);
+  // xyFromUV3();
+  //vImage=makeSumAlternatingSines(1);
+   // xImage=Math.abs(uImage);
+   // yImage=makeSumCosines(1);  
+   //uImage=makeSumAlternatingSines2(1,-1);
+   //xyFromUV2();
+   //vImage=makeSumCosinesOdd2(-1,2)-makeSumCosinesOdd2(2,-1);
+   //yImage=makeSumSinesOdd2(-1,2)+makeSumSinesOdd2(2,-1);
+   uImage=makeSumCosinesEven2(-1,2)-makeSumCosinesEven2(2,-1);
+   //xyFromUV2();
+   xImage=Math.abs(uImage);
+   yImage=makeSumCosines(1);
 
 }
 

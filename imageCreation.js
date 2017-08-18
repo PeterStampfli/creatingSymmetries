@@ -25,8 +25,14 @@ var transSmoothing=0;
 // the different color symmetries,choose ..
 
 // colorAmplitude: d<0 - background, d>1 imagecolor (transformed), 0<d<1 - interpolation between background color and pixel color
+// full amplitude everywhere for transWidth<0
 function makeColorAmplitude(d){
-    colorAmplitude=Math.max(0,(Math.abs(d)-transWidth)/transSmoothing);
+    if (transWidth<0){
+        colorAmplitude=1;
+    }
+    else {
+        colorAmplitude=Math.max(0,(Math.abs(d)-transWidth)/transSmoothing);
+    }
 }
 
 // two color symmetry, depending only on u

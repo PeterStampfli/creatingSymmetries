@@ -91,6 +91,32 @@ function makeSumAlternatingCosines2(k1,k2){
     }
     return sum;
 }
+// for 2-color symmetry (2p-rotational symmetry with odd p)
+function makeSumAlternatingSines(k){
+    var sum=0;
+    var factor=1;
+    for (var i=0;i<p;i++){
+        sum+=factor*fSin(k*xTimesE[i]);
+        factor=-factor;
+    }
+    return sum;
+}
+
+//  color symmetries
+// for 2-color symmetry (2p-rotational symmetry with odd p)
+function makeSumAlternatingSines2(k1,k2){
+    var sum=0;
+    var lastXTimesE=-xTimesE[p-1];
+    var newXTimesE;
+    var factor=1;
+    for (var i=0;i<p;i++){
+        newXTimesE=xTimesE[i];
+        sum+=factor*fSin(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
+        factor=-factor;
+    }
+    return sum;
+}
 
 // for color symmetry with odd-p rotational symmetry
 // calculate basic w-wave
@@ -173,4 +199,50 @@ function colorSumEven2(k1,k2){
             lastXTimesE=newXTimesE;
         }
     }
+}
+
+//  morphing
+//  2p fold rotational symmetry in 2 parts, for even p
+
+// lower set
+function sumCosinesLower(k){
+    var sum=0;
+    for (var i=0;i<p-1;i+=2){
+        sum+=fCos(k*xTimesE[i]);
+    }
+    return sum;
+}
+// upper set
+function sumCosinesUpper(k){
+    var sum=0;
+    for (var i=1;i<p;i+=2){
+        sum+=fCos(k*xTimesE[i]);
+    }
+    return sum;
+}
+
+// lower set, two waves, difference is 2
+function makeSumCosinesEven2Lower(k1,k2){
+    var sum=0;
+    var lastXTimesE=-xTimesE[p-2];
+    var newXTimesE;
+    for (var i=0;i<p-1;i+=2){
+        newXTimesE=xTimesE[i];
+        sum+=fCos(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
+    }
+    return sum;
+}
+
+// upper set, two waves, difference is 2
+function makeSumCosinesEven2Lower(k1,k2){
+    var sum=0;
+    var lastXTimesE=-xTimesE[p-1];
+    var newXTimesE;
+    for (var i=1;i<p;i+=2){
+        newXTimesE=xTimesE[i];
+        sum+=fCos(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
+    }
+    return sum;
 }
