@@ -30,6 +30,15 @@ function prepareFactors2PI(periodX,periodY){
 	rotXX=periodY*0.5/Math.PI;
 }
 
+// prepare rotation and scaling factors for square lattice,
+//  for integer wavevectors and basic periodicity 2PI
+// (0,2PI)=> (m*2PI,n*2PI)
+function prepareFactorsSquareLattice(m,n){
+	rotXY=-m;
+	rotXX=n;
+}
+
+
 function rotate(){
 	var xx=rotXX*xT-rotXY*yT;
 	yT=rotXY*xT+rotXX*yT;
