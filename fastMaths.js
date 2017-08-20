@@ -4,6 +4,31 @@
 
 var RT3HALF=Math.sqrt(3)/2;
 var PIHALF=Math.PI*0.5;
+var IPIHALF=1.0/PIHALF;
+
+// some useful small functions
+
+// reduction to period of given length
+
+function periodic(length,x){
+    return x-length*Math.floor(x/length);
+}
+
+// replacing cosine by a triangle function of same amplitude and frequency
+
+function triangleCos(x){
+    x=periodic(6.2831853,x);
+    if (x>Math.PI){
+        x=6.2831853-x
+    }
+    return 1-0.63661977*x;
+}
+
+// replacing sine by a traingle function
+
+function triangleSin(x){
+    return triangleCos(x-1.570796);
+}
 
 //=================================================================================================
 // fast approximations of functions

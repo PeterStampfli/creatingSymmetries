@@ -92,15 +92,21 @@ function unitVectors(p,deltaAngle){
 }
 
 // unit vectors for odd number of rotational symmetry (odd p)
+// including wraparound prefactor for wave
+
+var evenOddSign=1;
+
 // simplified unit vectors
 function unitvectorsOdd(p){
     unitVectors(p,2*Math.PI/p);
+    evenOddSign=1;
 }
 
 // unit vectors for even number of rottaional symmetry (even or odd p)
 // simplified unit vectors
 function unitvectorsEven(p){
     unitVectors(p,Math.PI/p);
+    evenOddSign=-1;
 }
 
 //  rotate the wavevector
@@ -299,9 +305,16 @@ function quasiperiodicMapping(x,y){
     logSpiral(x,y);
     rotate();
 
-    xTimesUnitvectors(xT,yT);
+  //  xTimesUnitvectors(xT,yT);
+    xTimesUnitvectors(x,y);
 
-   xImage=makeSumCosinesEven2(2,-1);
+  // xImage=makeSumSharpCosinesEven2(2,-1);
+  // yImage=makeSumSharpCosines(1);
+
+ //  xImage=makeSumCosinesEven2(2,-1);
+ //  yImage=makeSumCosines(1);
+
+   xImage=makeSumCosines2(2,-1);
    yImage=makeSumCosines(1);
 
 }
