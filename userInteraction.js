@@ -82,11 +82,8 @@ var mapX = [];
 var mapY = [];
 var mapU=[];
 var mapV=[];
-// and the color changing : colorSector and colorAmplitude
-// colorSector is number for interchanges, 0 changes nothing
-// colorAmplitude=0 - outsideColor, colorAmplitude=1 - full image color
-var mapColorSector = [];
-var mapColorAmplitude = [];
+
+
 
 //  with dimensions (part of the periodic unit cell)
 var mapWidth=0;
@@ -120,8 +117,8 @@ function updateMapDimensions(){
     mapHeight = outputHeight;
     mapX.length = mapWidth * mapHeight;
     mapY.length = mapWidth * mapHeight;
-    mapColorSector.length = mapWidth * mapHeight;
-    mapColorAmplitude.length = mapWidth * mapHeight;
+    mapU.length = mapWidth * mapHeight;
+    mapV.length = mapWidth * mapHeight;
     makeMapTables();
 }
 

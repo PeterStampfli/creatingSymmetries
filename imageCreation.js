@@ -128,9 +128,7 @@ function makeMapTables() {
     var locMapY=mapY;
     var locMapU=mapU;
     var locMapV=mapV;
-    var locMapColorSector=mapColorSector;
-    var locMapColorAmplitude=mapColorAmplitude;
-    //  this mapping function has to be defined depending on the desired image
+     //  this mapping function has to be defined depending on the desired image
     var locMapping=mapping;
     // do each pixel and store result of mapping
     startMapping();
@@ -146,11 +144,7 @@ function makeMapTables() {
             locMapX[index] = xImage;
             locMapY[index] = yImage; 
             locMapU[index]=uImage; 
-            locMapV[index]=vImage; 
-            // get colorSector and colorAmplitude from uImage and vImage
-            makeColorSymmetry();
-            locMapColorSector[index] = colorSector;          
-            locMapColorAmplitude[index++] = colorAmplitude;          
+            locMapV[index++]=vImage; 
         }
     }
 }
@@ -228,9 +222,7 @@ function basicDrawing(){
     var locMapY = mapY;
     var locMapU=mapU;
     var locMapV=mapV;
-    var locMapColorSector = mapColorSector;
-    var locMapColorAmplitude = mapColorAmplitude;
-    var locOutputPixels=outputPixels;
+     var locOutputPixels=outputPixels;
     // get the colors for each output pixel
     var outputIndex=0;
     var mapIndex=0;
@@ -241,9 +233,9 @@ function basicDrawing(){
         // translation, rotation and scaling
         doOnePixel(locMapX[mapIndex],locMapY[mapIndex],locMapU[mapIndex],locMapV[mapIndex]);
 
-        outputPixels[outputIndex++]=pixelRed;
-        outputPixels[outputIndex++]=pixelGreen;
-        outputPixels[outputIndex]=pixelBlue;
+        locOutputPixels[outputIndex++]=pixelRed;
+        locOutputPixels[outputIndex++]=pixelGreen;
+        locOutputPixels[outputIndex]=pixelBlue;
         outputIndex += 2;
     }
 	// put the image on the output canvas
@@ -277,8 +269,6 @@ function smoothedDrawing(){
     var locMapY = mapY;
     var locMapU=mapU;
     var locMapV=mapV;
-    var locMapColorSector = mapColorSector;
-    var locMapColorAmplitude = mapColorAmplitude;
     var locOutputPixels=outputPixels;
     // get the colors for each output pixel
     var outputIndex=0;
@@ -359,9 +349,9 @@ function smoothedDrawing(){
             pixelBlue=Math.round(0.25*pixSumBlue);
 
 
-            outputPixels[outputIndex++]=pixelRed;
-            outputPixels[outputIndex++]=pixelGreen;
-            outputPixels[outputIndex]=pixelBlue;
+            locOutputPixels[outputIndex++]=pixelRed;
+            locOutputPixels[outputIndex++]=pixelGreen;
+            locOutputPixels[outputIndex]=pixelBlue;
             outputIndex += 2;
             mapIndex++;
         }
