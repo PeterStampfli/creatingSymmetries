@@ -126,6 +126,8 @@ function makeMapTables() {
     var locMapScale=mapScale;
     var locMapX=mapX;
     var locMapY=mapY;
+    var locMapU=mapU;
+    var locMapV=mapV;
     var locMapColorSector=mapColorSector;
     var locMapColorAmplitude=mapColorAmplitude;
     //  this mapping function has to be defined depending on the desired image
@@ -142,7 +144,9 @@ function makeMapTables() {
             x=(i-locMapOffsetI)*locMapScale;
             locMapping(x,y);
             locMapX[index] = xImage;
-            locMapY[index] = yImage;  
+            locMapY[index] = yImage; 
+            locMapU[index]=uImage; 
+            locMapV[index]=vImage; 
             // get colorSector and colorAmplitude from uImage and vImage
             makeColorSymmetry();
             locMapColorSector[index] = colorSector;          
@@ -167,12 +171,32 @@ var nColorMod=0;
 var modifyColors;
 var inputScaleCos,inputScaleSin,inputCenterX,inputCenterY;
 
-function doOnePixel(xMap,yMap){
+function doOnePixel(xMap,yMap,uMap,vMap){
     var x = inputScaleCos * xMap - inputScaleSin * yMap + inputCenterX;
     var y = inputScaleSin * xMap + inputScaleCos * yMap + inputCenterY;
     //  get the interpolated input pixel color components, write on output pixels
     // if colorAmplitude<0: background color 
     pixelInterpolation(x, y, inputData);
+       // modify color if not outside input image
+        if (pixelRed>=0){
+            uImage=uMap;
+            vImage=vMap;
+            makeColorSymmetry();
+
+
+            modifyColors(colorSector);
+
+            if ((nColorMod>0)&&(colorAmplitude<1)){
+                pixelRed=(1-colorAmplitude)*outsideRed+colorAmplitude*pixelRed;
+                pixelGreen=(1-colorAmplitude)*outsideGreen+colorAmplitude*pixelGreen;
+                pixelBlue=(1-colorAmplitude)*outsideBlue+colorAmplitude*pixelBlue;
+            }
+        }
+        else {
+            pixelRed=outsideRed;
+            pixelGreen=outsideGreen;
+            pixelBlue=outsideBlue;
+        }
 
     // mark the reference image pixel, make it fully opaque
     x = Math.round(scaleInputToReference * x);
@@ -202,6 +226,8 @@ function basicDrawing(){
     // local reference to the mapping table
     var locMapX = mapX;
     var locMapY = mapY;
+    var locMapU=mapU;
+    var locMapV=mapV;
     var locMapColorSector = mapColorSector;
     var locMapColorAmplitude = mapColorAmplitude;
     var locOutputPixels=outputPixels;
@@ -213,22 +239,8 @@ function basicDrawing(){
     var colorAmplitude;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
         // translation, rotation and scaling
-        doOnePixel(locMapX[mapIndex],locMapY[mapIndex]);
-        // modify color if not outside input image
-        if (pixelRed>=0){
-            modifyColors(mapColorSector[mapIndex]);
-            colorAmplitude=locMapColorAmplitude[mapIndex];
-            if ((nColorMod>0)&&(colorAmplitude<1)){
-                pixelRed=(1-colorAmplitude)*outsideRed+colorAmplitude*pixelRed;
-                pixelGreen=(1-colorAmplitude)*outsideGreen+colorAmplitude*pixelGreen;
-                pixelBlue=(1-colorAmplitude)*outsideBlue+colorAmplitude*pixelBlue;
-            }
-        }
-        else {
-            pixelRed=outsideRed;
-            pixelGreen=outsideGreen;
-            pixelBlue=outsideBlue;
-        }
+        doOnePixel(locMapX[mapIndex],locMapY[mapIndex],locMapU[mapIndex],locMapV[mapIndex]);
+
         outputPixels[outputIndex++]=pixelRed;
         outputPixels[outputIndex++]=pixelGreen;
         outputPixels[outputIndex]=pixelBlue;
@@ -263,6 +275,8 @@ function smoothedDrawing(){
     // local reference to the mapping table
     var locMapX = mapX;
     var locMapY = mapY;
+    var locMapU=mapU;
+    var locMapV=mapV;
     var locMapColorSector = mapColorSector;
     var locMapColorAmplitude = mapColorAmplitude;
     var locOutputPixels=outputPixels;
@@ -280,6 +294,7 @@ function smoothedDrawing(){
     var index=0;
     var pixSumRed,pixSumGreen,pixSumBlue;
     var mapIndexPlusX,mapIndexPlusY,mapIndexPlusXY;
+    var x0,y0,u0,v0;
     for (j=0;j<mapHeight;j++){
         for (i=0;i<mapWidth;i++){
             mapIndexPlusX=mapIndex;
@@ -294,22 +309,31 @@ function smoothedDrawing(){
                 mapIndexPlusXY+=mapWidth;
             }
             
-            // translation, rotation and scaling
-            doOnePixel(locMapX[mapIndex],locMapY[mapIndex]);
+            x0=locMapX[mapIndex];
+            y0=locMapY[mapIndex];
+            u0=locMapU[mapIndex];
+            v0=locMapV[mapIndex];
+
+            doOnePixel(x0,y0,u0,v0);
             pixSumRed=pixelRed;
             pixSumGreen=pixelGreen;
             pixSumBlue=pixelBlue;
 
-            doOnePixel(0.5*(locMapX[mapIndex]+locMapX[mapIndexPlusX]),
-                        0.5*(locMapY[mapIndex]+locMapY[mapIndexPlusX]));
+            doOnePixel(0.5*(x0+locMapX[mapIndexPlusX]),
+                        0.5*(y0+locMapY[mapIndexPlusX]),
+                        0.5*(u0+locMapU[mapIndexPlusX]),
+                        0.5*(v0+locMapV[mapIndexPlusX]));
 
             pixSumRed+=pixelRed;
             pixSumGreen+=pixelGreen;
             pixSumBlue+=pixelBlue;
 
 
-            doOnePixel(0.5*(locMapX[mapIndex]+locMapX[mapIndexPlusY]),
-                        0.5*(locMapY[mapIndex]+locMapY[mapIndexPlusY]));
+ 
+            doOnePixel(0.5*(x0+locMapX[mapIndexPlusY]),
+                        0.5*(y0+locMapY[mapIndexPlusY]),
+                        0.5*(u0+locMapU[mapIndexPlusY]),
+                        0.5*(v0+locMapV[mapIndexPlusY]));
 
 
             pixSumRed+=pixelRed;
@@ -317,8 +341,12 @@ function smoothedDrawing(){
             pixSumBlue+=pixelBlue;
 
 
-            doOnePixel(0.5*(locMapX[mapIndex]+locMapX[mapIndexPlusXY]),
-                        0.5*(locMapY[mapIndex]+locMapY[mapIndexPlusXY]));
+ 
+            doOnePixel(0.5*(x0+locMapX[mapIndexPlusXY]),
+                        0.5*(y0+locMapY[mapIndexPlusXY]),
+                        0.5*(u0+locMapU[mapIndexPlusXY]),
+                        0.5*(v0+locMapV[mapIndexPlusXY]));
+
 
 
             pixSumRed+=pixelRed;
@@ -329,21 +357,8 @@ function smoothedDrawing(){
             pixelRed=Math.round(0.25*pixSumRed);
             pixelGreen=Math.round(0.25*pixSumGreen);
             pixelBlue=Math.round(0.25*pixSumBlue);
-            // modify color if not outside input image
-            if (pixelRed>=0){
-                modifyColors(mapColorSector[mapIndex]);
-                colorAmplitude=locMapColorAmplitude[mapIndex];
-                if ((nColorMod>0)&&(colorAmplitude<1)){
-                    pixelRed=(1-colorAmplitude)*outsideRed+colorAmplitude*pixelRed;
-                    pixelGreen=(1-colorAmplitude)*outsideGreen+colorAmplitude*pixelGreen;
-                    pixelBlue=(1-colorAmplitude)*outsideBlue+colorAmplitude*pixelBlue;
-                }
-            }
-            else {
-                pixelRed=outsideRed;
-                pixelGreen=outsideGreen;
-                pixelBlue=outsideBlue;
-            }
+
+
             outputPixels[outputIndex++]=pixelRed;
             outputPixels[outputIndex++]=pixelGreen;
             outputPixels[outputIndex]=pixelBlue;

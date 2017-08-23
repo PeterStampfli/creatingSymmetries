@@ -295,7 +295,7 @@ function startMapping(){
     sinCosPhases();
     //unitvectorsOdd(p);
     unitvectorsEven(p);
-    prepareFactorsSquareLattice(1,10);
+    prepareFactorsSquareLattice(2,7);
 }
 
 // depends on each point
@@ -305,8 +305,8 @@ function quasiperiodicMapping(x,y){
     logSpiral(x,y);
     rotate();
 
-  //  xTimesUnitvectors(xT,yT);
-    xTimesUnitvectors(x,y);
+    xTimesUnitvectors(xT,yT);
+   // xTimesUnitvectors(x,y);
 
   // xImage=makeSumSharpCosinesEven2(2,-1);
   // yImage=makeSumSharpCosines(1);
@@ -314,8 +314,9 @@ function quasiperiodicMapping(x,y){
  //  xImage=makeSumCosinesEven2(2,-1);
  //  yImage=makeSumCosines(1);
 
-   xImage=makeSumCosines2(2,-1);
-   yImage=makeSumCosines(1);
+   xImage=makeSumSharpCosines2(1,-1);
+   yImage=makeSumSharpCosines(1);
+   uImage=makeSumCosines(0.5);
 
 }
 

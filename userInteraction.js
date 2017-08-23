@@ -80,6 +80,8 @@ var outputHeightChooser;
 // the table for the mapping function (same size as output canvas)
 var mapX = [];
 var mapY = [];
+var mapU=[];
+var mapV=[];
 // and the color changing : colorSector and colorAmplitude
 // colorSector is number for interchanges, 0 changes nothing
 // colorAmplitude=0 - outsideColor, colorAmplitude=1 - full image color
