@@ -13,7 +13,10 @@ var xT,yT;
 // for logarithmic spirals
 
 function logSpiral(x,y){
-	xT=0.5*fLog(x*x+y*y);
+	var a=15;
+	//xT=0.5*(fLog((x-a)*(x-a)+y*y)+fLog((x+a)*(x+a)+y*y));
+	xT=0.5*(fLog(x*x+y*y));
+	//yT=fAtan2(y,x-a)+fAtan2(y,x+a);
 	yT=fAtan2(y,x);
 }
 

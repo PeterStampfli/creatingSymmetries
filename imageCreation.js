@@ -118,6 +118,8 @@ function make4ColorSymmetry(){
 
 // default
 var makeColorSymmetry=make2ColorSymmetry;
+// relative position of pixel
+var pixPosX,pixPosY;
 
 function makeMapTables() {
     // local variables and references to speed up access
@@ -136,10 +138,14 @@ function makeMapTables() {
     var x=0;
     var y=0;
     var index=0;
+    var iMapHeight=1.0/mapHeight;
+    var iMapWidth=1.0/mapWidth;
     for (j=0;j<mapHeight;j++){
         y=(j-locMapOffsetJ)*locMapScale;
+        pixPosY=j*iMapHeight;
         for (i=0;i<mapWidth;i++){
             x=(i-locMapOffsetI)*locMapScale;
+            pixPosX=i*iMapWidth;
             locMapping(x,y);
             locMapX[index] = xImage;
             locMapY[index] = yImage; 

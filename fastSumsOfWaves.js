@@ -313,7 +313,7 @@ function makeSumCosinesEven2Lower(k1,k2){
 }
 
 // upper set, two waves, difference is 2
-function makeSumCosinesEven2Lower(k1,k2){
+function makeSumCosinesEven2Upper(k1,k2){
     var sum=0;
     var lastXTimesE=-xTimesE[p-1];
     var newXTimesE;
