@@ -215,14 +215,12 @@ function makeInteractions(){
         },false);
     progressDiv=document.getElementById("progress");
 
-    var downloadImageButton = document.getElementById('downloadImageButton');
-    //  for image downloading, using jpeg image format, default quality=0.92
-    downloadImageButton.addEventListener('click', function () {
-            //  use correct data format and filename
-            downloadImageButton.href = outputCanvas.toDataURL("image/jpeg"); // the data URL is made at the time of the click
-            downloadImageButton.download = "theImage.jpg";
-        }, false);
-
+    var blobButton = document.getElementById('blob');
+    blobButton.addEventListener('click',function(){
+        outputCanvas.toBlob(function(blob){
+            saveAs(blob,"someImage.jpg");
+        },'image/jpeg',0.92);
+    },false);
 }
 
 //  the canvases and their interaction

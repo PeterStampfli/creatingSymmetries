@@ -289,12 +289,12 @@ function xyFromUV2(){
 
 // prepare things that are same for each point
 function startMapping(){
-    p=4;
+    p=5;
     nColors=2;
     chooseColorSymmetry();
     sinCosPhases();
     //unitvectorsOdd(p);
-    unitvectorsEven(p);
+    unitvectorsOdd(p);
     prepareFactorsSquareLattice(1,6);
 }
 
@@ -315,9 +315,13 @@ function quasiperiodicMapping(x,y){
 
  //  xImage=makeSumCosinesEven2(2,-1);
  //  yImage=makeSumCosines(1);
-    var xFactor= Math.min(1,2*pixPosX);
-   xImage=sumCosinesLower(1)+xFactor*sumCosinesUpper(1);
-   yImage=makeSumCosinesEven2Lower(1,1)+xFactor*makeSumCosinesEven2Upper(1,1);
+ /*var x=pixPosX-0.5;
+    var xFactor= x*x;
+    x=pixPosY-0.5;
+    xFactor=Math.max(0,1-3*(xFactor+x*x));
+    */
+   xImage=makeSumSharpCosines(1);
+   yImage=makeSumSharpSines(1);
 
  
   // uImage=makeSumCosines(1/1.618);
