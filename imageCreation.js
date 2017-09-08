@@ -248,6 +248,7 @@ function basicDrawing(){
     outputImage.putImageData(outputData,0, 0);
 	// put the reference image
     referenceImage.putImageData(referenceData, 0, 0);
+    //colorMinMax();
     progressDiv.innerHTML="Done. No smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 
 }
@@ -323,8 +324,6 @@ function smoothedDrawing(){
             pixSumRed+=pixelRed;
             pixSumGreen+=pixelGreen;
             pixSumBlue+=pixelBlue;
-
-
  
             doOnePixel(0.5*(x0+locMapX[mapIndexPlusY]),
                         0.5*(y0+locMapY[mapIndexPlusY]),
@@ -336,8 +335,6 @@ function smoothedDrawing(){
             pixSumGreen+=pixelGreen;
             pixSumBlue+=pixelBlue;
 
-
- 
             doOnePixel(0.5*(x0+locMapX[mapIndexPlusXY]),
                         0.5*(y0+locMapY[mapIndexPlusXY]),
                         0.5*(u0+locMapU[mapIndexPlusXY]),

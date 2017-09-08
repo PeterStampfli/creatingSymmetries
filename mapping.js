@@ -320,11 +320,11 @@ function quasiperiodicMapping(x,y){
     x=pixPosY-0.5;
     xFactor=Math.max(0,1-3*(xFactor+x*x));
     */
-   xImage=makeSumSharpCosines(1);
+   xImage=makeSumSharpCosines2(2,-1);
    yImage=makeSumSharpSines(1);
 
  
-  // uImage=makeSumCosines(1/1.618);
+   uImage=makeSumCosines(1/1.618);
 
 }
 

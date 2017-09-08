@@ -103,13 +103,25 @@ function makeFunctionTable(length,start,delta,theFunction){
 
 //==================================================================================================
 //  the sine and cosine function
+// and sharp and sharper
 //-------------------------------------------------------------------------------------------
 var PIHALF=Math.PI*0.5;
 
 var sinTab=[];
+var sharpSinTab=[];
+var sharperSinTab=[];
 var sinTabLengthM1=0;
 var sinTabFactor=1;
 var sinTabHigherCorrection=0;
+
+// first terms of the fourier expansion of the triangle function
+function sharpSin(x){
+	return Math.sin(x)-0.111111*Math.sin(3*x);
+}
+
+function sharperSin(x){
+	return Math.sin(x)-0.111111*Math.sin(3*x)+0.04*Math.sin(5*x);
+}
 
 // set up the table, its length is a power of 2 (plus one for linear interpolation)
 function setupSinCosTable(p) {
@@ -118,6 +130,8 @@ function setupSinCosTable(p) {
     sinTabFactor = 0.5*sinTabLength/Math.PI;
     sinTabHigherCorrection=0.25/sinTabFactor/sinTabFactor;
     sinTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,Math.sin);
+    sharpSinTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,sharpSin);
+    sharperSinTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,sharperSin);
 }
 
 // approximations for the sine function

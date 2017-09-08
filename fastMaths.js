@@ -50,9 +50,31 @@ function makeFunctionTable(length,start,delta,theFunction){
 //  the sine and cosine function
 //-------------------------------------------------------------------------------------------
 var sinTab=[];
+var sharpSinTab=[];
+var sharperSinTab=[];
 var cosTab=[];
+var sharpCosTab=[];
+var sharperCosTab=[];
 var sinTabLengthM1=0;
 var sinTabFactor=1;
+
+// first terms of the fourier expansion of the triangle function
+// without factor 8/PI_square
+function sharpSin(x){
+    return Math.sin(x)-0.111111*Math.sin(3*x);
+}
+
+function sharperSin(x){
+    return Math.sin(x)-0.111111*Math.sin(3*x)+0.04*Math.sin(5*x);
+}
+
+function sharpCos(x){
+    return Math.cos(x)+0.111111*Math.cos(3*x);
+}
+
+function sharperCos(x){
+    return Math.cos(x)+0.111111*Math.cos(3*x)+0.04*Math.cos(5*x);
+}
 
 // set up the table, its length is a power of 2
 function setupSinCosTable(p) {
@@ -60,7 +82,11 @@ function setupSinCosTable(p) {
     sinTabLengthM1=sinTabLength-1;
     sinTabFactor = 0.5*sinTabLength/Math.PI;
     sinTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,Math.sin);
+    sharpSinTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,sharpSin);
+    sharperSinTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,sharperSin);
     cosTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,Math.cos);
+    sharpCosTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,sharpCos);
+    sharperCosTab=makeFunctionTable(sinTabLength+1,0,1.0/sinTabFactor,sharperCos);
 }
 
 setupSinCosTable(12);
@@ -73,12 +99,44 @@ function fSin(x){
     return sinTab[index]*(1-x)+sinTab[index+1]*x;
 }
 
+function fSharpSin(x){
+    x*=sinTabFactor;
+    var index=Math.floor(x);
+    x-=index;
+    index=index&sinTabLengthM1;
+    return sharpSinTab[index]*(1-x)+sharpSinTab[index+1]*x;
+}
+
+function fSharperSin(x){
+    x*=sinTabFactor;
+    var index=Math.floor(x);
+    x-=index;
+    index=index&sinTabLengthM1;
+    return sharperSinTab[index]*(1-x)+sharperSinTab[index+1]*x;
+}
+
 function fCos(x){
     x*=sinTabFactor;
     var index=Math.floor(x);
     x-=index;
     index=index&sinTabLengthM1;
     return cosTab[index]*(1-x)+cosTab[index+1]*x;
+}
+
+function fSharpCos(x){
+    x*=sinTabFactor;
+    var index=Math.floor(x);
+    x-=index;
+    index=index&sinTabLengthM1;
+    return sharpCosTab[index]*(1-x)+sharpCosTab[index+1]*x;
+}
+
+function fSharperCos(x){
+    x*=sinTabFactor;
+    var index=Math.floor(x);
+    x-=index;
+    index=index&sinTabLengthM1;
+    return sharperCosTab[index]*(1-x)+sharperCosTab[index+1]*x;
 }
 
 // both in parallel

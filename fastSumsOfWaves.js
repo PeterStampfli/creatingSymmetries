@@ -19,7 +19,7 @@ function makeSumSharpCosines(k){
     var phase;
     for (var i=0;i<p;i++){
         phase=k*xTimesE[i];
-        sum+=fCos(phase)+0.11111*fCos(3*phase);
+        sum+=fSharpCos(phase);
     }
     return sum;
 }
@@ -30,7 +30,7 @@ function makeSumSharperCosines(k){
     var phase;
     for (var i=0;i<p;i++){
         phase=k*xTimesE[i];
-        sum+=fCos(phase)+0.11111*fCos(3*phase)+0.04*fCos(5*phase);
+        sum+=fSharpestCos(phase);
     }
     return sum;
 }
@@ -60,7 +60,7 @@ function makeSumSharpSines(k){
     var phase;
      for (var i=0;i<p;i++){
         phase=k*xTimesE[i];
-        sum+=fSin(phase)-0.111111*fSin(3*phase);
+        sum+=fSharpSin(phase);
     }
     return sum;
 }
@@ -70,7 +70,7 @@ function makeSumSharperSines(k){
     var phase;
      for (var i=0;i<p;i++){
         phase=k*xTimesE[i];
-        sum+=fSin(phase)-0.111111*fSin(3*phase)+0.04*fSin(5*phase);
+        sum+=fSharperSin(phase);
     }
     return sum;
 }
