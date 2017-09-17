@@ -83,6 +83,20 @@ function makeSumSharpestSines(k){
     return sum;
 }
 
+
+function makeSumSharpSines2(k1,k2){
+    var sum=0;
+    var lastXTimesE=evenOddSign*xTimesE[p-1];
+    var newXTimesE;
+    for (var i=0;i<p;i++){
+        newXTimesE=xTimesE[i];
+        sum+=fSharpSin(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
+    }
+    return sum;
+}
+
+
 //  image mapping: making sums for wavevectors with two neighboring non-zero coefficients
 
 //  for odd-p and even rotational symmetry
@@ -101,13 +115,11 @@ function makeSumCosines2(k1,k2){
 
 function makeSumSharpCosines2(k1,k2){
     var sum=0;
-    var phase;
     var lastXTimesE=evenOddSign*xTimesE[p-1];
     var newXTimesE;
     for (var i=0;i<p;i++){
         newXTimesE=xTimesE[i];
-        phase=k1*lastXTimesE+k2*newXTimesE;
-        sum+=fCos(phase)+0.11111*fCos(3*phase);
+        sum+=fSharpCos(k1*lastXTimesE+k2*newXTimesE);
         lastXTimesE=newXTimesE;
     }
     return sum;
@@ -115,13 +127,11 @@ function makeSumSharpCosines2(k1,k2){
 
 function makeSumSharperCosines2(k1,k2){
     var sum=0;
-    var phase;
     var lastXTimesE=evenOddSign*xTimesE[p-1];
     var newXTimesE;
     for (var i=0;i<p;i++){
         newXTimesE=xTimesE[i];
-        phase=k1*lastXTimesE+k2*newXTimesE;
-        sum+=fCos(phase)+0.11111*fCos(3*phase)+0.04*fCos(5*phase);
+        sum+=fSharperCos(k1*lastXTimesE+k2*newXTimesE);
         lastXTimesE=newXTimesE;
     }
     return sum;

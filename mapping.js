@@ -293,9 +293,11 @@ function startMapping(){
     nColors=2;
     chooseColorSymmetry();
     sinCosPhases();
-    //unitvectorsOdd(p);
     unitvectorsOdd(p);
+    //unitvectorsEven(p);
     prepareFactorsSquareLattice(1,6);
+    transWidth=0.1;
+    transSmoothing=0.05
 }
 
 // relative position of pixel: pixPosX,pixPosY;
@@ -320,11 +322,14 @@ function quasiperiodicMapping(x,y){
     x=pixPosY-0.5;
     xFactor=Math.max(0,1-3*(xFactor+x*x));
     */
-   xImage=makeSumSharpCosines2(2,-1);
-   yImage=makeSumSharpSines(1);
+   xImage=makeSumSharpSines(1);
+   yImage=makeSumSharpSines(1/1.618);
 
  
-   uImage=makeSumCosines(1/1.618);
+   //uImage=makeSumCosines(1/1.618);
+   uImage=makeSumAlternatingSines(1/1.618);
+   //uImage=makeSumCosines(0.414);
+   //yImage=makeSumSharpSines2(1,-1);
 
 }
 

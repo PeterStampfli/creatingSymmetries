@@ -249,7 +249,8 @@ function basicDrawing(){
 	// put the reference image
     referenceImage.putImageData(referenceData, 0, 0);
     //colorMinMax();
-    progressDiv.innerHTML="Done. No smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
+    progressDiv.innerHTML="Width "+outputWidth+", height "+outputHeight+
+    ". No smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 
 }
 
@@ -363,7 +364,8 @@ function smoothedDrawing(){
     outputImage.putImageData(outputData,0, 0);
     // put the reference image
     referenceImage.putImageData(referenceData, 0, 0);
-    progressDiv.innerHTML="Done. 2 x 2 smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
+    progressDiv.innerHTML="Width "+outputWidth+", height "+outputHeight+
+    ". 2x2 smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 }
 
 var drawing=basicDrawing;

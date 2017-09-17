@@ -152,9 +152,26 @@ function updateOutputDimensions(newWidth,newHeight) {
 var progressDiv;
 var interpolation="nearest";
 var colorMod="none";
+var choosenWidth,choosenHeight;
+
+function updateAll() {
+
+    choosenWidth=parseInt(outputWidthChooser.value,10);
+    choosenHeight=parseInt(outputHeightChooser.value,10);
+
+    if ((choosenWidth!=outputWidth)||(choosenHeight!=outputHeight)){
+        updateOutputDimensions(choosenWidth,choosenHeight);
+    }
+
+
+    drawing();
+
+}
 
 // make up interactions with html elements: adds event listeners
 function makeInteractions(){
+    choosenWidth=initialOutputWidth;
+    choosenHeight=initialOutputHeight;
     var imageInputButton = document.getElementById('imageInput')
     imageInputButton.addEventListener('change',function(){
             imageReader.readAsDataURL(imageInputButton.files[0]);
@@ -162,22 +179,19 @@ function makeInteractions(){
     // we need the choosers to write back the corrected data
     outputWidthChooser = document.getElementById('outputWidthChooser');
     outputWidthChooser.addEventListener('change',function(){
-            updateOutputDimensions(parseInt(outputWidthChooser.value,10),outputHeight);
-            drawing();
+        //    choosenWidth=parseInt(outputWidthChooser.value,10);
         },false);
     outputHeightChooser = document.getElementById('outputHeightChooser');
     outputHeightChooser.addEventListener('change',function(){
-            updateOutputDimensions(outputWidth, parseInt(outputHeightChooser.value,10));
-            drawing();
+         //   choosenHeight=parseInt(outputHeightChooser.value,10);
         },false);
+
     var smoothingChoosers=document.getElementsByClassName('smoothing');
    smoothingChoosers[0].addEventListener('click',function(){
             drawing=basicDrawing;
-            drawing();
         },false);
    smoothingChoosers[1].addEventListener('click',function(){
             drawing=smoothedDrawing;
-            drawing();
         },false);
 
 
@@ -185,35 +199,39 @@ function makeInteractions(){
     interpolationChoosers[0].addEventListener('click',function(){
             pixelInterpolation = pixelInterpolationNearest;
             interpolation="nearest";
-            drawing();
         },false);
     interpolationChoosers[1].addEventListener('click',function(){
             pixelInterpolation = pixelInterpolationLinear;
             interpolation="linear";
-            drawing();
         },false);
     interpolationChoosers[2].addEventListener('click',function(){
             pixelInterpolation = pixelInterpolationCubic;
             interpolation="cubic";
-            drawing();
         },false);
+
+    // color modification changes things directly
     var inversionChoosers=document.getElementsByClassName('inversion');
     inversionChoosers[0].addEventListener('click',function(){
             nColorMod = 0;
             colorMod="none";
-            drawing();
+            updateAll();
         },false);
     inversionChoosers[1].addEventListener('click',function(){
             nColorMod = 1;
             colorMod="first";
-            drawing();
+            updateAll();
         },false);
     inversionChoosers[2].addEventListener('click',function(){
             nColorMod = 2;
             colorMod="second";
-            drawing();
+            updateAll();
         },false);
     progressDiv=document.getElementById("progress");
+
+    var updateButton=document.getElementById("update");
+    updateButton.addEventListener('click',function(){
+        updateAll();
+    },false);
 
     var blobButton = document.getElementById('blob');
     blobButton.addEventListener('click',function(){
