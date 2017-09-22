@@ -186,52 +186,52 @@ function makeInteractions(){
          //   choosenHeight=parseInt(outputHeightChooser.value,10);
         },false);
 
-    var smoothingChoosers=document.getElementsByClassName('smoothing');
-   smoothingChoosers[0].addEventListener('click',function(){
+    var smoothingChoosers=new Chooser('smoothing');
+    smoothingChoosers.add(function(){
             drawing=basicDrawing;
-        },false);
-   smoothingChoosers[1].addEventListener('click',function(){
+        });
+    smoothingChoosers.add(function(){
             drawing=smoothedDrawing;
-        },false);
+        });
 
 
-    var interpolationChoosers=document.getElementsByClassName('interpolation');
-    interpolationChoosers[0].addEventListener('click',function(){
+    var interpolationChoosers=new Chooser('interpolation');
+    interpolationChoosers.add(function(){
             pixelInterpolation = pixelInterpolationNearest;
             interpolation="nearest";
-        },false);
-    interpolationChoosers[1].addEventListener('click',function(){
+        });
+    interpolationChoosers.add(function(){
             pixelInterpolation = pixelInterpolationLinear;
             interpolation="linear";
-        },false);
-    interpolationChoosers[2].addEventListener('click',function(){
+        });
+    interpolationChoosers.add(function(){
             pixelInterpolation = pixelInterpolationCubic;
             interpolation="cubic";
-        },false);
+        });
 
     // color modification changes things directly
-    var inversionChoosers=document.getElementsByClassName('inversion');
-    inversionChoosers[0].addEventListener('click',function(){
+    var inversionChoosers=new Chooser('inversion');
+    inversionChoosers.add(function(){
             nColorMod = 0;
             colorMod="none";
             updateAll();
-        },false);
-    inversionChoosers[1].addEventListener('click',function(){
+        });
+    inversionChoosers.add(function(){
             nColorMod = 1;
             colorMod="first";
             updateAll();
-        },false);
-    inversionChoosers[2].addEventListener('click',function(){
+        });
+    inversionChoosers.add(function(){
             nColorMod = 2;
             colorMod="second";
             updateAll();
-        },false);
+        });
+
     progressDiv=document.getElementById("progress");
 
-    var updateButton=document.getElementById("update");
-    updateButton.addEventListener('click',function(){
-        updateAll();
-    },false);
+    makeClickButton("update",function(){
+        updateAll()
+        });
 
     var blobButton = document.getElementById('blob');
     blobButton.addEventListener('click',function(){

@@ -308,6 +308,22 @@ function sumCosinesUpper(k){
     }
     return sum;
 }
+// lower set
+function sumSharpCosinesLower(k){
+    var sum=0;
+    for (var i=0;i<p-1;i+=2){
+        sum+=fSharpCos(k*xTimesE[i]);
+    }
+    return sum;
+}
+// upper set
+function sumSharpCosinesUpper(k){
+    var sum=0;
+    for (var i=1;i<p;i+=2){
+        sum+=fSharpCos(k*xTimesE[i]);
+    }
+    return sum;
+}
 
 // lower set, two waves, difference is 2
 function makeSumCosinesEven2Lower(k1,k2){
@@ -330,6 +346,32 @@ function makeSumCosinesEven2Upper(k1,k2){
     for (var i=1;i<p;i+=2){
         newXTimesE=xTimesE[i];
         sum+=fCos(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
+    }
+    return sum;
+}
+
+// lower set, two waves, difference is 2
+function sumSharpCosinesEven2Lower(k1,k2){
+    var sum=0;
+    var lastXTimesE=-xTimesE[p-2];
+    var newXTimesE;
+    for (var i=0;i<p-1;i+=2){
+        newXTimesE=xTimesE[i];
+        sum+=fSharpCos(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
+    }
+    return sum;
+}
+
+// upper set, two waves, difference is 2
+function sumSharpCosinesEven2Upper(k1,k2){
+    var sum=0;
+    var lastXTimesE=-xTimesE[p-1];
+    var newXTimesE;
+    for (var i=1;i<p;i+=2){
+        newXTimesE=xTimesE[i];
+        sum+=fSharpCos(k1*lastXTimesE+k2*newXTimesE);
         lastXTimesE=newXTimesE;
     }
     return sum;

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<head>
+	<title>test</title>
+	<style>
+		body { 
+			background-color:rgb(235,235,190);
+			color:rgb(80,40,0);
+		}
+
+		a{
+			color:black;
+			text-decoration:none;
+			border-style:solid;
+			background-color:white;
+			border-width:1px;
+		}
+		
+		.numbers{
+			width: 35px;
+		}
+	</style>
+</head>
+<body>
+	<noscript>
+		<h1 style="background-color:white">
+			Please allow execution of javascript !
+			<br>
+			(Else nothing happens.)
+		</h1>
+	</noscript>
+		<p>			
+			<form action="">
+				Choose image smoothing:
+				<input type="radio" name="smoothing" class='smoothing' checked>none
+				<input type="radio" name="smoothing" class='smoothing'>2x2
+			</form>
+		</p>
+
+</body>
+	<script src="chooser.js"></script>
+	<script type="text/javascript">
+		console.log("hello");
+		var smoothingChooser=new Chooser('smoothing');
+
+		smoothingChooser.add(function(){
+			console.log("0");
+		})
+
+		smoothingChooser.add(function(){
+			console.log("1");
+		})
+	</script>
+</html>
