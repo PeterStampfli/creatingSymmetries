@@ -57,6 +57,12 @@ function useNewInputImage() {
     referencePixels = referenceData.data;
     inputData = offScreenCanvasImage.getImageData(0, 0, inputWidth, inputHeight);
     inputPixels = inputData.data;
+
+
+//document.removeChild(offScreenCanvas);
+console.log(offScreenCanvas.parent);
+offScreenCanvas=null;
+
     drawing();
 }
 
@@ -97,7 +103,7 @@ var mapOffsetJ=0;
 // makes a blue screen as output image
 // does NOT limit the period dimensions (avoid tangle, responsability of callers)
 function setOutputDimensions(newWidth,newHeight){
-    outputWidthChooser.value = newWidth.toString();
+    outputWidthChooser.setValue(newWidth);
     outputHeightChooser.value = newHeight.toString();
     outputWidth = newWidth;
     outputHeight = newHeight;
@@ -156,7 +162,7 @@ var choosenWidth,choosenHeight;
 
 function updateAll() {
 
-    choosenWidth=parseInt(outputWidthChooser.value,10);
+    choosenWidth=outputWidthChooser.getValue();
     choosenHeight=parseInt(outputHeightChooser.value,10);
 
     if ((choosenWidth!=outputWidth)||(choosenHeight!=outputHeight)){
@@ -172,15 +178,13 @@ function updateAll() {
 function makeInteractions(){
     choosenWidth=initialOutputWidth;
     choosenHeight=initialOutputHeight;
-    var imageInputButton = document.getElementById('imageInput')
-    imageInputButton.addEventListener('change',function(){
-            imageReader.readAsDataURL(imageInputButton.files[0]);
-        },false);
+    var imageInputButton = new Button('imageInput');
+    imageInputButton.onChange(function(){
+            imageReader.readAsDataURL(imageInputButton.button.files[0]);
+        });
     // we need the choosers to write back the corrected data
-    outputWidthChooser = document.getElementById('outputWidthChooser');
-    outputWidthChooser.addEventListener('change',function(){
-        //    choosenWidth=parseInt(outputWidthChooser.value,10);
-        },false);
+    outputWidthChooser = new Button('outputWidthChooser');
+
     outputHeightChooser = document.getElementById('outputHeightChooser');
     outputHeightChooser.addEventListener('change',function(){
          //   choosenHeight=parseInt(outputHeightChooser.value,10);
@@ -228,17 +232,22 @@ function makeInteractions(){
         });
 
     progressDiv=document.getElementById("progress");
-
+/*
     makeClickButton("update",function(){
         updateAll()
         });
+*/
+    var updateButton=new Button("update");
+    updateButton.onClick(function(){
+        updateAll();
+        });
 
-    var blobButton = document.getElementById('blob');
-    blobButton.addEventListener('click',function(){
+    var saveImageButton=new Button("blob");
+    saveImageButton.onClick(function(){
         outputCanvas.toBlob(function(blob){
-            saveAs(blob,"someImage.jpg");
-        },'image/jpeg',0.92);
-    },false);
+                saveAs(blob,"someImage.jpg");
+            },'image/jpeg',0.92);
+        });
 }
 
 //  the canvases and their interaction
