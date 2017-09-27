@@ -3,9 +3,6 @@
 // a single file reader
 var fileReader=new FileReader();
 
-// global reference to the input object
-//var input;
-
 /*
 object for reading images and getting their pixels
 */
@@ -36,6 +33,13 @@ InputImage.prototype.makePixels=function(){
 }
 
 /*
+free the image for garbage collection
+*/
+InputImage.prototype.deleteImage=function(){
+	this.image=null;
+}
+
+/*
 read an image from a file and do some action
 */
 InputImage.prototype.read=function(file,action){
@@ -54,3 +58,20 @@ InputImage.prototype.read=function(file,action){
 	fileReader.readAsDataURL(file);
 }
 
+/*
+get color of nearest pixel
+this.red=-1 for pixels lying outside
+*/
+InputImage.prototype.getNearest=function(color,x,y){
+    var h = Math.round(x);
+    var k = Math.round(y);
+    if ((h<0)||(h>=this.width)||(k<0)||(k>=this.height)){
+    	color.red=-1;
+    }
+    else {
+    	var index=(h+this.width*k)<<2;    // shift - multiply with four
+    	color.red=this.pixels[index++];
+    	color.green=this.pixels[index++];
+    	color.blue=this.pixels[index];
+    }
+}

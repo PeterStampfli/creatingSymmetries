@@ -44,6 +44,7 @@
 	<script src="chooser.js"></script>
 	<script src="button.js"></script>
 	<script src="inputImage.js"></script>
+	<script src="color.js"></script>
 	<script type="text/javascript">
 		console.log("hello");
 		var smoothingChooser=new Chooser('smoothing');
@@ -57,6 +58,7 @@
 		})
 
 		var inputImage=new InputImage();
+		var c=new Color();
 
     var imageInputButton = new Button('imageInput');
     imageInputButton.onChange(function(){
@@ -64,6 +66,9 @@
     	inputImage.read(imageInputButton.button.files[0],
     		function(input){
     			console.log("action"+input.width);
+    			input.getNearest(c,23.4,56.3);
+    			    console.log(c.toString());
+
     		})
            // imageReader.readAsDataURL(imageInputButton.button.files[0]);
         });
@@ -71,5 +76,27 @@
 
     outputCanvas = document.getElementById("outputCanvas");
     outputImage = outputCanvas.getContext("2d");
+
+    console.log(new Color().toString());
+    c=new Color();
+    c.setRgb(3,4,5);
+    c.simpleInversion();
+    console.log(c);
+    c.improvedInversion();
+    console.log(c.toString());
+    c.rotation();
+        console.log(c.toString());
+   c.inverseRotation();
+        console.log(c.toString());
+        c.higFromRgb();
+        console.log("*"+c.toString());
+        c.simpleInversion();
+        console.log(c.toString());
+        c.rgbFromHig();
+        console.log(c.toString());
+        c.shiftHue(33);
+        console.log(c.toString());
+        console.log((6+2)>>2);
+
 	</script>
 </html>
