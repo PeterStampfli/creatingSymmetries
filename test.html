@@ -45,6 +45,7 @@
 	<script src="button.js"></script>
 	<script src="inputImage.js"></script>
 	<script src="color.js"></script>
+	<script src="mouseEvents.js"></script>
 	<script type="text/javascript">
 		console.log("hello");
 		var smoothingChooser=new Chooser('smoothing');
@@ -79,7 +80,11 @@
 
 
     outputCanvas = document.getElementById("outputCanvas");
+    outputCanvas.width=200;
+    outputCanvas.height=200;
     outputImage = outputCanvas.getContext("2d");
+   outputImage.fillStyle = "Blue";
+    outputImage.fillRect(0, 0, 200, 200);
 
     console.log(new Color().toString());
     c=new Color();
@@ -101,6 +106,11 @@
         c.shiftHue(33);
         console.log(c.toString());
         console.log((6+2)>>2);
+
+var canvasMouse=new MouseEvents("outputCanvas");
+canvasMouse.addEvent("mousedown",function(event){console.log("mouse");});
+canvasMouse.addEvent("mousedown",function(event){console.log("mousemore");});
+
 
 	</script>
 </html>
