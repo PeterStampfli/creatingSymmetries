@@ -51,7 +51,7 @@ Button.prototype.setValue=function(number){
 	this.button.value=number.toString();
 }
 
-//fast floor (positive numbers)
+//fast round (positive numbers)
 
 // With a bitwise or.
 //rounded = (0.5 + somenum) | 0;
