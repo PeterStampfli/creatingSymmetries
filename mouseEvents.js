@@ -16,7 +16,7 @@ function MouseEvents(idName){
 	this.dx=0;
 	this.dy=0;
 	this.pressed=false;
-
+	this.name=idName;
 
 }
 
@@ -30,8 +30,8 @@ MouseEvents.prototype.stopEventPropagationAndDefaultAction=function (event) {
 read the mouse position relative to element, calculate changes
 */
 MouseEvents.prototype.updateMousePosition=function(event){
-	this.lastX=x;
-	this.lastY=y;
+	this.lastX=this.x;
+	this.lastY=this.y;
 	this.x = event.pageX - this.element.offsetLeft;
     this.y = event.pageY - this.element.offsetTop;
     this.dx=this.x-this.lastX;
@@ -44,7 +44,7 @@ where action function only cares about the thing to do
 */
 // listeners for useCapture, acting in bottom down capturing phase
 //  they should return false to stop event propagation ...
-MouseEvents.prototype.addEvent=function(eventName,action){
+MouseEvents.prototype.addAction=function(eventName,action){
 	var mouseEvents=this;
 	this.element.addEventListener(eventName,function(event){
 		mouseEvents.stopEventPropagationAndDefaultAction(event);
@@ -54,9 +54,50 @@ MouseEvents.prototype.addEvent=function(eventName,action){
 }
 
 /*
+add action for a mouse down event
+*/
+MouseEvents.prototype.addDownAction=function(action){
+	this.addAction("mousedown",action);
+}
+
+/*
+add action for a mouse up event
+*/
+MouseEvents.prototype.addUpAction=function(action){
+	this.addAction("mouseup",action);
+}
+
+/*
+add action for a mouse move event, automaticall checks if pressed and updates position
+*/
+MouseEvents.prototype.addMoveAction=function(action){
+	this.addAction("mousemove",function(event,mouseEvents){
+		if (mouseEvents.pressed){
+			mouseEvents.updateMousePosition(event);
+			action(event,mouseEvents);
+		}
+	});
+}
+
+/*
+add action for a mouse out event
+*/
+MouseEvents.prototype.addOutAction=function(action){
+	this.addAction("mouseout",action);
+}
+
+/*
+add action for a mouse wheel event
+*/
+MouseEvents.prototype.addWheelAction=function(action){
+	this.addAction("mousewheel",action);
+}
+
+
+/*
 on mouse down set pressed =true and update position
 */
-MouseEvents.prototype.basicMouseDownAction=function(event,mouseEvents){
+MouseEvents.prototype.basicDownAction=function(event,mouseEvents){
 	mouseEvents.pressed=true;
 	mouseEvents.updateMousePosition(event);
 }
@@ -65,16 +106,16 @@ MouseEvents.prototype.basicMouseDownAction=function(event,mouseEvents){
 on mouse up set pressed =false
 same for mouseout
 */
-MouseEvents.prototype.basicMouseUpAction=function(event,mouseEvents){
+MouseEvents.prototype.basicUpAction=function(event,mouseEvents){
 	mouseEvents.pressed=false;
+	console.log("up "+mouseEvents.pressed+mouseEvents.name);
 }
 
 
 /*
-on mouse move do something with position
+on mouse move do something with position, called onla if mouse pressed
 */
-MouseEvents.prototype.basicMouseMoveAction=function(event,mouseEvents){
-	mouseEvents.updateMousePosition(event);
+MouseEvents.prototype.basicMoveAction=function(event,mouseEvents){
 	console.log(mouseEvents.dx,mouseEvents.dy);
 }
 
@@ -82,6 +123,16 @@ MouseEvents.prototype.basicMouseMoveAction=function(event,mouseEvents){
 /*
 on (mouse) wheel do something depending on direction
 */
-MouseEvents.prototype.basicMouseWheelAction=function(event,mouseEvents){
+MouseEvents.prototype.basicWheelAction=function(event,mouseEvents){
 	console.log(event.deltaY);
+}
+
+/*
+add the basic up, down and out actions
+*/
+MouseEvents.prototype.addBasicDownUpOutActions=function(){
+	//var mouseEvents=this;
+	this.addDownAction(this.basicDownAction);
+	this.addUpAction(this.basicUpAction);
+	this.addOutAction(this.basicUpAction);
 }
