@@ -22,8 +22,10 @@ Map.prototype.setSize=function(width,height){
 	this.height=height;
 	oldLength=this.data.length;
 	newLength=width*height;
+	if (oldLength<newLength){
 	this.data.length=newLength;
-	for (var i=oldLength;i<newLength;i++){
-		this.data[i]=new MapOutput();
+		for (var i=oldLength;i<newLength;i++){
+			this.data[i]=new MapOutput();
+		}
 	}
 }

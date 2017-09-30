@@ -49,6 +49,8 @@
 	<script src="mapInput.js"></script>
 	<script src="mapOutput.js"></script>
 	<script src="map.js"></script>
+	<script src="funTest.js"></script>
+	<script src="fastFunction.js"></script>
 	<script type="text/javascript">
 		console.log("hello");
 		var smoothingChooser=new Chooser('smoothing');
@@ -118,6 +120,29 @@ canvasMouse.addDownAction(function(event){console.log("down");});
 canvasMouse.addBasicDownUpOutActions();
 canvasMouse.addMoveAction(canvasMouse.basicMoveAction);
 canvasMouse.addWheelAction(canvasMouse.basicWheelAction);
+
+
+var funTest=new FunTest();
+
+funTest.trueFunction=function(x){
+	return x;
+}
+
+funTest.approxFunction=function(x){
+	return 1;
+}
+
+
+var fastSin=new FastFun();
+fastSin.makePeriodicTable(10,Math.sin);
+console.log(fastSin.sinLike(1));
+funTest.trueFunction=Math.sin;
+funTest.approxFunction=function(x){return fastSin.sinLike(x);};
+var f=function(x){return x;};
+console.log("*"+f(88));
+console.log(function(event){console.log("down");})
+funTest.compare(0,3,12,function(x){return fastSin.sinLike(x);});
+funTest.timing(0,6,10000000);
 
 	</script>
 </html>
