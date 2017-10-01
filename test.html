@@ -136,13 +136,26 @@ funTest.approxFunction=function(x){
 var fastSin=new FastFun();
 fastSin.makePeriodicTable(10,Math.sin);
 console.log(fastSin.sinLike(1));
-funTest.trueFunction=Math.sin;
-funTest.approxFunction=function(x){return fastSin.sinLike(x);};
+funTest.trueFunction=Math.cos;
+funTest.approxFunction=function(x){return fastSin.cosLike(x);};
 var f=function(x){return x;};
 console.log("*"+f(88));
 console.log(function(event){console.log("down");})
-funTest.compare(0,3,12,function(x){return fastSin.sinLike(x);});
+funTest.compare(0,3,12,function(x){return fastSin.cosLike(x);});
 funTest.timing(0,6,10000000);
+var fastExp=new FastFun();
+fastExp.makeExpTable(1000);
+
+console.log(fastExp.exp(1));
+
+funTest.trueFunction=Math.exp;
+funTest.approxFunction=function(x){return fastExp.exp(x)};
+funTest.compare(-1,0,20);
+funTest.timing(0,6,10000000);
+
+var fastLog=new FastFun();
+fastLog.makeLogTable(1000);
+console.log(fastLog.log(2.718));
 
 	</script>
 </html>
