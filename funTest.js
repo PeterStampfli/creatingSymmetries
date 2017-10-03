@@ -60,7 +60,7 @@ FunTest.prototype.compare=function(start,end,nSteps){
 	var error;
 	console.log(this.approxFunction);
 	console.log("compare:  x, true function, approximation, error");
-	while (x<=end){
+	while (x<=end+0.01){
 		error=(this.approxFunction(x)-this.trueFunction(x));
 		console.log(x.toPrecision(3)+" "+this.trueFunction(x).toPrecision(3)
 			+" "+this.approxFunction(x).toPrecision(3)

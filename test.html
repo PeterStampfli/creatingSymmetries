@@ -71,16 +71,8 @@
     	console.log("www");
     	inputImage.read(imageInputButton.button.files[0],
     		function(input){
-    			console.log("action"+input.width);
-    			input.getNearest(c,23.4,56.3);
-    			    console.log(c.toString());
-			input.getLinear(c,23.4,56.3);
-    			    console.log(c.toString());
-			input.getCubic(c,23.4,56.3);
-    			    console.log(c.toString());
-
+ 
     		})
-           // imageReader.readAsDataURL(imageInputButton.button.files[0]);
         });
 
 
@@ -91,30 +83,8 @@
    outputImage.fillStyle = "Blue";
     outputImage.fillRect(0, 0, 200, 200);
 
-    console.log(new Color().toString());
-    c=new Color();
-    c.setRgb(3,4,5);
-    c.simpleInversion();
-    console.log(c);
-    c.improvedInversion();
-    console.log(c.toString());
-    c.rotation();
-        console.log(c.toString());
-   c.inverseRotation();
-        console.log(c.toString());
-        c.higFromRgb();
-        console.log("*"+c.toString());
-        c.simpleInversion();
-        console.log(c.toString());
-        c.rgbFromHig();
-        console.log(c.toString());
-        c.shiftHue(33);
-        console.log(c.toString());
-        console.log((6+2)>>2);
-
-        var map=new Map();
-        map.setSize(8,9);
-
+ 
+ 
 var canvasMouse=new MouseEvents("outputCanvas");
 canvasMouse.addDownAction(function(event){console.log("down");});
 canvasMouse.addBasicDownUpOutActions();
@@ -122,40 +92,9 @@ canvasMouse.addMoveAction(canvasMouse.basicMoveAction);
 canvasMouse.addWheelAction(canvasMouse.basicWheelAction);
 
 
-var funTest=new FunTest();
+       var map=new Map();
+        map.setSize(8,9);
 
-funTest.trueFunction=function(x){
-	return x;
-}
-
-funTest.approxFunction=function(x){
-	return 1;
-}
-
-
-var fastSin=new FastFun();
-fastSin.makePeriodicTable(10,Math.sin);
-console.log(fastSin.sinLike(1));
-funTest.trueFunction=Math.cos;
-funTest.approxFunction=function(x){return fastSin.cosLike(x);};
-var f=function(x){return x;};
-console.log("*"+f(88));
-console.log(function(event){console.log("down");})
-funTest.compare(0,3,12,function(x){return fastSin.cosLike(x);});
-funTest.timing(0,6,10000000);
-var fastExp=new FastFun();
-fastExp.makeExpTable(1000);
-
-console.log(fastExp.exp(1));
-
-funTest.trueFunction=Math.exp;
-funTest.approxFunction=function(x){return fastExp.exp(x)};
-funTest.compare(-1,0,20);
-funTest.timing(0,6,10000000);
-
-var fastLog=new FastFun();
-fastLog.makeLogTable(1000);
-console.log(fastLog.log(2.718));
 
 	</script>
 </html>

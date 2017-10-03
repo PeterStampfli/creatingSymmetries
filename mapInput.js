@@ -5,17 +5,17 @@
 input data for the map transform, may be changed
 
 position in geometrical space
-	spaceX
-	spaceY
+	x
+	y
 
-relative position on the image, size independent coordinates, going from 0 to 1
-	imageX
-	imageY
+relative position on the canvas, size independent coordinates, going from 0 to 1
+	canvasX
+	canvasY
 */
 
 function MapInput(){
-	this.spaceX=0;
-	this.spaceY=0;
-	this.imageX=0;
-	this.imageY=0;
+	this.x=0;
+	this.y=0;
+	this.canvasX=0;
+	this.canvasY=0;
 }
