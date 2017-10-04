@@ -17,6 +17,7 @@ function InputImage(){
 }
 
 // we use an off-screen canvas to get the data of the input image
+// the off-screen canvas is local to this function and should be garbage collected
 InputImage.prototype.makePixels=function(){
     var offScreenCanvas;
     var offScreenCanvasImage;
@@ -36,11 +37,11 @@ InputImage.prototype.makePixels=function(){
 free the image for garbage collection
 */
 InputImage.prototype.deleteImage=function(){
-	this.image=null;
+    this.image=null;
 }
 
 /*
-read an image from a file and do some action
+read an image from a file, make its pixels and do some action (create output image)
 */
 InputImage.prototype.read=function(file,action){
 	var input=this;

@@ -51,6 +51,8 @@
 	<script src="map.js"></script>
 	<script src="funTest.js"></script>
 	<script src="fastFunction.js"></script>
+	<script src="pixelCanvas.js"></script>
+	<script src="fileSaver.js"></script>
 	<script type="text/javascript">
 		console.log("hello");
 		var smoothingChooser=new Chooser('smoothing');
@@ -76,14 +78,17 @@
         });
 
 
-    outputCanvas = document.getElementById("outputCanvas");
-    outputCanvas.width=200;
+    outputCanvas = new PixelCanvas("outputCanvas");
+    outputCanvas.setSize(200,150);
+    outputCanvas.saveImage("test");
+
+ /*   outputCanvas.width=200;
     outputCanvas.height=200;
     outputImage = outputCanvas.getContext("2d");
    outputImage.fillStyle = "Blue";
     outputImage.fillRect(0, 0, 200, 200);
 
- 
+ */
  
 var canvasMouse=new MouseEvents("outputCanvas");
 canvasMouse.addDownAction(function(event){console.log("down");});
@@ -95,6 +100,9 @@ canvasMouse.addWheelAction(canvasMouse.basicWheelAction);
        var map=new Map();
         map.setSize(8,9);
 
+console.log(map.identity);
+console.log(Map.prototype.identity);
+map.make(map.identity);
 
 	</script>
 </html>
