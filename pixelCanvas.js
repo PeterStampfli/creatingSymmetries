@@ -12,7 +12,9 @@ function PixelCanvas(idName){
 	this.height=0;
 	this.canvas=document.getElementById(idName);
 	this.canvasImage=this.canvas.getContext('2d');
+	this.canvasData=null;
 	this.pixels=null;
+	this.color=new Color();
 }
 
 /*
@@ -28,8 +30,8 @@ PixelCanvas.prototype.setSize=function(width,height){
 	this.canvas.height=height;
 	this.canvasImage.fillStyle="Blue";
 	this.canvasImage.fillRect(0,0,width,height);
-	canvasData=this.canvasImage.getImageData(0,0,width,height);
-	this.pixels=canvasData.data;
+	this.canvasData=this.canvasImage.getImageData(0,0,width,height);
+	this.pixels=this.canvasData.data;
 }
 
 /*
@@ -40,4 +42,39 @@ PixelCanvas.prototype.saveImage=function(fileName){
 	this.canvas.toBlob(function(blob){
 		saveAs(blob,fileName+'.jpg');
 	},'image/jpeg',0.92);
+}
+
+/*
+put the pixels on canvas
+*/
+PixelCanvas.prototype.showPixels=function(){
+	this.canvasImage.putImageData(this.canvasData,0,0);
+}
+
+/*
+set alpha value of all pixels
+*/
+PixelCanvas.prototype.setAlpha=function(alpha){
+	for (var i=this.pixels.length-1;i>0;i-=4){
+		this.pixels[i]=alpha;
+	}
+}
+
+/*
+create a pixel 
+Go through all pixels, 
+call method that sets image.color object depending on the total index of the pixel
+(will get data from a map related to the canvas)
+method(color,index)
+*/
+PixelCanvas.prototype.setPixels=function(method){
+	var color=this.color;
+	var pixels=this.pixels;
+	var index=this.width*this.height-1;
+	for (var i=this.pixels.length-4;i>=0;i-=4){
+		method(color,index--);
+		pixels[i]=color.red;
+		pixels[i+1]=color.green;
+		pixels[i+2]=color.blue;
+	}
 }
