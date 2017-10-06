@@ -22,7 +22,6 @@ function FastFun(){
 	// the atan function
 	this.atanTabFactor;
 	this.atanTable=[];
-
 }
 
 /*

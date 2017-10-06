@@ -65,16 +65,26 @@ create a pixel
 Go through all pixels, 
 call method that sets image.color object depending on the total index of the pixel
 (will get data from a map related to the canvas)
-method(color,index)
+makeColor(color,index)
 */
-PixelCanvas.prototype.setPixels=function(method){
+PixelCanvas.prototype.setPixels=function(makeColor){
 	var color=this.color;
 	var pixels=this.pixels;
 	var index=this.width*this.height-1;
+	console.log(color);
 	for (var i=this.pixels.length-4;i>=0;i-=4){
-		method(color,index--);
+		makeColor(color,index--);
 		pixels[i]=color.red;
 		pixels[i+1]=color.green;
 		pixels[i+2]=color.blue;
 	}
+}
+
+/*
+test implementation
+*/
+PixelCanvas.prototype.makeColor=function(color,index){
+	color.red=index/200;
+	color.green=100;
+	color.blue=0;
 }

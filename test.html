@@ -53,6 +53,7 @@
 	<script src="fastFunction.js"></script>
 	<script src="pixelCanvas.js"></script>
 	<script src="fileSaver.js"></script>
+	<script src="sumWaves.js"></script>
 	<script type="text/javascript">
 		console.log("hello");
 		var smoothingChooser=new Chooser('smoothing');
@@ -83,7 +84,7 @@
    // outputCanvas.saveImage("test");
    //outputCanvas.setAlpha(100);
 
-
+outputCanvas.setPixels(outputCanvas.makeColor);
 
    
    outputCanvas.showPixels();
@@ -110,5 +111,8 @@ console.log(map.identity);
 console.log(Map.prototype.identity);
 map.make(map.identity);
 
+var sumWaves=new SumWaves(4);
+sumWaves.oddRotationalSymmetry();
+sumWaves.positionTimesUnitVectors(12,3.4);
 	</script>
 </html>
