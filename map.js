@@ -53,6 +53,7 @@ Map.prototype.setSize=function(width,height){
 
 /*
 make the mapp based on supplied map method(mapOutput,mapInput)
+includes efficient offset and scaling
 */
 Map.prototype.make=function(mapMethod){
 	var i,j;

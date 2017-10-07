@@ -54,6 +54,7 @@
 	<script src="pixelCanvas.js"></script>
 	<script src="fileSaver.js"></script>
 	<script src="sumWaves.js"></script>
+	<script src="transform.js"></script>
 	<script type="text/javascript">
 		console.log("hello");
 		var smoothingChooser=new Chooser('smoothing');
@@ -114,5 +115,13 @@ map.make(map.identity);
 var sumWaves=new SumWaves(4);
 sumWaves.oddRotationalSymmetry();
 sumWaves.positionTimesUnitVectors(12,3.4);
+
+var fastFun=new FastFunction();
+fastFun.makeSinTable();
+var transform=new Transform(fastFun);
+
+
+transform.combineScaleRotation();
+
 	</script>
 </html>

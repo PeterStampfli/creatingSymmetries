@@ -66,6 +66,11 @@ from pixelInterpolation.js
 */
 
 /*
+position is any object with
+position.x and position.y fields
+*/
+
+/*
 get color of nearest pixel
 */
 InputImage.prototype.getNearest=function(color,x,y){

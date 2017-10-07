@@ -4,7 +4,7 @@
 approximating functions with linear table interpolation
 */
 
-function FastFun(){
+function FastFunction(){
 	//periodic function (sine with higher harmonics)
 	this.periodicTabFactor;
 	this.periodicTable=[];
@@ -27,7 +27,7 @@ function FastFun(){
 /*
 make the table, length is number of intervalls plus 1 for interpolation
 */
-FastFun.prototype.makeTable=function(table,start,end,nIntervals,theFunction){
+FastFunction.prototype.makeTable=function(table,start,end,nIntervals,theFunction){
 	var step=(end-start)/nIntervals;
 	var x=start;
 	table.length=nIntervals+1;
@@ -41,7 +41,7 @@ FastFun.prototype.makeTable=function(table,start,end,nIntervals,theFunction){
 make a table for a periodic function with a power of 2 number of intervalls
 period length is 2pi
 */
-FastFun.prototype.makePeriodicTable=function(log2NIntervals,theFunction){
+FastFunction.prototype.makePeriodicTable=function(log2NIntervals,theFunction){
 	var nIntervals=Math.round(Math.pow(2,log2NIntervals));
 	this.nPeriodicIntervalsM1=nIntervals-1;
 	this.periodicTabFactor=nIntervals/2/Math.PI;
@@ -52,7 +52,7 @@ FastFun.prototype.makePeriodicTable=function(log2NIntervals,theFunction){
 interpolate periodic function directly
 assuming that table is a sine-like function you get this sine-like function
 */
-FastFun.prototype.sinLike=function(x){
+FastFunction.prototype.sinLike=function(x){
 	var index;
 	x*=this.periodicTabFactor;
 	index=Math.floor(x);
@@ -65,7 +65,7 @@ FastFun.prototype.sinLike=function(x){
 interpolate periodic function with a shift by pi/2
 assuming that table is a sine-like function you get this cos-like function
 */
-FastFun.prototype.cosLike=function(x){
+FastFunction.prototype.cosLike=function(x){
 	var index;
 	x=this.periodicTabFactor*(x+1.570796);                            //pi/2
 	index=Math.floor(x);
@@ -77,7 +77,7 @@ FastFun.prototype.cosLike=function(x){
 /*
 setup table for exponential function
 */
-FastFun.prototype.makeExpTable=function(nIntervals){
+FastFunction.prototype.makeExpTable=function(nIntervals){
 	this.makeTable(this.expTabIntPart,this.expMinArgument,this.expMaxArgument,
 		this.expTabIntPartMaxIndex,Math.exp);	
 	this.expTabFracFactor=nIntervals;
@@ -88,7 +88,7 @@ FastFun.prototype.makeExpTable=function(nIntervals){
 the exponential function
 (seems to be faster in forefox, but not in chrome)
 */
-FastFun.prototype.exp=function(x){
+FastFunction.prototype.exp=function(x){
 	var indexToIntPart,indexToFractPart;
 	indexToIntPart=Math.floor(x);
 	x=this.expTabFracFactor*(x-indexToIntPart);
@@ -101,7 +101,7 @@ FastFun.prototype.exp=function(x){
 /*
 setup table for log function: values between 1 and e
 */
-FastFun.prototype.makeLogTable=function(nIntervals){
+FastFunction.prototype.makeLogTable=function(nIntervals){
 	this.logTabFactor=nIntervals/(Math.exp(1)-1);
 	this.makeTable(this.logTable,1,Math.exp(1),nIntervals,Math.log);
 }
@@ -110,7 +110,7 @@ FastFun.prototype.makeLogTable=function(nIntervals){
 fast log, fallback to native log for large value, using inversion for small values
 slower than native log for chrome, twice times faster for firefox
 */
-FastFun.prototype.log=function(x){
+FastFunction.prototype.log=function(x){
 	var index;
     var ln=0;
 	if (x<1){
@@ -148,7 +148,7 @@ FastFun.prototype.log=function(x){
 /*
 make the table for the atan function
 */
-FastFun.prototype.makeAtanTable=function(nIntervals){
+FastFunction.prototype.makeAtanTable=function(nIntervals){
 	this.atanTabFactor=nIntervals;
 	this.makeTable(this.atanTable,0,1,nIntervals,Math.atan);
 }
@@ -161,7 +161,7 @@ fast atan function
 fast atan2
 */
 
-FastFun.prototype.atan2= function(y,x){
+FastFunction.prototype.atan2= function(y,x){
     var index;
     if (x>=0){
         if (y>0) {
@@ -231,14 +231,14 @@ creating periodic tables
 /*
 for the simple sine and cosine
 */
-FastFun.prototype.makeSinTable=function(){
+FastFunction.prototype.makeSinTable=function(){
 	this.makePeriodicTable(12,Math.sin);
 }
 
 /*
 the triangle function, scaled to match the sine expansion
 */
-FastFun.prototype.triangle=function(x){
+FastFunction.prototype.triangle=function(x){
 	var factor=0.25*Math.PI;
 	if (x<0.5*Math.PI){
 		return factor*x;
@@ -254,14 +254,14 @@ FastFun.prototype.triangle=function(x){
 /*
 make periodic table with the triangle function
 */
-FastFun.prototype.makeTriangleTable=function(){
+FastFunction.prototype.makeTriangleTable=function(){
 	this.makePeriodicTable(4,this.triangle);
 }
 
 /*
 fourier expansion of the triangle function
 */
-FastFun.prototype.triangleExpansion=function(n,x){
+FastFunction.prototype.triangleExpansion=function(n,x){
 	var sign=1;
 	var sum=0;
 	var tIP1;
@@ -276,7 +276,7 @@ FastFun.prototype.triangleExpansion=function(n,x){
 /*
 make periodic table with the fourier expansion of the triangle function
 */
-FastFun.prototype.makeTriangleExpansionTable=function(nHarmonics){
+FastFunction.prototype.makeTriangleExpansionTable=function(nHarmonics){
 	var fastFun=this;
 	this.makePeriodicTable(12,function(x){
 		return fastFun.triangleExpansion(nHarmonics,x);
@@ -289,7 +289,7 @@ with suitable lengths (test!)
 returns the object, for chaining with creator
 periodic function is simple sine
 */
-FastFun.prototype.makeTables=function(){
+FastFunction.prototype.makeTables=function(){
 	this.makeSinTable();
 	this.makeExpTable(1000);
 	this.makeLogTable(1000);
