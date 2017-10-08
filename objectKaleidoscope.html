@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<head>
+	<title>kaleidoscope</title>
+	<style>
+		body { 
+			background-color:rgb(235,235,190);
+			color:rgb(80,40,0);
+		}
+
+		a{
+			color:black;
+			text-decoration:none;
+			border-style:solid;
+			background-color:white;
+			border-width:1px;
+		}
+		
+		.numbers{
+			width: 35px;
+		}
+	</style>
+</head>
+<body>
+	<noscript>
+		<h1 style="background-color:white">
+			Please allow execution of javascript !
+			<br>
+			(Else nothing happens.)
+		</h1>
+	</noscript>
+		<p>
+			Choose the input image file:
+			<input type="file" accept="image/*" id="imageInput" 
+				>
+		</p>
+		<p>
+			Choose the size of the generated image: width
+			<input type="text" class="numbers" id="outputWidthChooser" maxlength="4" />
+			, height 
+			<input type="text" class="numbers" id="outputHeightChooser" maxlength="4" />
+			.
+		</p>
+		<p>			
+			<form action="">
+				Choose image smoothing:
+				<input type="radio" name="smoothing" class='smoothing' checked>none
+				<input type="radio" name="smoothing" class='smoothing'>2x2
+			</form>
+		</p>
+		<p>			
+			<form action="">
+				Choose image interpolation:
+				<input type="radio" name="interpolation" class='interpolation' checked>nearest
+				<input type="radio" name="interpolation" class='interpolation'>linear
+				<input type="radio" name="interpolation" class='interpolation'>cubic
+			</form>
+		</p>
+		<p>	
+			<form action="">
+				Choose color modification:
+				<input type="radio" name="inversion" class='inversion' checked>none
+				<input type="radio" name="inversion" class='inversion'>first
+				<input type="radio" name="inversion" class='inversion'>second
+			</form>
+		</p>
+			To get the result of new settings: 
+			<button type="button" id="update">
+				update image
+			</button>
+		<p>
+
+		</p>
+
+		<p>
+			Drag the mouse on the three images and turn the mouse wheel to adjust the view.
+		</p>
+		<p id="progress">
+ 		Waiting for input image.
+ 		</p>
+
+
+		<h4>To download this image <button id="blob" type="button">click here ! </button>
+		</h4>
+
+		<p style="text-align:center">
+		<canvas id="outputCanvas" moz-opaque></canvas>
+	</p>
+
+	<p style="text-align:center;">
+		<canvas id="referenceCanvas" style="vertical-align: top;"></canvas>
+		<canvas id="orientationCanvas" style="vertical-align: top;";></canvas>
+	</p>
+</body>
+	<script src="chooser.js"></script>
+	<script src="button.js"></script>
+	<script src="inputImage.js"></script>
+	<script src="color.js"></script>
+	<script src="mouseEvents.js"></script>
+	<script src="mapInput.js"></script>
+	<script src="mapOutput.js"></script>
+	<script src="map.js"></script>
+	<script src="funTest.js"></script>
+	<script src="fastFunction.js"></script>
+	<script src="pixelCanvas.js"></script>
+	<script src="fileSaver.js"></script>
+	<script src="sumWaves.js"></script>
+	<script src="transform.js"></script>
+
+
+	<script src="setupInteractions.js"></script>
+
+
+	<script type="text/javascript">
+
+	console.log("hello");
+
+</script>
+</html>

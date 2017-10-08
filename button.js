@@ -60,6 +60,6 @@ Button.prototype.setValue=function(number){
 // Finally, a left bitwise shift.
 //rounded = (0.5 + somenum) << 0;
 
-console.log(3.55|0);
+//3.55|0 gives 3
 
-console.log(-3.55|0);
+//-3.55|0 gives -3 INSTEAD of -4 !!!
