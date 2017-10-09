@@ -45,9 +45,9 @@ where action function only cares about the thing to do
 // listeners for useCapture, acting in bottom down capturing phase
 //  they should return false to stop event propagation ...
 MouseEvents.prototype.addAction=function(eventName,action){
-	var mouseEvents=this;
+	var mouseEvents=this;                                              // hook to this mouseEvents object
 	this.element.addEventListener(eventName,function(event){
-		mouseEvents.stopEventPropagationAndDefaultAction(event);
+		mouseEvents.stopEventPropagationAndDefaultAction(event,mouseEvents);
 		action(event,mouseEvents);
 		return false;
 	},true);
@@ -108,12 +108,11 @@ same for mouseout
 */
 MouseEvents.prototype.basicUpAction=function(event,mouseEvents){
 	mouseEvents.pressed=false;
-	console.log("up "+mouseEvents.pressed+mouseEvents.name);
 }
 
 
 /*
-on mouse move do something with position, called onla if mouse pressed
+on mouse move do something with position, called only if mouse pressed
 */
 MouseEvents.prototype.basicMoveAction=function(event,mouseEvents){
 	console.log(mouseEvents.dx,mouseEvents.dy);

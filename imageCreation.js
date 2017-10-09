@@ -103,7 +103,8 @@ function make4ColorSymmetry(){
             colorSector=3;
             makeColorAmplitude(Math.min(uImage,-vImage));
         }
-    }
+    }    progressDiv=document.getElementById("progress");
+
     else {
         if (vImage>0){
             colorSector=1;
