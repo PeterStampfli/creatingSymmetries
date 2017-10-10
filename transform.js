@@ -4,6 +4,7 @@
 
 /*
 create the object with a fastFunction
+has elementary sin and cos functions
 */
 function Transform(fastFunction){
 	this.fastFunction=fastFunction;
@@ -29,6 +30,14 @@ adjust the shift
 Transform.prototype.addShift=function(x,y){
 	this.shiftX+=x;
 	this.shiftY+=y;
+}
+
+/*
+scale the shift
+*/
+Transform.prototype.scaleShift=function(factor){
+	this.shiftX*=factor;
+	this.shiftY*=factor;
 }
 
 /*
@@ -64,10 +73,24 @@ Transform.prototype.shiftScale=function(position){
 }
 
 /*
-first rotate and scale, then shift
+change position: first rotate and scale, then shift
 */
 Transform.prototype.scaleRotateShift=function(position){
 	var h=this.scaleCosAngle*position.x-this.scaleSinAngle*position.y+this.shiftX;
 	position.y=this.scaleSinAngle*position.x+this.scaleCosAngle*position.y+this.shiftY;
 	position.x=h;
+}
+
+/*
+changed coordinate x-component: first rotate and scale, then shift
+*/
+Transform.prototype.scaleRotateShiftX=function(position){
+	return this.scaleCosAngle*position.x-this.scaleSinAngle*position.y+this.shiftX;
+}
+
+/*
+changed coordinate y-component: first rotate and scale, then shift
+*/
+Transform.prototype.scaleRotateShiftY=function(position){
+	return this.scaleSinAngle*position.x+this.scaleCosAngle*position.y+this.shiftY;
 }

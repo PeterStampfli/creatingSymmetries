@@ -28,10 +28,23 @@ PixelCanvas.prototype.setSize=function(width,height){
 	this.height=height;
 	this.canvas.width=width;
 	this.canvas.height=height;
+}
+
+/*
+make a blue screen
+*/
+PixelCanvas.prototype.blueScreen=function(){
 	this.canvasImage.fillStyle="Blue";
-	this.canvasImage.fillRect(0,0,width,height);
-	this.canvasData=this.canvasImage.getImageData(0,0,width,height);
-	this.pixels=this.canvasData.data;
+	this.canvasImage.fillRect(0,0,this.width,this.height);	
+}
+
+
+/*
+create pixels
+*/
+PixelCanvas.prototype.createPixels=function(){
+	this.canvasData=this.canvasImage.getImageData(0,0,this.width,this.height);
+	this.pixels=this.canvasData.data;	
 }
 
 /*
@@ -61,6 +74,18 @@ PixelCanvas.prototype.setAlpha=function(alpha){
 }
 
 /*
+set alpha value of a pixel to 255
+*/
+PixelCanvas.prototype.setOpaquePixel=function(x,y){
+	x=Math.round(x);
+	y=Math.round(y);
+    // but check if we are on the canvas, shift to multiply
+    if ((x >= 0) && (x < this.width) && (y >= 0) && (y < this.height)) {
+        this.pixels[((this.width * y + x)<<2) + 3] = 255;
+    }	
+}
+
+/*
 create a pixel 
 Go through all pixels, 
 call method that sets image.color object depending on the total index of the pixel
@@ -71,7 +96,6 @@ PixelCanvas.prototype.setPixels=function(makeColor){
 	var color=this.color;
 	var pixels=this.pixels;
 	var index=this.width*this.height-1;
-	console.log(color);
 	for (var i=this.pixels.length-4;i>=0;i-=4){
 		makeColor(color,index--);
 		pixels[i]=color.red;
