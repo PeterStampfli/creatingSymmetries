@@ -29,9 +29,18 @@ Color.prototype.toString=function(){
 set values
 */
 Color.prototype.setRgb=function(red,green,blue){
-	this.red=red;
-	this.green=green;
-	this.blue=blue;
+    this.red=red;
+    this.green=green;
+    this.blue=blue;
+}
+
+/*
+set values
+*/
+Color.prototype.set=function(color){
+    this.red=color.red;
+    this.green=color.green;
+    this.blue=color.blue;
 }
 
 // color manipulation, from colors.js

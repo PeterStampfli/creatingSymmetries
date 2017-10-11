@@ -85,14 +85,15 @@ InputImage.prototype.getNearest=function(color,x,y){
 get interpolated pixel color - linear interpolation
 */
 InputImage.prototype.getLinear=function(color,x,y){
-    var h = Math.round(x);
-    var k = Math.round(y);
+    var h = Math.floor(x);
+    var k = Math.floor(y);
     var dx,dy;
     var i00, i01, i10, i11;
     var f00, f01, f10, f11;
     var inPixels;
     if ((h<0)||(h+1>=this.width)||(k<0)||(k+1>=this.height)){
     	color.red=-1;
+        console.log("out");
     }
     else {
     dx = x - h;
@@ -126,8 +127,8 @@ InputImage.prototype.kernel=function mitchellNetrovalli(x) { // Mitchell-Netrova
 }
 
 InputImage.prototype.getCubic=function(color,x,y){
-    var h = Math.round(x);
-    var k = Math.round(y);
+    var h = Math.floor(x);
+    var k = Math.floor(y);
     var dx,dy;
     var indexM, index0, index1, index2;
     var width4;

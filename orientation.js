@@ -54,11 +54,13 @@ orientationMouseEvents.deltaAngle=0.05;
 orientationMouseEvents.setAngle=function(angle){
 	this.angle=angle;
 	orientationCanvas.drawOrientation(angle);
+	inputTransform.setAngle(angle);
+	createImage();
 	// set inputImage Transform angle
 	// make drawing
 }
 
-orientationMouseEvents.setAngle(0);
+orientationCanvas.drawOrientation(0);
 
 orientationMouseEvents.addWheelAction(function(event,mouseEvents){
 	mouseEvents.updateMousePosition(event);

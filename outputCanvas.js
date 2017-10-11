@@ -5,6 +5,8 @@
 var elementaryFastFunction=new FastFunction();
 elementaryFastFunction.makeSinTable();
 
+console.log(elementaryFastFunction.cosLike(0)+" ***")
+
 // the output canvas and the map
 var initialOutputWidth=500;
 var initialOutputHeight=500

@@ -1,5 +1,6 @@
 "use strict";
 
+var initialInputScale=1;           // number of pixels per geometry unit
 
 // make the input image object, set initial interpolation method
 var inputImage=new InputImage();
@@ -10,11 +11,15 @@ inputImage.interpolation=inputImage.getNearest;
 // setting up the buttons
 
 // the input image
+// get the input image pixels, adjust the reference, set the inputTransform
 var imageInputButton = new Button('imageInput');
 imageInputButton.onChange(function(){
     inputImage.read(imageInputButton.button.files[0],function(){
     	console.log("adjust reference");
         referenceCanvas.adjust();
+        inputTransform.setShift(0.5*inputImage.width,0.5*inputImage.height);
+        inputTransform.setScale(initialInputScale);
+        inputTransform.setAngle(0);
     	createImage();
     });
 });

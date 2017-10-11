@@ -25,9 +25,5 @@ referenceCanvas.adjust=function(){
 
 var inputTransform=new Transform(elementaryFastFunction);
 
-// get interpolated image pixel
-// set the color depending on the given vector2 position
-// mark reference pixel
-function getInputColor(color,position){
-
-}
+// mouse control to change the input transform
+var referenceMouseEvents=new MouseEvents('referenceCanvas');
