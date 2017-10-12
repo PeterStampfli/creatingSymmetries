@@ -1,6 +1,8 @@
 "use strict";
 
-// transform any object with x any fields
+// transform any object with x and y fields
+// scale rotation and shift combined
+// complex logarithm
 
 /*
 create the object with a fastFunction
@@ -33,9 +35,9 @@ Transform.prototype.addShift=function(x,y){
 }
 
 /*
-scale the shift
+change the shift by a factor
 */
-Transform.prototype.scaleShift=function(factor){
+Transform.prototype.changeShift=function(factor){
 	this.shiftX*=factor;
 	this.shiftY*=factor;
 }
@@ -53,6 +55,14 @@ set the scale (and the combined factors)
 */
 Transform.prototype.setScale=function(scale){
 	this.scale=scale;
+	this.combineScaleRotation();
+}
+
+/*
+change the scale (and the combined factors) by a factor
+*/
+Transform.prototype.changeScale=function(factor){
+	this.scale*=factor;
 	this.combineScaleRotation();
 }
 
@@ -93,4 +103,13 @@ changed coordinate y-component: first rotate and scale, then shift
 */
 Transform.prototype.scaleRotateShiftY=function(position){
 	return this.scaleSinAngle*position.x+this.scaleCosAngle*position.y+this.shiftY;
+}
+
+/*
+complex logarithm
+*/
+Transform.prototype.log=function(position){
+	var h=position.x*position.x+position.y*position.y;
+	position.y=this.fastFunction.atan2(position.y,position.x);
+	position.x=0.5*this.fastFunction.log(h);
 }

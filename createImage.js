@@ -26,7 +26,6 @@ function getInputColor(color,position){
 
 
 function createImage(){
-	console.log("createImage");
 	if (inputImage.pixels==null){                    // no input image, no output
 		return;
 	}

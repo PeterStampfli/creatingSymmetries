@@ -56,8 +56,6 @@ orientationMouseEvents.setAngle=function(angle){
 	orientationCanvas.drawOrientation(angle);
 	inputTransform.setAngle(angle);
 	createImage();
-	// set inputImage Transform angle
-	// make drawing
 }
 
 orientationCanvas.drawOrientation(0);
@@ -73,6 +71,7 @@ orientationMouseEvents.addWheelAction(function(event,mouseEvents){
 	}
 });
 
+// restrict on the circle shape
 orientationMouseEvents.addAction("mousemove",function(event,mouseEvents){
 	var radius=orientationCanvas.width/2;
 	if (mouseEvents.pressed){

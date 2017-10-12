@@ -4,8 +4,7 @@
 // fast functions with elementary sin function
 var elementaryFastFunction=new FastFunction();
 elementaryFastFunction.makeSinTable();
-
-console.log(elementaryFastFunction.cosLike(0)+" ***")
+elementaryFastFunction.makeExpLogAtanTables();
 
 // the output canvas and the map
 var initialOutputWidth=500;
@@ -27,7 +26,7 @@ outputMouseEvents.addWheelAction(function(event, mouseEvents){
 		factor=1/factor;
 	}
 	map.transform.scale*=factor;
-	map.transform.scaleShift(1/factor);
+	map.transform.changeShift(1/factor);
   	map.make(mappingFunction);
   	createImage();
 });

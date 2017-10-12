@@ -25,13 +25,13 @@ function FastFunction(){
 }
 
 /*
-make the table, length is number of intervalls plus 1 for interpolation
+make the table, length is number of intervalls plus 2 for interpolation and data at end of interval
 */
 FastFunction.prototype.makeTable=function(table,start,end,nIntervals,theFunction){
 	var step=(end-start)/nIntervals;
 	var x=start;
-	table.length=nIntervals+1;
-	for (var i=0;i<=nIntervals;i++){
+	table.length=nIntervals+2;
+	for (var i=0;i<nIntervals+2;i++){
 		table[i]=theFunction(x);
 		x+=step;
 	}
@@ -284,13 +284,12 @@ FastFunction.prototype.makeTriangleExpansionTable=function(nHarmonics){
 }
 
 /*
-make all the tables together
+make all the tables except the periodic table
 with suitable lengths (test!)
 returns the object, for chaining with creator
 periodic function is simple sine
 */
-FastFunction.prototype.makeTables=function(){
-	this.makeSinTable();
+FastFunction.prototype.makeExpLogAtanTables=function(){
 	this.makeExpTable(1000);
 	this.makeLogTable(1000);
 	this.makeAtanTable(1000);
