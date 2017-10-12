@@ -5,9 +5,11 @@ making the sums
 but first prepare and organize the data
 
 int p is dimension of embedding space
+fastFunction has the periodic sinLike and cosLike functions for the waves
 */
-function SumWaves(p){
+function SumWaves(p,fastFunction){
 	this.p=p;
+    this.fastFunction=fastFunction;
 	this.evenOddSign=1;
 	// the unit vectors
 	this.ex=new Array(p);
@@ -53,3 +55,33 @@ SumWaves.prototype.positionTimesUnitVectors= function (x,y){
         this.xTimesE[i]=x*this.ex[i]+y*this.ey[i];
     }
 }
+
+/*
+making the sums: initialize with oddRotationalSymmetry or evenRotationalSymmetry
+*/
+
+/*
+only one wavevector component, is the same for even and odd rotational symmetry
+*/
+
+SumWaves.prototype.cosines1=function(k){
+    var sum=0;
+    var xTimesE=this.xTimesE;
+    var fastFunction=this.fastFunction;
+    for (var i=0;i<p;i++){
+        sum+=fastFunction.cosLike(k*xTimesE[i]);
+    }
+}
+
+SumWaves.prototype.sines1=function(k){
+    var sum=0;
+    var xTimesE=this.xTimesE;
+    var fastFunction=this.fastFunction;
+    for (var i=0;i<p;i++){
+        sum+=fastFunction.sinLike(k*xTimesE[i]);
+    }
+}
+
+/*
+two wavevector components: with initialized wraparound sign
+*/
