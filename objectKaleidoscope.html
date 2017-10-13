@@ -93,6 +93,7 @@
 		<canvas id="orientationCanvas" style="vertical-align: top;";></canvas>
 	</p>
 </body>
+<!--   first the pure objects   -->
 	<script src="chooser.js"></script>
 	<script src="button.js"></script>
 	<script src="inputImage.js"></script>
@@ -103,14 +104,19 @@
 	<script src="funTest.js"></script>
 	<script src="fastFunction.js"></script>
 	<script src="pixelCanvas.js"></script>
-	<script src="fileSaver.js"></script>
 	<script src="sumWaves.js"></script>
 	<script src="transform.js"></script>
-	<script src="orientation.js"></script>
+
+<!-- setting up things, mofifying object "subclassing"-->
+
+	<script src="mappingFunctions.js"></script>
+	<script src="parameters.js"></script>
 	<script src="outputCanvas.js"></script>
+	<script src="orientation.js"></script>
 	<script src="referenceCanvas.js"></script>
 	<script src="createImage.js"></script>
 
+	<script src="fileSaver.js"></script>
 
 	<script src="setupInteractions.js"></script>
 
@@ -118,12 +124,11 @@
 	<script type="text/javascript">
 
 	console.log("hello");
-	p=new Vector2();
-	p.setComponents(1,0);
-console.log(p);
-	inputTransform.log(p);
-console.log(p);
+
 console.log(elementaryFastFunction.atan2(1,1));
-sum=new SumWaves(5,elementaryFastFunction);
+
+
+
+
 </script>
 </html>

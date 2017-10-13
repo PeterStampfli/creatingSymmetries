@@ -1,8 +1,8 @@
 "use strict";
 
 /*
-the mapping data
-
+creating the mapping data
+with a transform of the coordinates
 */
 
 function Map(fastFunction){
@@ -11,6 +11,7 @@ function Map(fastFunction){
 	this.transform=new Transform(fastFunction);
 	this.inputImagePositions=[];              // for each pixel a pixel position on the input image
 	this.colorPositions=[];
+	this.isValid=false;                   // flag, to request remapping
 }
 
 /*
@@ -18,7 +19,6 @@ set the size, update the data array, fill with new MapOutput objects
 increases only the data array
 */
 Map.prototype.setSize=function(width,height){
-	console.log(width+" "+height);
 	var oldLength,newLength;
 	var oldWidth,oldHeight;
 	width=Math.round(width);
@@ -27,6 +27,7 @@ Map.prototype.setSize=function(width,height){
 	oldHeight=height;
 	this.width=width;
 	this.height=height;
+	this.isValid=false;                            // presumable size changes and map has to be redone
 	// update scale and offset
 	if (this.inputImagePositions.length!=0){   // update to new dimensions
 		this.transform.shiftX*=width/oldWidth;
@@ -59,6 +60,10 @@ make the mapp based on supplied map method(inputImagePosition,colorPosition,spac
 includes efficient offset and scaling
 */
 Map.prototype.make=function(mapMethod){
+	if (this.isValid){
+		return;                                      // do not recaculate the map if it has been done ...
+	}
+	console.log("remap");
 	var i,j;
 	var index=0;
 	var transform=this.transform;
@@ -72,6 +77,7 @@ Map.prototype.make=function(mapMethod){
 	var canvasPosition=new Vector2(); //relative pixel position on canvas (0,0)....(1,1)
 	var inputImagePositions=this.inputImagePositions;
 	var colorPositions=this.colorPositions;
+	this.isValid=true;
 	canvasPosition.y=-0.5*iHeight;
 	j=-jLimit;
 	while (j<=jLimit){

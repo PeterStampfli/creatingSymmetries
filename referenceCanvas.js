@@ -5,29 +5,28 @@
 
 var referenceCanvas=new PixelCanvas('referenceCanvas');
 
-referenceCanvas.baseSize=300;
+var inputTransform=new Transform(elementaryFastFunction);
+
+// mouse control to change the input transform
+var referenceMouseEvents=new MouseEvents('referenceCanvas');
+
 // length ratio from input image to reference canvas
 referenceCanvas.scaleFromInputImage=1;
 
 // adjust size fitting to input image, draw new input, make pixels
 referenceCanvas.adjust=function(){
 	if (inputImage.width>inputImage.height){
-		referenceCanvas.setSize(referenceCanvas.baseSize,
-			                    Math.round(referenceCanvas.baseSize*inputImage.height/inputImage.width));
+		referenceCanvas.setSize(referenceCanvasBaseSize,
+			                    Math.round(referenceCanvasBaseSize*inputImage.height/inputImage.width));
 	}
 	else {
-		referenceCanvas.setSize(Math.round(referenceCanvas.baseSize*inputImage.width/inputImage.height),
-			                    referenceCanvas.baseSize);
+		referenceCanvas.setSize(Math.round(referenceCanvasBaseSize*inputImage.width/inputImage.height),
+			                    referenceCanvasBaseSize);
 	}
 	referenceCanvas.scaleFromInputImage=referenceCanvas.width/inputImage.width;
 	referenceCanvas.canvasImage.drawImage(inputImage.image,0,0,referenceCanvas.width,referenceCanvas.height);
 	referenceCanvas.createPixels();
 }
-
-var inputTransform=new Transform(elementaryFastFunction);
-
-// mouse control to change the input transform
-var referenceMouseEvents=new MouseEvents('referenceCanvas');
 referenceMouseEvents.addBasicDownUpOutActions();
 
 

@@ -93,7 +93,6 @@ InputImage.prototype.getLinear=function(color,x,y){
     var inPixels;
     if ((h<0)||(h+1>=this.width)||(k<0)||(k+1>=this.height)){
     	color.red=-1;
-        console.log("out");
     }
     else {
     dx = x - h;
@@ -137,7 +136,7 @@ InputImage.prototype.getCubic=function(color,x,y){
     var inPixels;
     var kernel;
     if ((h<1)||(h+2>=this.width)||(k<1)||(k+2>=this.height)){
-    	pixelRed = -1;
+        color.red=-1;
     }
     else {
    		dx = x - h;

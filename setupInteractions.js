@@ -1,7 +1,5 @@
 "use strict";
 
-var initialInputScale=1;           // number of pixels per geometry unit
-
 // make the input image object, set initial interpolation method
 var inputImage=new InputImage();
 var interpolation="nearest";
@@ -15,7 +13,6 @@ inputImage.interpolation=inputImage.getNearest;
 var imageInputButton = new Button('imageInput');
 imageInputButton.onChange(function(){
     inputImage.read(imageInputButton.button.files[0],function(){
-    	console.log("adjust reference");
         referenceCanvas.adjust();
         inputTransform.setShift(0.5*inputImage.width,0.5*inputImage.height);
         inputTransform.setScale(initialInputScale);
@@ -31,18 +28,7 @@ var outputHeightChooser=new Button('outputHeightChooser');
 // set the start values
 outputWidthChooser.setValue(initialOutputWidth);
 outputHeightChooser.setValue(initialOutputHeight);
-outputCanvas.setSize(initialOutputWidth,initialOutputWidth);
-outputCanvas.blueScreen();
-outputCanvas.createPixels();
-map.setSize(initialOutputWidth,initialOutputWidth);
 
-map.setRange(100);
-
-
-map.make(mappingFunction);
-
-
-console.log(map.transform.scale);
 
 // the smoothing variants
 
@@ -63,17 +49,14 @@ var interpolationChoosers=new Chooser('interpolation');
 interpolationChoosers.add(function(){
 	inputImage.interpolation=inputImage.getNearest;
     interpolation="nearest";
-    console.log("interpolation "+interpolation);
 });
 interpolationChoosers.add(function(){
 	inputImage.interpolation=inputImage.getLinear;
     interpolation="linear";
-    console.log("interpolation "+interpolation);
 });
 interpolationChoosers.add(function(){
 	inputImage.interpolation=inputImage.getCubic;
     interpolation="cubic";
-    console.log("interpolation "+interpolation);
 });
 
 // the color modification (inversion)

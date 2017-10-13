@@ -1,18 +1,8 @@
 "use strict";
 
-
-// fast functions with elementary sin function
-var elementaryFastFunction=new FastFunction();
-elementaryFastFunction.makeSinTable();
-elementaryFastFunction.makeExpLogAtanTables();
-
-// the output canvas and the map
-var initialOutputWidth=500;
-var initialOutputHeight=500
+// the output canvas, the map, and mouse events for changing the map
 var outputCanvas=new PixelCanvas('outputCanvas');
 var map=new Map(elementaryFastFunction);
-// default for test
-var mappingFunction=map.identity;
 
 // mouse control to change map position and scale
 var outputMouseEvents=new MouseEvents('outputCanvas');
@@ -27,16 +17,23 @@ outputMouseEvents.addWheelAction(function(event, mouseEvents){
 	}
 	map.transform.scale*=factor;
 	map.transform.changeShift(1/factor);
-  	map.make(mappingFunction);
+  	map.isValid=false;
   	createImage();
 });
 
 // mouse move shifts the image
 outputMouseEvents.addMoveAction(function(event, mouseEvents){
 	map.transform.addShift(-mouseEvents.dx,-mouseEvents.dy);
-  	map.make(mappingFunction);
+  	map.isValid=false;
   	createImage();
 });
+
+
+outputCanvas.setSize(initialOutputWidth,initialOutputWidth);
+outputCanvas.blueScreen();
+outputCanvas.createPixels();
+map.setSize(initialOutputWidth,initialOutputWidth);
+map.setRange(initialMapRange);
 
 
 

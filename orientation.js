@@ -1,14 +1,14 @@
 "use strict";
 
-
+// orientation canvas with its mouse events, changing the inputTransform
 
 // the orientation canvas
 var orientationCanvas=new PixelCanvas('orientationCanvas');
-var orientationCanvasSize=200;
-orientationCanvas.setSize(orientationCanvasSize,orientationCanvasSize);
-// with axis ranges -1 ... 1
-orientationCanvas.canvasImage.scale(orientationCanvasSize/2,orientationCanvasSize/2);
-orientationCanvas.canvasImage.translate(1,1);
+
+// mouse control to change angle
+var orientationMouseEvents=new MouseEvents('orientationCanvas');
+orientationMouseEvents.angle=0;
+
 // drawing the orientation arrow
 orientationCanvas.drawOrientation=function(angle){
     var arrowWidth = 0.2;
@@ -33,10 +33,7 @@ orientationCanvas.isOnDisc=function(x,y){
 	return((x - radius) * (x - radius) + (y - radius) * (y - radius)) < radius * radius;
 }
 
-// mouse control to change angle
-var orientationMouseEvents=new MouseEvents('orientationCanvas');
-
-// adapt standard events to disc shape
+// adapt standard mpouse events to disc shape
 orientationMouseEvents.addDownAction(function(event,mouseEvents){
 	mouseEvents.updateMousePosition(event);
 	if (orientationCanvas.isOnDisc(mouseEvents.x,mouseEvents.y)){
@@ -46,9 +43,6 @@ orientationMouseEvents.addDownAction(function(event,mouseEvents){
 orientationMouseEvents.addUpAction(orientationMouseEvents.basicUpAction);
 orientationMouseEvents.addOutAction(orientationMouseEvents.basicUpAction);
 
-// changing the angle
-orientationMouseEvents.angle=0;
-orientationMouseEvents.deltaAngle=0.05;
 
 // set the angle, draw the orientation canvas and redraw the image
 orientationMouseEvents.setAngle=function(angle){
@@ -58,15 +52,14 @@ orientationMouseEvents.setAngle=function(angle){
 	createImage();
 }
 
-orientationCanvas.drawOrientation(0);
-
 orientationMouseEvents.addWheelAction(function(event,mouseEvents){
+	var deltaAngle=0.05;
 	mouseEvents.updateMousePosition(event);
 	if (orientationCanvas.isOnDisc(mouseEvents.x,mouseEvents.y)){
 		if (event.deltaY > 0) {
-            mouseEvents.setAngle(mouseEvents.angle + mouseEvents.deltaAngle);
+            mouseEvents.setAngle(mouseEvents.angle + deltaAngle);
         } else {
-            mouseEvents.setAngle(mouseEvents.angle - mouseEvents.deltaAngle);
+            mouseEvents.setAngle(mouseEvents.angle - deltaAngle);
         }
 	}
 });
@@ -87,3 +80,10 @@ orientationMouseEvents.addAction("mousemove",function(event,mouseEvents){
 	}
 });
 
+// finish setup
+
+orientationCanvas.setSize(orientationCanvasSize,orientationCanvasSize);
+// with axis ranges -1 ... 1
+orientationCanvas.canvasImage.scale(orientationCanvasSize/2,orientationCanvasSize/2);
+orientationCanvas.canvasImage.translate(1,1);
+orientationCanvas.drawOrientation(0);
