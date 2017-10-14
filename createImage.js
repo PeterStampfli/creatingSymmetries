@@ -49,7 +49,12 @@ function createImage(){
 
   	})
 */
-	simplePixels();
+	if (smoothing){
+		smoothedPixels();
+	}
+	else {
+		simplePixels();
+	}
   	outputCanvas.showPixels();
   	referenceCanvas.showPixels();
 
@@ -64,16 +69,83 @@ function simplePixels(){
 	var color=new Color();
     var outputIndex=0;
     var mapIndex=0;
-	var mapSize=inputImagePositions.length;
+	var mapSize=map.width*map.height;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
         // translation, rotation and scaling
         makeColor(color,colorPositions[mapIndex],inputImagePositions[mapIndex]);
-
         outputPixels[outputIndex++]=color.red;
         outputPixels[outputIndex++]=color.green;
         outputPixels[outputIndex]=color.blue;
         outputIndex += 2;
     }
+}
+
+// 2x2 averaging
+function smoothedPixels(){
+	var inputImagePositions=map.inputImagePositions;
+	var colorPositions=map.colorPositions;
+
+	var baseImagePosition;
+	var baseColorPosition;
+	var imagePosition=new Vector2();
+	var colorPosition=new Vector2();
+	var baseColor=new Color();
+	var colorPlusX=new Color();
+	var colorPlusY=new Color();
+	var colorPlusXY=new Color();
+
+	var outputPixels=outputCanvas.pixels;
+    var outputIndex=0;
+
+	var i,j;
+	var height=map.height;
+	var width=map.width;
+
+	var baseIndex=0;
+	var indexPlusX,indexPlusY,indexPlusXY;
+
+
+	for (j=0;j<height;j++){
+		if (j==height-1){                  // at top pixels beware of out of bounds indices
+			indexPlusY=baseIndex;
+		}
+		else {
+			indexPlusY=baseIndex+width;
+		}
+				
+
+		for (i=0;i<width;i++){
+			if (i<width-1){             // at right pixels beware of out of bounds indices
+				indexPlusX=baseIndex+1;
+				indexPlusXY=indexPlusY+1;
+			}
 	
+			baseImagePosition=inputImagePositions[baseIndex];
+			baseColorPosition=colorPositions[baseIndex];
+
+			makeColor(baseColor,baseColorPosition,baseImagePosition);
+
+
+			makeColor(colorPlusX,colorPosition.average(baseColorPosition,colorPositions[indexPlusX]),
+								 imagePosition.average(baseImagePosition,inputImagePositions[indexPlusX]));
+			makeColor(colorPlusY,colorPosition.average(baseColorPosition,colorPositions[indexPlusY]),
+								 imagePosition.average(baseImagePosition,inputImagePositions[indexPlusY]));
+			makeColor(colorPlusXY,colorPosition.average(baseColorPosition,colorPositions[indexPlusXY]),
+								 imagePosition.average(baseImagePosition,inputImagePositions[indexPlusXY]));
+
+			outputPixels[outputIndex++]=(2+baseColor.red+colorPlusX.red+colorPlusY.red+colorPlusXY.red)>>2;
+			outputPixels[outputIndex++]=(2+baseColor.green+colorPlusX.green+colorPlusY.green+colorPlusXY.green)>>2;
+			outputPixels[outputIndex]=(2+baseColor.blue+colorPlusX.blue+colorPlusY.blue+colorPlusXY.blue)>>2;
+
+
+	        outputIndex += 2;
+			baseIndex++;
+			indexPlusY++;			
+		}
+
+	}
+
+
+
 
 }

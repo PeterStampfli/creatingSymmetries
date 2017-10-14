@@ -26,8 +26,12 @@ Vector2.prototype.set=function(v){
 /*
 set a vector to average of 2 other vectors
 use for image smoothing
+return the vector
 */
-Vector2.prototype.average(one,two){
+Vector2.prototype.average=function(one,two){
 	this.x=0.5*(one.x+two.x);
 	this.y=0.5*(one.y+two.y);
+	this.x=two.x;
+	this.y=two.y;
+	return this;
 }
