@@ -22,3 +22,13 @@ sum.positionTimesUnitVectors(spacePosition.x,spacePosition.y);
 inputImagePosition.x=sum.cosines1(k);
 inputImagePosition.y=sum.sines1(k);
 }
+
+
+function testQuasi(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+
+sum.positionTimesUnitVectors(spacePosition.x,spacePosition.y);
+
+
+inputImagePosition.x=sum.cosines1(k);
+inputImagePosition.y=sum.cosines2(k,k);
+}

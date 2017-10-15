@@ -14,6 +14,9 @@ function makeColor(color,colorPosition,inputImagePosition){
 	if (color.red<0){
 		color.set(backgroundColor);
 	}
+	else {
+		colorSymmetry.makeSymmetry(color,colorPosition);
+	}
 }
 // function for creating the image
 

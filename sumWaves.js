@@ -73,7 +73,7 @@ SumWaves.prototype.cosines1=function(k){
     return sum;
 }
 
-// 2-color symmetry for 2p rotational symmetry with even p
+// 2-color symmetry for 2p rotational symmetry
 SumWaves.prototype.alternatingCosines1=function(k){
     var sum=0;
     var factor=1;
@@ -96,7 +96,7 @@ SumWaves.prototype.sines1=function(k){
     return sum;
 }
 
-// for 2-color symmetry (2p-rotational symmetry with odd p)
+// for 2-color symmetry (p-rotational symmetry with odd p)
 SumWaves.prototype.alternatingSines1=function(k){
     var sum=0;
     var factor=1;
@@ -115,8 +115,9 @@ two wavevector components: with initialized wraparound sign
 SumWaves.prototype.cosines2=function(k1,k2){
     var sum=0;
     var xTimesE=this.xTimesE;
-    var lastXTimesE=evenOddSign*xTimesE[0];
+    var lastXTimesE=this.evenOddSign*xTimesE[0];
     var newXTimesE;
+    var fastFunction=this.fastFunction;
     for (var i=this.p-1;i>=0;i--){
         newXTimesE=xTimesE[i];
         sum+=fastFunction.cosLike(k1*lastXTimesE+k2*newXTimesE);
@@ -125,16 +126,48 @@ SumWaves.prototype.cosines2=function(k1,k2){
     return sum;   
 }
 
-// 2-color symmetry for 2p rotational symmetry with even p
+// 2-color symmetry for 2p rotational symmetry 
 SumWaves.prototype.alternatingCosines2=function(k1,k2){
     var sum=0;
     var factor=1;
     var xTimesE=this.xTimesE;
-    var lastXTimesE=evenOddSign*xTimesE[0];
+    var lastXTimesE=this.evenOddSign*xTimesE[0];
     var newXTimesE;
+    var fastFunction=this.fastFunction;
     for (var i=this.p-1;i>=0;i--){
         newXTimesE=xTimesE[i];
         sum+=factor*fastFunction.cosLike(k1*lastXTimesE+k2*newXTimesE);
+        factor=-factor;
+        lastXTimesE=newXTimesE;
+    }
+    return sum;   
+}
+
+SumWaves.prototype.sines2=function(k1,k2){
+    var sum=0;
+    var xTimesE=this.xTimesE;
+    var lastXTimesE=this.evenOddSign*xTimesE[0];
+    var newXTimesE;
+    var fastFunction=this.fastFunction;
+    for (var i=this.p-1;i>=0;i--){
+        newXTimesE=xTimesE[i];
+        sum+=fastFunction.sinLike(k1*lastXTimesE+k2*newXTimesE);
+        lastXTimesE=newXTimesE;
+    }
+    return sum;   
+}
+
+// 2-color symmetry for p rotational symmetry with odd p
+SumWaves.prototype.alternatingSines2=function(k1,k2){
+    var sum=0;
+    var factor=1;
+    var xTimesE=this.xTimesE;
+    var lastXTimesE=this.evenOddSign*xTimesE[0];
+    var newXTimesE;
+    var fastFunction=this.fastFunction;
+    for (var i=this.p-1;i>=0;i--){
+        newXTimesE=xTimesE[i];
+        sum+=factor*fastFunction.sinLike(k1*lastXTimesE+k2*newXTimesE);
         factor=-factor;
         lastXTimesE=newXTimesE;
     }

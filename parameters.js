@@ -3,7 +3,7 @@
 // parameters and other small things
 
 // mapping default for test
-var mappingFunction=basicOddQuasiperiodic;;
+var mappingFunction=testQuasi;
 
 
 // the output canvas size
@@ -31,3 +31,5 @@ var initialInputScale=100;
 var backgroundColor=new Color;
 backgroundColor.setRgb(100,100,100);
 
+// the color symmetry
+var colorSymmetry=new ColorSymmetry(2);

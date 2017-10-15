@@ -43,6 +43,15 @@ Color.prototype.set=function(color){
     this.blue=color.blue;
 }
 
+/*
+interpolate from background: T=1 gives color, T=0 gives background color
+*/
+Color.prototype.fromBackground=function(t){
+    this.red=t*this.red+(1-t)*backgroundColor.red;
+    this.green=t*this.green+(1-t)*backgroundColor.green;
+    this.blue=t*this.blue+(1-t)*backgroundColor.blue;
+}
+
 // color manipulation, from colors.js
 
 /*
