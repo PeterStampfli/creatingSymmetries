@@ -47,3 +47,51 @@ ColorSymmetry.prototype.make2ColorSymmetry=function(color,colorPosition){
     color.fromBackground(this.colorAmplitude(colorPosition.x));
 
 }
+
+/*
+make 3-color symmetry depending on the full color position
+*/
+ColorSymmetry.prototype.make3ColorSymmetry=function(color,colorPosition){
+    if (colorPosition.x>0){
+        if (colorPosition.y>0){
+            // no change in color, only transition
+            if (uImage>2*(this.transWidth+this.transSmoothing)) {
+            	color.fromBackground(this.colorAmplitude(colorPosition.y));
+            }
+            else {
+                makeColorAmplitude(Math.min(vImage,(0.8660*uImage+0.5*vImage));
+            }
+        }
+        else {
+            colorSector=2;
+            if (uImage>2*(transWidth+transSmoothing)) {
+                makeColorAmplitude(-vImage);
+            }
+            else {
+                makeColorAmplitude(Math.min(-vImage,RT3HALF*uImage-0.5*vImage));
+            }        
+        }
+    }
+    else {
+        var d;
+        if (vImage>0){
+            d=RT3HALF*uImage+0.5*vImage;
+            if (d>0){
+                colorSector=0;
+            }
+            else {
+                colorSector=1;
+            }
+        }
+        else {
+            d=RT3HALF*uImage-0.5*vImage;
+            if (d>0){
+                colorSector=2;
+            }
+            else {
+                colorSector=1;
+            }           
+        }
+        makeColorAmplitude(d);
+    }
+}

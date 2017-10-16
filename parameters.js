@@ -1,9 +1,7 @@
 "use strict";
 
-// parameters and other small things
 
-// mapping default for test
-var mappingFunction=testQuasi;
+// standard parameters
 
 
 // the output canvas size
@@ -31,5 +29,24 @@ var initialInputScale=100;
 var backgroundColor=new Color;
 backgroundColor.setRgb(100,100,100);
 
+
+
+// parameters and other small things defining a particular image
+
+
+var p=5;
+var nColorSymmetry=2;
+
+var sum=new SumWaves(p,nColorSymmetry,elementaryFastFunction);
+
 // the color symmetry
-var colorSymmetry=new ColorSymmetry(2);
+var colorSymmetry=new ColorSymmetry(nColorSymmetry);
+
+
+sum.oddRotationalSymmetry();
+
+var k=1;
+
+// mapping default for test
+var mappingFunction=testQuasi;
+

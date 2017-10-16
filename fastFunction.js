@@ -295,3 +295,10 @@ FastFunction.prototype.makeExpLogAtanTables=function(){
 	this.makeAtanTable(1000);
 	return this;
 }
+
+
+// fast functions with elementary sin function
+var elementaryFastFunction=new FastFunction();
+elementaryFastFunction.makeSinTable();
+elementaryFastFunction.makeExpLogAtanTables();
+
