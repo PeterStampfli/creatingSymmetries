@@ -2,96 +2,170 @@
 
 // changing the color according to the colorposition
 // depending on number of different color variants
+
+/*
+transition region between different color modifications:
+
+transWidth is half of the tpotal witdth of the region.
+inside the region: backgroundColor
+changing to the color of the region on the transSmoothing length by linear interpolation
+*/
 function ColorSymmetry(numberOfVariants){
-
-
 	this.transWidth=-1;
 	this.transSmoothing=1;
-
 	switch (numberOfVariants){
 		case 2:
 			this.makeSymmetry=this.make2ColorSymmetry;
+			break;
+		case 3:
+			this.makeSymmetry=this.make3ColorSymmetry;
+			break;
+		case 4:
+			this.makeSymmetry=this.make4ColorSymmetry;
 			break;
 	}
 }
 
 /*
-make color amplitude:
-d<0 - background, d>1 imagecolor (transformed), 0<d<1 - interpolation between background color and pixel color
- full amplitude everywhere for transWidth<0
+make color transition:
+d is the distance from the line separating the different regions.
+
+d>transWidth: color of the region, no change in color
+transWidth-transSmoothing<d<transWidth: linear interpolation
+d<transwidth-transSmoothing: background color
 */
-ColorSymmetry.prototype.colorAmplitude=function(d){
-	if (this.transWidth<0){
-        return 1;
-    }
-    else {
-        return Math.max(0,(Math.abs(d)-this.transWidth)/this.transSmoothing);
-    }
+ColorSymmetry.prototype.transition=function(color,d){
+	if (d<this.transWidth){                     // no changes if d is great enough
+		d-=this.transWidth-this.transSmoothing;
+		if (d<0){                               // background color close to the separation
+			color.set(backgroundColor);
+		}
+		else {
+			color.fromBackground(d/this.transSmoothing);
+		}
+	}
 }
 
 /*
 make 2-color symmetry depending on x-coordinate of color position
 */
 ColorSymmetry.prototype.make2ColorSymmetry=function(color,colorPosition){
+	var d=colorPosition.x;
 	// change color if in the changing section
-    if (colorPosition.x<0){
+    if (d<0){
         switch (nColorMod){
         	case 1:
         		color.simpleInversion();
         		break;
         	case 2: 
         		color.improvedInversion();
+        		break;
         }
+        this.transition(color,-d);
     }
-    // transition region (for no color symmetry too)
-    color.fromBackground(this.colorAmplitude(colorPosition.x));
-
+    else {
+    	this.transition(color,d);
+    }
 }
 
 /*
 make 3-color symmetry depending on the full color position
 */
+
 ColorSymmetry.prototype.make3ColorSymmetry=function(color,colorPosition){
     if (colorPosition.x>0){
         if (colorPosition.y>0){
             // no change in color, only transition
-            if (uImage>2*(this.transWidth+this.transSmoothing)) {
-            	color.fromBackground(this.colorAmplitude(colorPosition.y));
-            }
-            else {
-                makeColorAmplitude(Math.min(vImage,(0.8660*uImage+0.5*vImage));
-            }
+            if (colorPosition.y<2*this.transWidth){                        // no transition if y large enough
+	            if (colorPosition.x>2*this.transWidth) {// transition at x-axis
+	            	this.transition(color,colorPosition.y);
+	            }
+	            else {
+	                this.transition(color,Math.min(colorPosition.y,
+	                						0.8660*colorPosition.x+0.5*colorPosition.y));
+          		}
+       		}
         }
         else {
-            colorSector=2;
-            if (uImage>2*(transWidth+transSmoothing)) {
-                makeColorAmplitude(-vImage);
-            }
-            else {
-                makeColorAmplitude(Math.min(-vImage,RT3HALF*uImage-0.5*vImage));
-            }        
+            if (nColorMod>0) color.inverseRotation();
+            if (colorPosition.y>-2*this.transWidth) {
+	            if (colorPosition.x>2*this.transWidth) {
+	            	this.transition(color,-colorPosition.y);
+	            }
+	            else {
+	                this.transition(color,Math.min(-colorPosition.y,
+	                						0.8660*colorPosition.x-0.5*colorPosition.y));
+	            }   
+            }     
         }
     }
     else {
         var d;
-        if (vImage>0){
-            d=RT3HALF*uImage+0.5*vImage;
-            if (d>0){
-                colorSector=0;
+        if (colorPosition.y>0){
+            d=0.8660*colorPosition.x+0.5*colorPosition.y;    // distance from 120 degrees separation
+            if (d>0){                                         // no change, still first sector
+                this.transition(color,d);
             }
-            else {
-                colorSector=1;
+            else {                                        // second sector
+            	if (nColorMod>0) color.rotation();
+                this.transition(color,-d);
             }
         }
         else {
-            d=RT3HALF*uImage-0.5*vImage;
+            d=0.8660*colorPosition.x-0.5*colorPosition.y;
             if (d>0){
-                colorSector=2;
+           		if (nColorMod>0) color.inverseRotation();
+                this.transition(color,d);
             }
             else {
-                colorSector=1;
+           		if (nColorMod>0) color.rotation();
+                this.transition(color,-d);
             }           
         }
-        makeColorAmplitude(d);
+    }
+}
+
+// 4 color symmetry, transitions near the x- ynd y- axis, whatever is closer
+ColorSymmetry.prototype.make4ColorSymmetry=function(color,colorPosition){
+    if (colorPosition.x>0){
+        if (colorPosition.y>0){    // first quadrant-no color change
+            this.transition(color,Math.min(colorPosition.x,colorPosition.y));
+        }
+        else {
+			switch (nColorMod){    // third quadrant
+	        	case 1:
+	        		color.shiftHue(4.5);
+	        		break;
+	        	case 2: 
+	        		color.improvedInversion();
+	        		break;
+        	}
+            this.transition(color,Math.min(colorPosition.x,-colorPosition.y));
+        }
+    }   
+    else {
+        if (colorPosition.y>0){
+			switch (nColorMod){    // third quadrant
+	        	case 1:
+	        		color.shiftHue(1.5);
+	        		break;
+	        	case 2: 
+	        		color.simpleInversion();
+	        		break;
+        	}
+            this.transition(color,Math.min(-colorPosition.x,colorPosition.y));
+        }
+        else {
+			switch (nColorMod){    // third quadrant
+	        	case 1:
+	        		color.shiftHue(3);
+	        		break;
+	        	case 2: 
+	        		color.simpleInversion();
+	        		color.improvedInversion();
+	        		break;
+        	}
+            this.transition(color,Math.min(-colorPosition.x,-colorPosition.y));
+        }
     }
 }

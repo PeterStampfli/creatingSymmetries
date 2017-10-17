@@ -20,9 +20,9 @@ sum.positionTimesUnitVectors(spacePosition.x,spacePosition.y);
 
 
 inputImagePosition.x=sum.cosines1(k);
-inputImagePosition.y=sum.cosines2(k,k);
-colorPosition.x=sum.sines1(1);
-sum.colorSum1X(1);
-sum.colorSum1Y(1);
+inputImagePosition.y=sum.cosines2(k,2*k);
+colorPosition.x=sum.colorSum1X(k);
+colorPosition.y=sum.colorSum1Y(k);
+//sum.colorSum1Y(1);
 }
 

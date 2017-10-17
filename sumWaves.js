@@ -198,6 +198,8 @@ SumWaves.prototype.colorSum1X=function(k){
     var sum=0;
     var xTimesE=this.xTimesE;
     var fastFunction=this.fastFunction;
+    var cos2PiHDivN=this.cos2PiHDivN;
+    var sin2PiHDivN=this.sin2PiHDivN;
     if (this.isOdd){
         var deltaPhase=2*Math.PI/this.nColorSym;
         var phase=0;

@@ -177,6 +177,7 @@ Color.prototype.rgbFromHig=function(){
 
 /*
 shift the hue to rotate the color
+hue goes from 0 to 6, cyclically
 */
 Color.prototype.shiftHue=function(amount){
 	this.higFromRgb();

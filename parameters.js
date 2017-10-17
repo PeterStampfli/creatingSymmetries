@@ -34,16 +34,18 @@ backgroundColor.setRgb(100,100,100);
 // parameters and other small things defining a particular image
 
 
-var p=5;
-var nColorSymmetry=2;
+var p=4;
+var nColorSymmetry=4;
 
 var sum=new SumWaves(p,nColorSymmetry,elementaryFastFunction);
+sum.evenRotationalSymmetry();
 
 // the color symmetry
 var colorSymmetry=new ColorSymmetry(nColorSymmetry);
+colorSymmetry.transWidth=0.2;
+colorSymmetry.transSmoothing=0.05;
 
 
-sum.oddRotationalSymmetry();
 
 var k=1;
 
