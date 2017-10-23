@@ -28,12 +28,9 @@ outputMouseEvents.addMoveAction(function(event, mouseEvents){
   	createImage();
 });
 
-
 outputCanvas.setSize(initialOutputWidth,initialOutputWidth);
 outputCanvas.blueScreen();
 outputCanvas.createPixels();
 map.setSize(initialOutputWidth,initialOutputWidth);
 map.setRange(initialMapRange);
-
-
-
+map.make(mappingFunction);

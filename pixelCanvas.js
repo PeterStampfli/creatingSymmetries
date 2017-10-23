@@ -28,6 +28,7 @@ PixelCanvas.prototype.setSize=function(width,height){
 	this.height=height;
 	this.canvas.width=width;
 	this.canvas.height=height;
+	console.log(width+" "+height);
 }
 
 /*
@@ -111,4 +112,21 @@ PixelCanvas.prototype.makeColor=function(color,index){
 	color.red=index/200;
 	color.green=100;
 	color.blue=0;
+}
+
+/*
+periodic repetition of another canvas/image
+*/
+PixelCanvas.prototype.periodic=function(inputImage){
+	var verticalRepetitions=Math.floor(this.width/inputImage.width)+1;
+	var xStart=0.5*(this.width-verticalRepetitions*inputImage.width);
+	var horizontalRepetitions=Math.floor(this.height/inputImage.height)+1;
+	var yStart=0.5*(this.height-horizontalRepetitions*inputImage.height);
+
+	for (var i=0;i<verticalRepetitions;i++){
+		for (var j=0;j<horizontalRepetitions;j++){
+			this.canvasImage.drawImage(inputImage,xStart+i*inputImage.width,yStart+j*inputImage.height);
+		}
+	}
+	
 }

@@ -6,7 +6,7 @@
 
 // the output canvas size
 var initialOutputWidth=500;
-var initialOutputHeight=500
+var initialOutputHeight=500;
 
 // the map transform makes that the x-coordinate on the outputCanvas
 // goes initially from - initialMapRange to + initialMapRange
@@ -32,6 +32,11 @@ backgroundColor.setRgb(100,100,100);
 
 
 // parameters and other small things defining a particular image
+
+// repetitions: use entire number to get center of tile at center of image
+//  use slighly smaller than integer to get seams at center
+var verticalRepetitions=2;
+var horizontalRepetitions=2;
 
 
 var p=4;

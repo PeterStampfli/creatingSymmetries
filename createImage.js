@@ -32,26 +32,19 @@ function createImage(){
 	if (inputImage.pixels==null){                    // no input image, no output
 		return;
 	}
-	// do necessary if output is resized
-  	if ((outputWidthChooser.getValue()!=outputCanvas.width)||(outputHeightChooser.getValue()!=outputCanvas.height)){
-		outputCanvas.setSize(outputWidthChooser.getValue(),outputHeightChooser.getValue());
+	// do resize tasks if output is resized
+	var width=outputWidthChooser.getValue();
+	var height=outputHeightChooser.getValue();
+  	if ((width!=outputCanvas.width)||(height!=outputCanvas.height)){
+		outputCanvas.setSize(width,height);
 		outputCanvas.blueScreen();
 		outputCanvas.createPixels();
-	  	map.setSize(outputWidthChooser.getValue(),outputHeightChooser.getValue());
+	  	map.setSize(width,height);
+	  	finalCanvas.setSize(2*width,2*height);
+	  	finalCanvas.blueScreen();
   	}
 	map.make(mappingFunction);                    // recalculates only if necessary
-
-  	//outputCanvas.canvasImage.drawImage(inputImage.image,0,0);
   	referenceCanvas.setAlpha(128);
-/*
-  	outputCanvas.setPixels(function(color,index){
-
-  		var position=map.inputImagePositions[index];
-  		getInputColor(color,position);
-
-
-  	})
-*/
 	if (smoothing){
 		smoothedPixels();
 	}
@@ -60,7 +53,7 @@ function createImage(){
 	}
   	outputCanvas.showPixels();
   	referenceCanvas.showPixels();
-
+  	finalCanvas.periodic(outputCanvas.canvas);
   	progressMessage();
 }
 

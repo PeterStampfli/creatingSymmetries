@@ -17,6 +17,7 @@ function Map(fastFunction){
 /*
 set the size, update the data array, fill with new MapOutput objects
 increases only the data array
+only called if size changes
 */
 Map.prototype.setSize=function(width,height){
 	var oldLength,newLength;
@@ -89,7 +90,6 @@ Map.prototype.make=function(mapMethod){
 			spacePosition.x=i;
 			spacePosition.y=j;
 			transform.shiftScale(spacePosition);
-
 			mapMethod(inputImagePositions[index],colorPositions[index],spacePosition,canvasPosition);
 			index++;
 			i+=1;

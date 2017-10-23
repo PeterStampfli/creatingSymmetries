@@ -94,9 +94,16 @@ updateButton.onClick(function(){
     createImage();
 });
 
-var saveImageButton=new Button("blob");
+var saveImageButton=new Button("outputOutputCanvas");
 saveImageButton.onClick(function(){
     outputCanvas.canvas.toBlob(function(blob){
+        saveAs(blob,"someImage.jpg");
+    },'image/jpeg',0.92);
+});
+
+var saveFinalImageButton=new Button("outputFinalCanvas");
+saveFinalImageButton.onClick(function(){
+    finalCanvas.canvas.toBlob(function(blob){
         saveAs(blob,"someImage.jpg");
     },'image/jpeg',0.92);
 });
