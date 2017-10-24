@@ -17,6 +17,7 @@ outputMouseEvents.addWheelAction(function(event, mouseEvents){
 	}
 	map.transform.scale*=factor;
 	map.transform.changeShift(1/factor);
+	map.transform.addShift(map.width*0.5*(1/factor-1),map.height*0.5*(1/factor-1));
   	map.isValid=false;
   	createImage();
 });
@@ -32,5 +33,6 @@ outputCanvas.setSize(initialOutputWidth,initialOutputWidth);
 outputCanvas.blueScreen();
 outputCanvas.createPixels();
 map.setSize(initialOutputWidth,initialOutputWidth);
+map.setRelativeOrigin(initialRelativeOriginX,initialRelativeOriginY);
 map.setRange(initialMapRange);
 map.make(mappingFunction);

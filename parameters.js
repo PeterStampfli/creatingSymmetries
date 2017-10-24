@@ -9,11 +9,13 @@ var initialOutputWidth=500;
 var initialOutputHeight=500;
 
 // the map transform makes that the x-coordinate on the outputCanvas
-// goes initially from - initialMapRange to + initialMapRange
-// same for y-coordinate of sqaure canvas
-var initialMapRange=10; 
+// has an intervall length of initialMapRange
+// same for y-coordinate of square canvas
+var initialMapRange=20; 
 
-
+// the initial relative origin
+var initialRelativeOriginX=0.5;
+var initialRelativeOriginY=0;
 
 
 var orientationCanvasSize=200;

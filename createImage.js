@@ -27,7 +27,6 @@ function makeColor(color,colorPosition,inputImagePosition){
 // make the output image 
 
 
-
 function createImage(){
 	if (inputImage.pixels==null){                    // no input image, no output
 		return;
@@ -59,8 +58,12 @@ function createImage(){
 
 // make the pixels without averaging
 function simplePixels(){
-	var inputImagePositions=map.inputImagePositions;
-	var colorPositions=map.colorPositions;
+	var imagePositionX=map.imagePositionX;
+	var imagePositionY=map.imagePositionY;
+	var imagePosition=new Vector2();
+	var colorPositionX=map.colorPositionX;
+	var colorPositionY=map.colorPositionY;
+	var colorPosition=new Vector2();
 	var outputPixels=outputCanvas.pixels;
 	var color=new Color();
     var outputIndex=0;
@@ -68,7 +71,15 @@ function simplePixels(){
 	var mapSize=map.width*map.height;
     for (mapIndex=0;mapIndex<mapSize;mapIndex++){
         // translation, rotation and scaling
-        makeColor(color,colorPositions[mapIndex],inputImagePositions[mapIndex]);
+        colorPosition.x=colorPositionX[mapIndex];
+        colorPosition.y=colorPositionY[mapIndex];
+
+        imagePosition.x=imagePositionX[mapIndex];
+        imagePosition.y=imagePositionY[mapIndex];
+
+        makeColor(color,colorPosition,imagePosition);
+
+
         outputPixels[outputIndex++]=color.red;
         outputPixels[outputIndex++]=color.green;
         outputPixels[outputIndex]=color.blue;
@@ -78,11 +89,18 @@ function simplePixels(){
 
 // 2x2 averaging
 function smoothedPixels(){
-	var inputImagePositions=map.inputImagePositions;
-	var colorPositions=map.colorPositions;
+	var imagePositionX=map.imagePositionX;
+	var imagePositionY=map.imagePositionY;
+	var imagePosition=new Vector2();
+	var colorPositionX=map.colorPositionX;
+	var colorPositionY=map.colorPositionY;
+	var colorPosition=new Vector2();
 
-	var baseImagePosition;
-	var baseColorPosition;
+	var baseImagePositionX;
+	var baseImagePositionY;
+	var baseColorPositionX;
+	var baseColorPositionY;
+
 	var imagePosition=new Vector2();
 	var colorPosition=new Vector2();
 	var baseColor=new Color();
@@ -116,18 +134,43 @@ function smoothedPixels(){
 				indexPlusXY=indexPlusY+1;
 			}
 	
-			baseImagePosition=inputImagePositions[baseIndex];
-			baseColorPosition=colorPositions[baseIndex];
+			baseImagePositionX=imagePositionX[baseIndex];
+			baseImagePositionY=imagePositionY[baseIndex];
+			baseColorPositionX=colorPositionX[baseIndex];
+			baseColorPositionY=colorPositionY[baseIndex];
 
-			makeColor(baseColor,baseColorPosition,baseImagePosition);
+			imagePosition.x=baseImagePositionX;
+			imagePosition.y=baseImagePositionY;
+			colorPosition.x=baseColorPositionX;
+			colorPosition.y=baseColorPositionY;
+
+			makeColor(baseColor,colorPosition,imagePosition);
 
 
-			makeColor(colorPlusX,colorPosition.average(baseColorPosition,colorPositions[indexPlusX]),
-								 imagePosition.average(baseImagePosition,inputImagePositions[indexPlusX]));
-			makeColor(colorPlusY,colorPosition.average(baseColorPosition,colorPositions[indexPlusY]),
-								 imagePosition.average(baseImagePosition,inputImagePositions[indexPlusY]));
-			makeColor(colorPlusXY,colorPosition.average(baseColorPosition,colorPositions[indexPlusXY]),
-								 imagePosition.average(baseImagePosition,inputImagePositions[indexPlusXY]));
+			imagePosition.x=0.5*(baseImagePositionX+imagePositionX[indexPlusX]);
+			imagePosition.y=0.5*(baseImagePositionY+imagePositionY[indexPlusX]);
+			colorPosition.x=0.5*(baseColorPositionX+colorPositionX[indexPlusX]);
+			colorPosition.y=0.5*(baseColorPositionY+colorPositionY[indexPlusX]);
+
+			makeColor(colorPlusX,colorPosition,imagePosition);
+
+
+			imagePosition.x=0.5*(baseImagePositionX+imagePositionX[indexPlusY]);
+			imagePosition.y=0.5*(baseImagePositionY+imagePositionY[indexPlusY]);
+			colorPosition.x=0.5*(baseColorPositionX+colorPositionX[indexPlusY]);
+			colorPosition.y=0.5*(baseColorPositionY+colorPositionY[indexPlusY]);
+
+			makeColor(colorPlusY,colorPosition,imagePosition);
+
+
+			imagePosition.x=0.5*(baseImagePositionX+imagePositionX[indexPlusXY]);
+			imagePosition.y=0.5*(baseImagePositionY+imagePositionY[indexPlusXY]);
+			colorPosition.x=0.5*(baseColorPositionX+colorPositionX[indexPlusXY]);
+			colorPosition.y=0.5*(baseColorPositionY+colorPositionY[indexPlusXY]);
+
+			makeColor(colorPlusXY,colorPosition,imagePosition);
+
+
 
 			outputPixels[outputIndex++]=(2+baseColor.red+colorPlusX.red+colorPlusY.red+colorPlusXY.red)>>2;
 			outputPixels[outputIndex++]=(2+baseColor.green+colorPlusX.green+colorPlusY.green+colorPlusXY.green)>>2;
