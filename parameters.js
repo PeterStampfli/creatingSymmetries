@@ -14,7 +14,7 @@ var initialOutputHeight=500;
 var initialMapRange=20; 
 
 // the initial relative origin
-var initialRelativeOriginX=0.5;
+var initialRelativeOriginX=0.0;
 var initialRelativeOriginY=0;
 
 

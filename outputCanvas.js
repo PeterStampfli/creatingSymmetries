@@ -36,3 +36,7 @@ map.setSize(initialOutputWidth,initialOutputWidth);
 map.setRelativeOrigin(initialRelativeOriginX,initialRelativeOriginY);
 map.setRange(initialMapRange);
 map.make(mappingFunction);
+
+
+
+console.log(map.position(new Vector2().setComponents(-866.8,9)));

@@ -60,6 +60,8 @@ Map.prototype.setRelativeOrigin=function(x,y){
 
 /*
 initialization: set the intervall length (range) for coordinates assuming a square canvas/map
+
+if relative origin =(0,0) then pixel (i,j)=(0,0) lies at (0,0) and inexistant pixel (width,width) would lie at (range,range)
 */
 Map.prototype.setRange=function(range){
 	this.transform.setScale(range/this.width);
@@ -86,23 +88,27 @@ Map.prototype.make=function(mapMethod){
 		var colorPositionX=this.colorPositionX;
 		var colorPositionY=this.colorPositionY;
 		var colorPosition=new Vector2();
+		var scale=this.transform.scale;
+		var scaleShiftX=scale*this.transform.shiftX;
+		var scaleShiftY=scale*this.transform.shiftY;
 		this.isValid=true;
-		canvasPosition.y=0;
+		canvasPosition.y=0.5*iHeight;
+		spacePosition.y=scaleShiftY;
 		for (j=0;j<height;j++){
-			canvasPosition.y+=iHeight;
-			canvasPosition.x=0;
+			canvasPosition.x=0.5*iWidth;
+			spacePosition.x=scaleShiftX;
 			for (i=0;i<width;i++){
-				canvasPosition.x+=iWidth;
-				spacePosition.x=i;
-				spacePosition.y=j;
-				transform.shiftScale(spacePosition);
 				mapMethod(imagePosition,colorPosition,spacePosition,canvasPosition);
 				imagePositionX[index]=imagePosition.x;
 				imagePositionY[index]=imagePosition.y;
 				colorPositionX[index]=colorPosition.x;
 				colorPositionY[index]=colorPosition.y;
 				index++;
+				canvasPosition.x+=iWidth;
+				spacePosition.x+=scale;
 			}
+			canvasPosition.y+=iHeight;
+			spacePosition.y+=scale;
 		}
 	}
 }
@@ -113,4 +119,46 @@ trivial test method: identity
 Map.prototype.identity=function(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	inputImagePosition.x=spacePosition.x;
 	inputImagePosition.y=spacePosition.y;
+}
+
+/*
+look up map at position 
+using linear interpolation/extrapolation to get intervall [0,range) with some safety margin upwards
+
+taking care that indices i=0...width-1, j=0...height-1
+
+return true if position is inside, false if outside
+*/
+
+Map.prototype.position=function(position){
+	var x,y;
+	var i,j;
+	console.log("*"+position.x);
+	// untransform to pixel coordinates and get base index, check if is inside
+	var transform=this.transform;
+	x=position.x/transform.scale-transform.shiftX;
+	i=Math.floor(x);
+	console.log(i);
+	if ((i > this.width)||(i<-1)){
+		return false;
+	}
+	if (i<0){
+		i=0;
+	}
+	else if (i>=width-1){
+		i=width-2;
+	}
+
+
+	y=position.y/transform.scale-transform.shiftY;
+	j=Math.floor(y);
+	if ((j>this.height)||(j<-1)){
+		return false;
+	}
+	
+
+
+
+
+	return true;
 }

@@ -83,6 +83,14 @@ Transform.prototype.shiftScale=function(position){
 }
 
 /*
+inverse shift and scale
+*/
+Transform.prototype.inverseShiftScale=function(position){
+	position.x=position.x/this.scale-this.shiftX;
+	position.y=position.y/this.scale-this.shiftY;
+}
+
+/*
 change position: first rotate and scale, then shift
 */
 Transform.prototype.scaleRotateShift=function(position){
