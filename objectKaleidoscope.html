@@ -135,7 +135,35 @@
 
 	console.log("hello");
 
-	
+var testMap=new Map(elementaryFastFunction);
+testMap.setSize(10,10);
+	testMap.transform.scale=1;
+testMap.setRelativeOrigin(0,0);
+testMap.transform.shiftX=0;
+testMap.transform.shiftY=00;
+console.log(testMap.transform);
+
+testMap.make(testMap.identity);
+
+
+
+function test(x,y){
+	var v=new Vector2().setComponents(x,y);
+	console.log("test "+testMap.imagePosition(v));
+	console.log(v);
+}
+
+test(5.001,8.33333333);
+
+elementaryFastFunction.makeGaussTable(4000);
+
+console.log(elementaryFastFunction.gauss(3.99));
+
+var ft=new FunTest();
+ft.approxFunction=function(x){ return elementaryFastFunction.gauss(x)};
+ft.trueFunction=elementaryFastFunction.originalGauss;
+
+ft.absError(0,5,20);
 
 
 </script>

@@ -46,8 +46,8 @@ Transform.prototype.changeShift=function(factor){
 set the combined factors from scale and angle
 */
 Transform.prototype.combineScaleRotation=function(){
-	this.scaleCosAngle=this.scale*this.fastFunction.cosLike(this.angle);
-	this.scaleSinAngle=this.scale*this.fastFunction.sinLike(this.angle);
+	this.scaleCosAngle=this.scale*this.fastFunction.cos(this.angle);
+	this.scaleSinAngle=this.scale*this.fastFunction.sin(this.angle);
 }
 
 /*

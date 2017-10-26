@@ -5,6 +5,12 @@ approximating functions with linear table interpolation
 */
 
 function FastFunction(){
+    // sin function
+    this.sinTabFactor;
+    this.sinTable=[];
+    this.nSinIntervalsM1;
+
+
 	//periodic function (sine with higher harmonics)
 	this.periodicTabFactor;
 	this.periodicTable=[];
@@ -22,6 +28,16 @@ function FastFunction(){
 	// the atan function
 	this.atanTabFactor;
 	this.atanTable=[];
+    // the gauss functionm
+    this.gaussTabFactor;
+    this.gaussTable=[];
+
+
+    this.makeExpTable(1000);
+    this.makeLogTable(1000);
+    this.makeAtanTable(1000);
+    this.makeSinTable();
+    this.makeTriangleExpansionTable(1);
 }
 
 /*
@@ -38,15 +54,54 @@ FastFunction.prototype.makeTable=function(table,start,end,nIntervals,theFunction
 }
 
 /*
+make a table for a sin function with a power of 2 number of intervalls
+period length is 2pi
+*/
+FastFunction.prototype.makeSinTable=function(){
+    var nIntervals=Math.round(Math.pow(2,12));
+    this.nSinIntervalsM1=nIntervals-1;
+    this.sinTabFactor=nIntervals/2/Math.PI;
+    this.makeTable(this.sinTable,0,2*Math.PI,nIntervals,Math.sin);
+}
+
+
+/*
+interpolate periodic function directly
+assuming that table is a sine-like function you get this sine-like function
+*/
+FastFunction.prototype.sin=function(x){
+    var index;
+    x*=this.sinTabFactor;
+    index=Math.floor(x);
+    x-=index;
+    index=index&this.nSinIntervalsM1;
+    return this.sinTable[index]*(1-x)+this.sinTable[index+1]*x;
+}
+
+/*
+interpolate periodic function with a shift by pi/2
+assuming that table is a sine-like function you get this cos-like function
+*/
+FastFunction.prototype.cos=function(x){
+    var index;
+    x=this.sinTabFactor*(x+1.570796);                            //pi/2
+    index=Math.floor(x);
+    x-=index;
+    index=index&this.nSinIntervalsM1;
+    return this.sinTable[index]*(1-x)+this.sinTable[index+1]*x;
+}
+
+/*
 make a table for a periodic function with a power of 2 number of intervalls
 period length is 2pi
 */
 FastFunction.prototype.makePeriodicTable=function(log2NIntervals,theFunction){
-	var nIntervals=Math.round(Math.pow(2,log2NIntervals));
-	this.nPeriodicIntervalsM1=nIntervals-1;
-	this.periodicTabFactor=nIntervals/2/Math.PI;
-	this.makeTable(this.periodicTable,0,2*Math.PI,nIntervals,theFunction);
+    var nIntervals=Math.round(Math.pow(2,log2NIntervals));
+    this.nPeriodicIntervalsM1=nIntervals-1;
+    this.periodicTabFactor=nIntervals/2/Math.PI;
+    this.makeTable(this.periodicTable,0,2*Math.PI,nIntervals,theFunction);
 }
+
 
 /*
 interpolate periodic function directly
@@ -58,7 +113,7 @@ FastFunction.prototype.sinLike=function(x){
 	index=Math.floor(x);
 	x-=index;
 	index=index&this.nPeriodicIntervalsM1;
-	return this.periodicTable[index++]*(1-x)+this.periodicTable[index]*x;
+	return this.periodicTable[index]*(1-x)+this.periodicTable[index+1]*x;
 }
 
 /*
@@ -226,14 +281,34 @@ FastFunction.prototype.atan2= function(y,x){
 }
 
 /*
-creating periodic tables
+the gauss function
 */
-/*
-for the simple sine and cosine
-*/
-FastFunction.prototype.makeSinTable=function(){
-	this.makePeriodicTable(12,Math.sin);
+FastFunction.prototype.originalGauss=function(x){
+    return Math.exp(-x*x);
 }
+
+/*
+make the table for the gauss function exp(-x**2), x<4
+*/
+FastFunction.prototype.makeGaussTable=function(nIntervals){
+    this.gaussTabFactor=0.25*nIntervals;
+    this.makeTable(this.gaussTable,0,4,nIntervals,this.originalGauss);
+}
+
+/*
+look up gauss for small args
+*/
+FastFunction.prototype.gauss=function(x){
+    var index;
+    if (x>=4){
+        return 0;
+    }
+    x=this.gaussTabFactor*x;
+    index=Math.floor(x);
+    x-=index;
+    return this.gaussTable[index]*(1-x)+this.gaussTable[index+1]*x;
+}
+
 
 /*
 the triangle function, scaled to match the sine expansion
@@ -283,22 +358,9 @@ FastFunction.prototype.makeTriangleExpansionTable=function(nHarmonics){
 	})
 }
 
-/*
-make all the tables except the periodic table
-with suitable lengths (test!)
-returns the object, for chaining with creator
-periodic function is simple sine
-*/
-FastFunction.prototype.makeExpLogAtanTables=function(){
-	this.makeExpTable(1000);
-	this.makeLogTable(1000);
-	this.makeAtanTable(1000);
-	return this;
-}
 
 
 // fast functions with elementary sin function
 var elementaryFastFunction=new FastFunction();
-elementaryFastFunction.makeSinTable();
-elementaryFastFunction.makeExpLogAtanTables();
+
 

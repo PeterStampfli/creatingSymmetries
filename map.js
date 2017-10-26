@@ -117,8 +117,8 @@ Map.prototype.make=function(mapMethod){
 trivial test method: identity
 */
 Map.prototype.identity=function(inputImagePosition,colorPosition,spacePosition,canvasPosition){
-	inputImagePosition.x=spacePosition.x;
-	inputImagePosition.y=spacePosition.y;
+	inputImagePosition.x=spacePosition.x+10;
+	inputImagePosition.y=spacePosition.y+100;
 }
 
 /*
@@ -130,35 +130,70 @@ taking care that indices i=0...width-1, j=0...height-1
 return true if position is inside, false if outside
 */
 
-Map.prototype.position=function(position){
+Map.prototype.imagePosition=function(position){
+	var transform=this.transform;
 	var x,y;
-	var i,j;
+	var epsilon=0.01;
+	var h,k;
+	var dx,dy;
+    var i00, i01, i10, i11;
+    var f00, f01, f10, f11;
+	var imagePositionX=this.imagePositionX;
+	var imagePositionY=this.imagePositionY;
+
+
+
 	console.log("*"+position.x);
 	// untransform to pixel coordinates and get base index, check if is inside
-	var transform=this.transform;
 	x=position.x/transform.scale-transform.shiftX;
-	i=Math.floor(x);
-	console.log(i);
-	if ((i > this.width)||(i<-1)){
+	console.log("x "+x);
+	if ((x > this.width+epsilon)||(x<-epsilon)){
 		return false;
 	}
-	if (i<0){
-		i=0;
-	}
-	else if (i>=width-1){
-		i=width-2;
-	}
-
 
 	y=position.y/transform.scale-transform.shiftY;
-	j=Math.floor(y);
-	if ((j>this.height)||(j<-1)){
+
+	if ((y>this.height+epsilon)||(y<-epsilon)){
 		return false;
 	}
+
+	h=Math.floor(x);
+	console.log(h);
+	if (h<0){
+		h=0;
+	}
+	else if (h>=this.width-1){
+		h=this.width-2;
+	}
+
+	dx=x-h;
 	
+	k=Math.floor(y);
+	if (k<0){
+		k=0;
+	}
+	else if (k>=this.height-1){
+		k=height-2;
+	}
+
+	dy=y-k;
 
 
 
+
+    // the indices to pixel data
+    i00 = h+this.width*k;
+    i01 = i00+this.width;
+    i10 = i00+1;
+    i11 = i01+1;
+    //  the weights
+    f00 = (1 - dx) * (1 - dy);
+    f01 = (1 - dx) * dy;
+    f10 = dx * (1 - dy);
+    f11 = dy * dx;
+
+    position.x=f00*imagePositionX[i00]+f01*imagePositionX[i01]+f10*imagePositionX[i10]+f11*imagePositionX[i11];
+    position.y=f00*imagePositionY[i00]+f01*imagePositionY[i01]+f10*imagePositionY[i10]+f11*imagePositionY[i11];
 
 	return true;
 }
