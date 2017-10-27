@@ -37,6 +37,7 @@ function FastFunction(){
     this.makeLogTable(1000);
     this.makeAtanTable(1000);
     this.makeSinTable();
+    this.makeGaussTable(1000);
     this.makeTriangleExpansionTable(1);
 }
 
@@ -165,7 +166,7 @@ FastFunction.prototype.makeLogTable=function(nIntervals){
 fast log, fallback to native log for large value, using inversion for small values
 slower than native log for chrome, twice times faster for firefox
 */
-FastFunction.prototype.log=function(x){
+FastFunction.prototype.logOld=function(x){
 	var index;
     var ln=0;
 	if (x<1){
@@ -198,6 +199,59 @@ FastFunction.prototype.log=function(x){
     index=Math.floor(x);
     x-=index;
     return ln+this.logTable[index]*(1-x)+this.logTable[index+1]*x;
+}
+
+
+/*
+fast log, fallback to native log for large value, using inversion for small values
+slower than native log for chrome, twice times faster for firefox
+*/
+FastFunction.prototype.log=function(x){
+    var index;
+    var ln=0;
+    var iX;
+    var iDiv=1;
+    if (x<=0){
+        return NaN;
+    }
+    if (x<1){
+        return -this.log(1/x);
+    }
+    if (x>=2147483647){                  // 2**31-1
+        return Math.log(x);
+    }
+    iX=Math.floor(x);
+    if (iX>=65536){
+        iX=iX>>16;
+        iDiv=iDiv<<16;
+        ln=11.090354;
+    }
+    if (iX>=256){
+        iX=iX>>8;
+        iDiv=iDiv<<8;
+        ln+=5.545177;
+    }
+    if (iX>=16){
+        iX=iX>>4;
+        iDiv=iDiv<<4;
+        ln+=2.772588;
+    }
+    if (iX>=4){
+        iX=iX>>2;
+        iDiv=iDiv<<2;
+        ln+=1.386294;
+    }
+    if (iX>=2){
+        iX=iX>>1;
+        iDiv=iDiv<<1;
+        ln+=0.693147;
+    }
+    x=(x/iDiv-1)*this.logTabFactor;
+    index=Math.floor(x);
+    x-=index;
+    return ln+this.logTable[index]*(1-x)+this.logTable[index+1]*x;
+
+
 }
 
 /*
@@ -297,6 +351,8 @@ FastFunction.prototype.makeGaussTable=function(nIntervals){
 
 /*
 look up gauss for small args
+
+note that exp(-4)=0.018, thus for image averaging exp(-x*x)==0 for x>2
 */
 FastFunction.prototype.gauss=function(x){
     var index;

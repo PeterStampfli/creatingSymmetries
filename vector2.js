@@ -37,3 +37,23 @@ Vector2.prototype.average=function(one,two){
 	this.y=two.y;
 	return this;
 }
+
+/*
+symmetries
+*/
+
+/*
+periodic length 1 in x-direction, basic zone is 0...1
+*/
+Vector2.prototype.periodXUnit=function(){
+	this.x=this.x-Math.floor(this.x);
+}
+
+/*
+mirror from left to right if point is at right
+*/
+Vector2.prototype.leftToRightAt=function(x){
+	if (this.x>x){
+		this.x=x+x-this.x;
+	}
+}

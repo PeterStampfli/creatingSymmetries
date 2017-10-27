@@ -57,19 +57,26 @@
 				<input type="radio" name="interpolation" class='interpolation'>cubic
 			</form>
 		</p>
-		<p>	
-			<form action="">
-				Choose color modification:
-				<input type="radio" name="inversion" class='inversion' checked>none
-				<input type="radio" name="inversion" class='inversion'>first
-				<input type="radio" name="inversion" class='inversion'>second
-			</form>
 		</p>
 			To get the result of new settings: 
 			<button type="button" id="update">
 				update image
 			</button>
 		<p>
+		<p>	
+			<form action
+			="">
+				Choose color modification:
+				<input type="radio" name="inversion" class='inversion' checked>none
+				<input type="radio" name="inversion" class='inversion'>first
+				<input type="radio" name="inversion" class='inversion'>second
+			</form>
+		<p>
+			Choose the number of harmonics, negative or zero for triangle wave
+			<input type="text" class="numbers" id="harmonics" maxlength="4" />
+			.
+		</p>
+
 
 		</p>
 
@@ -110,6 +117,7 @@
 	<script src="mouseEvents.js"></script>
 	<script src="vector2.js"></script>
 	<script src="map.js"></script>
+	<script src="mapSymmetries.js"></script>
 	<script src="funTest.js"></script>
 	<script src="fastFunction.js"></script>
 	<script src="pixelCanvas.js"></script>
@@ -134,36 +142,6 @@
 	<script type="text/javascript">
 
 	console.log("hello");
-
-var testMap=new Map(elementaryFastFunction);
-testMap.setSize(10,10);
-	testMap.transform.scale=1;
-testMap.setRelativeOrigin(0,0);
-testMap.transform.shiftX=0;
-testMap.transform.shiftY=00;
-console.log(testMap.transform);
-
-testMap.make(testMap.identity);
-
-
-
-function test(x,y){
-	var v=new Vector2().setComponents(x,y);
-	console.log("test "+testMap.imagePosition(v));
-	console.log(v);
-}
-
-test(5.001,8.33333333);
-
-elementaryFastFunction.makeGaussTable(4000);
-
-console.log(elementaryFastFunction.gauss(3.99));
-
-var ft=new FunTest();
-ft.approxFunction=function(x){ return elementaryFastFunction.gauss(x)};
-ft.trueFunction=elementaryFastFunction.originalGauss;
-
-ft.absError(0,5,20);
 
 
 </script>

@@ -80,6 +80,8 @@ Map.prototype.make=function(mapMethod){
 		var width=this.width;
 		var iWidth=1.0/(width-1);
 		var iHeight=1.0/(height-1);
+		var spacePositionX,spacePositionY;
+		var canvasPositionX,canvasPositionY;
 		var spacePosition=new Vector2(); // pixel position in virtual space
 		var canvasPosition=new Vector2(); //relative pixel position on canvas (0,0)....(1,1), independent of offset
 		var imagePositionX=this.imagePositionX;
@@ -92,23 +94,27 @@ Map.prototype.make=function(mapMethod){
 		var scaleShiftX=scale*this.transform.shiftX;
 		var scaleShiftY=scale*this.transform.shiftY;
 		this.isValid=true;
-		canvasPosition.y=0.5*iHeight;
-		spacePosition.y=scaleShiftY;
+		canvasPositionY=0.5*iHeight;
+		spacePositionY=scaleShiftY;
 		for (j=0;j<height;j++){
-			canvasPosition.x=0.5*iWidth;
-			spacePosition.x=scaleShiftX;
+			canvasPositionX=0.5*iWidth;
+			spacePositionX=scaleShiftX;
 			for (i=0;i<width;i++){
+				spacePosition.x=spacePositionX;
+				spacePosition.y=spacePositionY;
+				canvasPosition.x=canvasPositionX;
+				canvasPosition.y=canvasPositionY;
 				mapMethod(imagePosition,colorPosition,spacePosition,canvasPosition);
 				imagePositionX[index]=imagePosition.x;
 				imagePositionY[index]=imagePosition.y;
 				colorPositionX[index]=colorPosition.x;
 				colorPositionY[index]=colorPosition.y;
 				index++;
-				canvasPosition.x+=iWidth;
-				spacePosition.x+=scale;
+				canvasPositionX+=iWidth;
+				spacePositionX+=scale;
 			}
-			canvasPosition.y+=iHeight;
-			spacePosition.y+=scale;
+			canvasPositionY+=iHeight;
+			spacePositionY+=scale;
 		}
 	}
 }
@@ -129,7 +135,6 @@ taking care that indices i=0...width-1, j=0...height-1
 
 return true if position is inside, false if outside
 */
-
 Map.prototype.imagePosition=function(position){
 	var transform=this.transform;
 	var x,y;
@@ -140,23 +145,15 @@ Map.prototype.imagePosition=function(position){
     var f00, f01, f10, f11;
 	var imagePositionX=this.imagePositionX;
 	var imagePositionY=this.imagePositionY;
-
-
-
-	console.log("*"+position.x);
 	// untransform to pixel coordinates and get base index, check if is inside
 	x=position.x/transform.scale-transform.shiftX;
-	console.log("x "+x);
 	if ((x > this.width+epsilon)||(x<-epsilon)){
 		return false;
 	}
-
 	y=position.y/transform.scale-transform.shiftY;
-
 	if ((y>this.height+epsilon)||(y<-epsilon)){
 		return false;
 	}
-
 	h=Math.floor(x);
 	console.log(h);
 	if (h<0){
@@ -165,9 +162,7 @@ Map.prototype.imagePosition=function(position){
 	else if (h>=this.width-1){
 		h=this.width-2;
 	}
-
-	dx=x-h;
-	
+	dx=x-h;	
 	k=Math.floor(y);
 	if (k<0){
 		k=0;
@@ -175,12 +170,7 @@ Map.prototype.imagePosition=function(position){
 	else if (k>=this.height-1){
 		k=height-2;
 	}
-
 	dy=y-k;
-
-
-
-
     // the indices to pixel data
     i00 = h+this.width*k;
     i01 = i00+this.width;
@@ -191,9 +181,7 @@ Map.prototype.imagePosition=function(position){
     f01 = (1 - dx) * dy;
     f10 = dx * (1 - dy);
     f11 = dy * dx;
-
     position.x=f00*imagePositionX[i00]+f01*imagePositionX[i01]+f10*imagePositionX[i10]+f11*imagePositionX[i11];
     position.y=f00*imagePositionY[i00]+f01*imagePositionY[i01]+f10*imagePositionY[i10]+f11*imagePositionY[i11];
-
 	return true;
 }

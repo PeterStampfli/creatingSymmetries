@@ -14,9 +14,12 @@ function ColorSymmetry(numberOfVariants){
 	this.transWidth=-1;
 	this.transSmoothing=1;
 	switch (numberOfVariants){
-		case 2:
-			this.makeSymmetry=this.make2ColorSymmetry;
-			break;
+        case 1:
+            this.makeSymmetry=this.noColorSymmetry;
+            break;
+        case 2:
+            this.makeSymmetry=this.make2ColorSymmetry;
+            break;
 		case 3:
 			this.makeSymmetry=this.make3ColorSymmetry;
 			break;
@@ -44,6 +47,12 @@ ColorSymmetry.prototype.transition=function(color,d){
 			color.fromBackground(d/this.transSmoothing);
 		}
 	}
+}
+
+/*
+no color symmetry (just one single variant), do nothing
+*/
+ColorSymmetry.prototype.noColorSymmetry=function(color,colorPosition){
 }
 
 /*

@@ -14,9 +14,9 @@ check for maximum absolute error
 */
 FunTest.prototype.absError=function(start,end,nSteps){
 	var x=start;
-	var xMax=0;
+	var xMax=-11111111;
 	var absError=0;
-	var absErrorMax=start;
+	var absErrorMax=-1;
 	var step=(end-start)/nSteps;
 	while (x<=end){
 		absError=Math.abs(this.trueFunction(x)-this.approxFunction(x));
@@ -52,6 +52,11 @@ FunTest.prototype.relError=function(start,end,nSteps){
 	console.log("max relative error: "+relErrorMax+" at "+xMax);
 }
 
+// compare at single point
+FunTest.prototype.compareAt=function(x){
+		console.log(x.toPrecision(3)+" orig "+this.trueFunction(x).toPrecision(3)
+			+" approx "+this.approxFunction(x).toPrecision(3));
+}
 
 //  compare the approximate function and a "correct" function
 FunTest.prototype.compare=function(start,end,nSteps){

@@ -15,7 +15,7 @@ var initialMapRange=20;
 
 // the initial relative origin
 var initialRelativeOriginX=0.0;
-var initialRelativeOriginY=0;
+var initialRelativeOriginY=0.5;
 
 
 var orientationCanvasSize=200;
@@ -40,16 +40,20 @@ backgroundColor.setRgb(100,100,100);
 var verticalRepetitions=2;
 var horizontalRepetitions=2;
 
+var initialHarmonics=1;
 
-var p=4;
-var nColorSymmetry=4;
+
+elementaryFastFunction.makeTriangleExpansionTable(initialHarmonics);
+
+var p=5;
+var nColorSymmetry=1;
 
 var sum=new SumWaves(p,nColorSymmetry,elementaryFastFunction);
-sum.evenRotationalSymmetry();
+sum.oddRotationalSymmetry();
 
 // the color symmetry
 var colorSymmetry=new ColorSymmetry(nColorSymmetry);
-colorSymmetry.transWidth=0.2;
+colorSymmetry.transWidth=-0.2;
 colorSymmetry.transSmoothing=0.05;
 
 

@@ -28,7 +28,6 @@ PixelCanvas.prototype.setSize=function(width,height){
 	this.height=height;
 	this.canvas.width=width;
 	this.canvas.height=height;
-	console.log(width+" "+height);
 }
 
 /*
@@ -106,7 +105,7 @@ PixelCanvas.prototype.setPixels=function(makeColor){
 }
 
 /*
-test implementation
+example: test implementation
 */
 PixelCanvas.prototype.makeColor=function(color,index){
 	color.red=index/200;

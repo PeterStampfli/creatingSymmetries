@@ -59,6 +59,12 @@ interpolationChoosers.add(function(){
     interpolation="cubic";
 });
 
+// do the changes
+var updateButton=new Button("update");
+updateButton.onClick(function(){
+    createImage();
+});
+
 // the color modification (inversion)
 	
 var nColorMod=0;
@@ -80,6 +86,22 @@ inversionChoosers.add(function(){
     createImage();
 });
 
+// the harmonics
+var harmonicsChooser=new Button("harmonics");
+harmonicsChooser.setValue(initialHarmonics);
+harmonicsChooser.onChange(function(){
+    var n=harmonicsChooser.getValue();
+    if (n<=0){
+        elementaryFastFunction.makeTriangleTable();
+    }
+    else {
+        elementaryFastFunction.makeTriangleExpansionTable(n);
+    }
+    map.isValid=false;
+    createImage();
+})
+
+
 // the message
 var progress=document.getElementById("progress");
 progress.innerHTML="Waiting for input image.";
@@ -88,11 +110,6 @@ function progressMessage(){
 	progress.innerHTML="Width "+outputWidthChooser.getValue()+", height "+outputHeightChooser.getValue()+
     ". No smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 }
-
-var updateButton=new Button("update");
-updateButton.onClick(function(){
-    createImage();
-});
 
 var saveImageButton=new Button("outputOutputCanvas");
 saveImageButton.onClick(function(){
