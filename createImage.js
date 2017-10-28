@@ -42,10 +42,7 @@ function createImage(){
 	  	finalCanvas.setSize(2*width,2*height);
 	  	finalCanvas.blueScreen();
   	}
-  	if (!map.isValid){
-		map.make(mappingFunction);                    // recalculates only if necessary
-
-	}
+  	totalMap();
   	referenceCanvas.setAlpha(128);
 	if (smoothing){
 		smoothedPixels();

@@ -37,5 +37,5 @@ map.setRelativeOrigin(initialRelativeOriginX,initialRelativeOriginY);
 map.setRange(initialMapRange);
 
 
-map.make(mappingFunction);
+totalMap();
 

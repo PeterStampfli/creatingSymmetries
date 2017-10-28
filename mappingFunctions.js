@@ -1,5 +1,16 @@
 "use strict";
 
+// make map using symmetries ...
+function totalMap(){
+  	if (!map.isValid){
+		map.make(mappingFunction);                    // recalculates only if necessary
+		//map.bottomToTop();
+	}
+
+
+}
+
+
 
 // mapping functions and how to prepare them
 
@@ -16,8 +27,8 @@ inputImagePosition.y=sum.sines1(k);
 
 function testQuasi(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 
-spacePosition.leftToRightAt(12);
-
+//spacePosition.circleInversion(0,0,10);
+spacePosition.upperLeftToLowerRightAt(0,-2);
 
 sum.positionTimesUnitVectors(spacePosition.x,spacePosition.y);
 

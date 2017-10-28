@@ -57,3 +57,61 @@ Vector2.prototype.leftToRightAt=function(x){
 		this.x=x+x-this.x;
 	}
 }
+
+/*
+mirror from top to bottom if point is above
+Attention: inverted y-axis
+*/
+Vector2.prototype.bottomToTopAt=function(y){
+	if (this.y>y){
+		this.y=y+y-this.y;
+	}
+}
+
+/*
+mirror at up going diagonal x=y if point is too high
+Attention: inverted y-axis
+*/
+Vector2.prototype.upperLeftToLowerRightAt=function(centerX,centerY){
+	var dx=this.x-centerX;
+	var dy=this.y-centerY;
+	if (dy>dx){
+		this.x=centerX+dy;
+		this.y=centerY+dx;
+	}	
+}
+
+/*
+inversion at a circle
+change vector only if point is inside the circle, 
+return true if inversion , false if point is outside
+*/
+Vector2.prototype.circleInversion=function(centerX,centerY,radius){
+	var dx=this.x-centerX;
+	var dy=this.y-centerY;
+	var pointR2=dx*dx+dy*dy;
+	var circleR2=radius*radius;
+	var factor;
+	if (pointR2>circleR2){
+		return false;
+	}
+	else {
+		factor=circleR2/pointR2;
+		this.x=centerX+dx*factor;
+		this.y=centerY+dy*factor;
+		return true;
+	}
+}
+
+/*
+check if a point is above a given line
+attention: inverted y-axis
+*/
+Vector2.prototype.isAbove=function(ax,ay,bx,by){
+	if (bx>ax){
+		return (bx-ax)*(this.y-ay)-(by-ay)*(this.x-ax)>0;	
+	}
+	else {
+		return (bx-ax)*(this.y-ay)-(by-ay)*(this.x-ax)<0;	
+	}
+}
