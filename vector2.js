@@ -104,14 +104,36 @@ Vector2.prototype.circleInversion=function(centerX,centerY,radius){
 }
 
 /*
-check if a point is above a given line
-attention: inverted y-axis
+check if a point is at left of a given line, looking from a to b
+attention: inverted y-axis mirrors, left appears to be right
 */
-Vector2.prototype.isAbove=function(ax,ay,bx,by){
-	if (bx>ax){
+Vector2.prototype.isAtLeftOfLine=function(ax,ay,bx,by){
 		return (bx-ax)*(this.y-ay)-(by-ay)*(this.x-ax)>0;	
+}
+
+/*
+check if point is inside a convex polygon
+points as pair of coordinates
+counterclockwise
+attention: inverted y-axis mirrors, left appears to be right
+argument is an array of coordinates, an arguments object with coordinates
+ or a list of coordinate values
+*/
+Vector2.prototype.isInsidePolygon=function(coordinates){
+	if (arguments.length>1){
+		return this.isInsidePolygon(arguments);
 	}
 	else {
-		return (bx-ax)*(this.y-ay)-(by-ay)*(this.x-ax)<0;	
+		var length=coordinates.length;
+		var lengthM3=length-3;
+		for (var i=0;i<lengthM3;i+=2){
+			if (!this.isAtLeftOfLine(coordinates[i],coordinates[i+1],coordinates[i+2],coordinates[i+3])){
+				return false;
+			}
+		}
+		if (!this.isAtLeftOfLine(coordinates[length-2],coordinates[length-1],coordinates[0],coordinates[1])){
+			return false;
+		}
+		return true;
 	}
 }

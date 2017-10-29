@@ -66,57 +66,92 @@ if relative origin =(0,0) then pixel (i,j)=(0,0) lies at (0,0) and inexistant pi
 Map.prototype.setRange=function(range){
 	this.transform.setScale(range/this.width);
 }
+
 /*
 make the mapp based on supplied map method(inputImagePosition,colorPosition,spacePosition,canvasPosition)
 includes efficient offset and scaling
+for limited range given by corner components in map pixel space
+*/
+Map.prototype.makeRegion=function(mapMethod,xMin,yMin,xMax,yMax){
+	console.log("remap");
+
+	var h;
+
+
+	xMin=Math.min(Math.max(0,xMin),this.width-1);
+	xMax=Math.min(Math.max(0,xMax),this.width-1);
+
+	if (xMax<xMin){
+		h=xMax;
+		xMax=xMin;
+		xMin=h;
+	}
+
+	yMin=Math.min(Math.max(0,yMin),this.height-1);
+	yMax=Math.min(Math.max(0,yMax),this.height-1);
+
+	if (yMax<yMin){
+		h=yMax;
+		yMax=yMin;
+		yMin=h;
+	}
+
+
+
+	var i,j;
+	var index=0;
+	var transform=this.transform;
+	var height=this.height;
+	var width=this.width;
+	var iWidth=1.0/(width-1);
+	var iHeight=1.0/(height-1);
+	var spacePositionX,spacePositionY;
+	var canvasPositionX,canvasPositionY;
+	var spacePosition=new Vector2(); // pixel position in virtual space
+	var canvasPosition=new Vector2(); //relative pixel position on canvas (0,0)....(1,1), independent of offset
+	var imagePositionX=this.imagePositionX;
+	var imagePositionY=this.imagePositionY;
+	var imagePosition=new Vector2();
+	var colorPositionX=this.colorPositionX;
+	var colorPositionY=this.colorPositionY;
+	var colorPosition=new Vector2();
+	var scale=this.transform.scale;
+	var scaleShiftX=scale*this.transform.shiftX;
+	var scaleShiftY=scale*this.transform.shiftY;
+	this.isValid=true;
+	canvasPositionY=(yMin+0.5)*iHeight;
+	spacePositionY=scaleShiftY+yMin*scale;
+
+	for (j=yMin;j<=yMax;j++){
+		canvasPositionX=(xMin+0.5)*iWidth;
+		spacePositionX=scaleShiftX+xMin*scale;
+
+		index=j*width+xMin;
+
+		for (i=xMin;i<=xMax;i++){
+			spacePosition.x=spacePositionX;
+			spacePosition.y=spacePositionY;
+			canvasPosition.x=canvasPositionX;
+			canvasPosition.y=canvasPositionY;
+			mapMethod(imagePosition,colorPosition,spacePosition,canvasPosition);
+			imagePositionX[index]=imagePosition.x;
+			imagePositionY[index]=imagePosition.y;
+			colorPositionX[index]=colorPosition.x;
+			colorPositionY[index]=colorPosition.y;
+			index++;
+			canvasPositionX+=iWidth;
+			spacePositionX+=scale;
+		}
+		canvasPositionY+=iHeight;
+		spacePositionY+=scale;
+	}
+}
+
+/*
+make the entire map
 */
 Map.prototype.make=function(mapMethod){
-	if (!this.isValid){ // do not recalculate the map if it has been done ...
-		console.log("remap");
-		var i,j;
-		var index=0;
-		var transform=this.transform;
-		var height=this.height;
-		var width=this.width;
-		var iWidth=1.0/(width-1);
-		var iHeight=1.0/(height-1);
-		var spacePositionX,spacePositionY;
-		var canvasPositionX,canvasPositionY;
-		var spacePosition=new Vector2(); // pixel position in virtual space
-		var canvasPosition=new Vector2(); //relative pixel position on canvas (0,0)....(1,1), independent of offset
-		var imagePositionX=this.imagePositionX;
-		var imagePositionY=this.imagePositionY;
-		var imagePosition=new Vector2();
-		var colorPositionX=this.colorPositionX;
-		var colorPositionY=this.colorPositionY;
-		var colorPosition=new Vector2();
-		var scale=this.transform.scale;
-		var scaleShiftX=scale*this.transform.shiftX;
-		var scaleShiftY=scale*this.transform.shiftY;
-		this.isValid=true;
-		canvasPositionY=0.5*iHeight;
-		spacePositionY=scaleShiftY;
-		for (j=0;j<height;j++){
-			canvasPositionX=0.5*iWidth;
-			spacePositionX=scaleShiftX;
-			for (i=0;i<width;i++){
-				spacePosition.x=spacePositionX;
-				spacePosition.y=spacePositionY;
-				canvasPosition.x=canvasPositionX;
-				canvasPosition.y=canvasPositionY;
-				mapMethod(imagePosition,colorPosition,spacePosition,canvasPosition);
-				imagePositionX[index]=imagePosition.x;
-				imagePositionY[index]=imagePosition.y;
-				colorPositionX[index]=colorPosition.x;
-				colorPositionY[index]=colorPosition.y;
-				index++;
-				canvasPositionX+=iWidth;
-				spacePositionX+=scale;
-			}
-			canvasPositionY+=iHeight;
-			spacePositionY+=scale;
-		}
-	}
+	this.makeRegion(mapMethod,0,0,this.width-1,this.height-1);
 }
 
 /*
