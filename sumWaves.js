@@ -80,6 +80,7 @@ making the sums: initialize with oddRotationalSymmetry or evenRotationalSymmetry
 /*
 only one wavevector component, is the same for even and odd rotational symmetry
 */
+// sum
 SumWaves.prototype.cosines1=function(k){
     var sum=0;
     var xTimesE=this.xTimesE;
@@ -88,6 +89,21 @@ SumWaves.prototype.cosines1=function(k){
         sum+=fastFunction.cosLike(k*xTimesE[i]);
     }
     return sum;
+}
+
+// minimum
+SumWaves.prototype.minimumCosines1=function(k){
+    var result=1000;
+    var term;
+    var xTimesE=this.xTimesE;
+    var fastFunction=this.fastFunction;
+    for (var i=this.p-1;i>=0;i--){
+        term=fastFunction.cosLike(k*xTimesE[i]);
+        if (Math.abs(term)<Math.abs(result)){
+            result=term;
+        }
+    }
+    return result;
 }
 
 // 2-color symmetry for 2p rotational symmetry
@@ -111,6 +127,21 @@ SumWaves.prototype.sines1=function(k){
         sum+=fastFunction.sinLike(k*xTimesE[i]);
     }
     return sum;
+}
+
+// minimum
+SumWaves.prototype.minimumSines1=function(k){
+    var result=1000;
+    var term;
+    var xTimesE=this.xTimesE;
+    var fastFunction=this.fastFunction;
+    for (var i=this.p-1;i>=0;i--){
+        term=fastFunction.sinLike(k*xTimesE[i]);
+        if (Math.abs(term)<Math.abs(result)){
+            result=term;
+        }
+    }
+    return result;
 }
 
 // for 2-color symmetry (2p-rotational symmetry with odd p)

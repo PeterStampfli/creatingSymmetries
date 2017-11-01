@@ -72,34 +72,24 @@ make the mapp based on supplied map method(inputImagePosition,colorPosition,spac
 includes efficient offset and scaling
 for limited range given by corner components in map pixel space
 */
-Map.prototype.makeRegion=function(mapMethod,xMin,yMin,xMax,yMax){
+Map.prototype.makeMapRegion=function(mapMethod,xMin,yMin,xMax,yMax){
 	console.log("remap");
-
+	this.isValid=true;
 	var h;
-
-
 	xMin=Math.min(Math.max(0,xMin),this.width-1);
 	xMax=Math.min(Math.max(0,xMax),this.width-1);
-
 	if (xMax<xMin){
 		h=xMax;
 		xMax=xMin;
 		xMin=h;
 	}
-
 	yMin=Math.min(Math.max(0,yMin),this.height-1);
 	yMax=Math.min(Math.max(0,yMax),this.height-1);
-
 	if (yMax<yMin){
 		h=yMax;
 		yMax=yMin;
 		yMin=h;
 	}
-
-
-
-	var i,j;
-	var index=0;
 	var transform=this.transform;
 	var height=this.height;
 	var width=this.width;
@@ -118,16 +108,14 @@ Map.prototype.makeRegion=function(mapMethod,xMin,yMin,xMax,yMax){
 	var scale=this.transform.scale;
 	var scaleShiftX=scale*this.transform.shiftX;
 	var scaleShiftY=scale*this.transform.shiftY;
-	this.isValid=true;
 	canvasPositionY=(yMin+0.5)*iHeight;
 	spacePositionY=scaleShiftY+yMin*scale;
-
+	var i,j;
+	var index=0;
 	for (j=yMin;j<=yMax;j++){
 		canvasPositionX=(xMin+0.5)*iWidth;
 		spacePositionX=scaleShiftX+xMin*scale;
-
 		index=j*width+xMin;
-
 		for (i=xMin;i<=xMax;i++){
 			spacePosition.x=spacePositionX;
 			spacePosition.y=spacePositionY;
@@ -151,7 +139,7 @@ Map.prototype.makeRegion=function(mapMethod,xMin,yMin,xMax,yMax){
 make the entire map
 */
 Map.prototype.make=function(mapMethod){
-	this.makeRegion(mapMethod,0,0,this.width-1,this.height-1);
+	this.makeMapRegion(mapMethod,0,0,this.width-1,this.height-1);
 }
 
 /*
