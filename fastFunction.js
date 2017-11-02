@@ -418,5 +418,5 @@ FastFunction.prototype.makeTriangleExpansionTable=function(nHarmonics){
 
 // fast functions with elementary sin function
 var elementaryFastFunction=new FastFunction();
-
-
+// fast functions with fourier series for image
+var imageFastFunction=new FastFunction();

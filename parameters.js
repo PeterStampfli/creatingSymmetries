@@ -48,8 +48,9 @@ elementaryFastFunction.makeTriangleExpansionTable(initialHarmonics);
 var p=5;
 var nColorSymmetry=1;
 
-var sum=new SumWaves(p,nColorSymmetry,elementaryFastFunction);
-sum.oddRotationalSymmetry();
+var imageSum=new SumWaves(imageFastFunction);
+imageSum.set(p,nColorSymmetry);
+imageSum.oddRotationalSymmetry();
 
 // the color symmetry
 var colorSymmetry=new ColorSymmetry(nColorSymmetry);

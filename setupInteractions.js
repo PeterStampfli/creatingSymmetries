@@ -92,10 +92,10 @@ harmonicsChooser.setValue(initialHarmonics);
 harmonicsChooser.onChange(function(){
     var n=harmonicsChooser.getValue();
     if (n<=0){
-        elementaryFastFunction.makeTriangleTable();
+        imageFastFunction.makeTriangleTable();
     }
     else {
-        elementaryFastFunction.makeTriangleExpansionTable(n);
+        imageFastFunction.makeTriangleExpansionTable(n);
     }
     map.isValid=false;
     createImage();

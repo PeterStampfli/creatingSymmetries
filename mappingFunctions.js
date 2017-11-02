@@ -19,16 +19,17 @@ function totalMap(){
 
 function basicOddQuasiperiodic(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 
-sum.positionTimesUnitVectors(spacePosition.x,spacePosition.y);
+imageSum.positionTimesUnitVectors(spacePosition.x,spacePosition.y);
 
 
 
-inputImagePosition.x=sum.minimumCosines1(k);
-inputImagePosition.y=sum.minimumSines1(k);
+inputImagePosition.x=imageSum.minimumCosines1(k);
+inputImagePosition.y=imageSum.minimumSines1(k);
 
 //inputImagePosition.x=sum.cosines1(k);
 //inputImagePosition.y=sum.sines1(k);
 }
+
 
 
 function testQuasi(inputImagePosition,colorPosition,spacePosition,canvasPosition){
@@ -46,17 +47,19 @@ if (spacePosition.isInsidePolygon([11,-5,15,0,11,8])){
 	spacePosition.y=0;
 }
 */
-sum.positionTimesUnitVectors(spacePosition.x,spacePosition.y);
+imageSum.positionTimesUnitVectors(spacePosition.x,spacePosition.y);
+
+imageSum.combination=makeAbsoluteSum;
 
 
-inputImagePosition.x=sum.sines1(k);
-inputImagePosition.y=sum.cosines1(k);
+inputImagePosition.x=imageSum.sines1(k);
+inputImagePosition.y=imageSum.cosines1(k);
 //colorPosition.x=sum.colorSum1X(k);
 //colorPosition.y=sum.colorSum1Y(k);
 //sum.colorSum1Y(1);
 
-inputImagePosition.x=sum.minimumCosines1(k);
-inputImagePosition.y=sum.minimumSines1(k);
+//inputImagePosition.x=sum.minimumCosines1(k);
+//inputImagePosition.y=sum.minimumSines1(k);
 
 }
 
