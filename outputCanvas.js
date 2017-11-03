@@ -36,6 +36,7 @@ map.setSize(initialOutputWidth,initialOutputWidth);
 map.setRelativeOrigin(initialRelativeOriginX,initialRelativeOriginY);
 map.setRange(initialMapRange);
 
+var imageCombination=makeAbsoluteSum;
 
 totalMap();
 

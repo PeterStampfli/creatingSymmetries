@@ -101,6 +101,10 @@ harmonicsChooser.onChange(function(){
     createImage();
 })
 
+// imageCombination
+
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
 
 // the message
 var progress=document.getElementById("progress");

@@ -275,40 +275,49 @@ SumWaves.prototype.colorSum1Y=function(k){
 
 // different methods for combining
 
+// symmetric, and continuous
 
+// the standard sum
 var makeSum=new Object();
 makeSum.start=0;
 makeSum.combine=function(result,term){
     return result+term;
 }
 
+// maximum of the waves
 var makeMax=new Object();
 makeMax.start=-100000;
 makeMax.combine=function(result,term){
     return Math.max(result,term);
 }
 
+// the product
 var makeProduct=new Object();
 makeProduct.start=1;
 makeProduct.combine=function(result,term){
     return result*term;
 }
 
+// the minimum of absolute values
 var makeAbsoluteMinimum=new Object();
 makeAbsoluteMinimum.start=10;
 makeAbsoluteMinimum.combine=function(result,term){
     return Math.min(result,Math.abs(term));
 }
 
-var makeSignedMinimum=new Object();
-makeSignedMinimum.start=10;
-makeSignedMinimum.combine=function(result,term){
-    return (Math.abs(result)>Math.abs(term))?term:result;
-}
 
 
+// sum of absolute values
 var makeAbsoluteSum=new Object();
 makeAbsoluteSum.start=0;
 makeAbsoluteSum.combine=function(result,term){
     return result+Math.abs(term)-0.636;
+}
+
+// discontinuous
+// value of wave with smallest absolute value
+var makeSignedMinimum=new Object();
+makeSignedMinimum.start=10;
+makeSignedMinimum.combine=function(result,term){
+    return (Math.abs(result)>Math.abs(term))?term:result;
 }

@@ -49,7 +49,7 @@ if (spacePosition.isInsidePolygon([11,-5,15,0,11,8])){
 */
 imageSum.positionTimesUnitVectors(spacePosition.x,spacePosition.y);
 
-imageSum.combination=makeAbsoluteSum;
+imageSum.combination=imageCombination;
 
 
 inputImagePosition.x=imageSum.sines1(k);
