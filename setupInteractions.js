@@ -113,28 +113,31 @@ combinationChooser.add(function(){
     imageCombination=makeProduct;
     map.isValid=false;
     createImage();
-    console.log("product");
 });
 
 combinationChooser.add(function(){
     imageCombination=makeMax;
     map.isValid=false;
     createImage();
-    console.log("product");
+});
+
+combinationChooser.add(function(){
+    imageCombination=makeMin;
+    map.isValid=false;
+    createImage();
+    console.log("min");
 });
 
 combinationChooser.add(function(){
     imageCombination=makeAbsoluteMinimum;
     map.isValid=false;
     createImage();
-    console.log("product");
 });
 
 combinationChooser.add(function(){
     imageCombination=makeAbsoluteSum;
     map.isValid=false;
     createImage();
-    console.log("product");
 });
 
 

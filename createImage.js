@@ -36,6 +36,7 @@ function createImage(){
 	var height=outputHeightChooser.getValue();
   	if ((width!=outputCanvas.width)||(height!=outputCanvas.height)){
 		outputCanvas.setSize(width,height);
+	  	finalCanvas.setSize(horizontalRepetitions*(width-1),verticalRepetitions*(height-1));
 		outputCanvas.blueScreen();
 		outputCanvas.createPixels();
 	  	map.setSize(width,height);

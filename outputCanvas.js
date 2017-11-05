@@ -29,10 +29,10 @@ outputMouseEvents.addMoveAction(function(event, mouseEvents){
   	createImage();
 });
 
-outputCanvas.setSize(initialOutputWidth,initialOutputWidth);
+outputCanvas.setSize(initialOutputWidth,initialOutputHeight);
 outputCanvas.blueScreen();
 outputCanvas.createPixels();
-map.setSize(initialOutputWidth,initialOutputWidth);
+map.setSize(initialOutputWidth,initialOutputHeight);
 map.setRelativeOrigin(initialRelativeOriginX,initialRelativeOriginY);
 map.setRange(initialMapRange);
 

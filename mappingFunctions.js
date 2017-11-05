@@ -3,6 +3,9 @@
 // make map using symmetries ...
 function totalMap(){
   	if (!map.isValid){
+
+  		map.transform.shiftY=0;
+
 		map.make(mappingFunction);                    // recalculates only if necessary
 	//	map.makeRegion(mappingFunction,0,0,40,250);                    // recalculates only if necessary
 		//map.bottomToTop();
@@ -63,3 +66,35 @@ inputImagePosition.y=imageSum.cosines1(k);
 
 }
 
+function testHyper(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+
+	var isFinished=false;
+	var iter=0;
+	var iterMax=10;
+				inputImagePosition.set(spacePosition);
+
+
+
+	while (!isFinished){
+
+
+
+	inputImagePosition.periodXUnit();
+		inputImagePosition.leftToRightAt(0.5);
+
+
+		iter++;
+		if (iter>iterMax){
+			isFinished=true;
+			inputImagePosition.y=1000000;
+		}
+
+		else if (!inputImagePosition.circleInversion(0.5,0,1)){
+			isFinished=true;
+		}
+
+	}
+
+	inputImagePosition.x=0.5*imageFastFunction.periodicMapping(inputImagePosition.x);
+
+}

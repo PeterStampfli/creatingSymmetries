@@ -367,10 +367,10 @@ FastFunction.prototype.gauss=function(x){
 
 
 /*
-the triangle function, scaled to match the sine expansion
+the triangle function, scaled to maximum value =1
 */
 FastFunction.prototype.triangle=function(x){
-	var factor=0.25*Math.PI;
+	var factor=2/Math.PI;
 	if (x<0.5*Math.PI){
 		return factor*x;
 	}
@@ -391,17 +391,20 @@ FastFunction.prototype.makeTriangleTable=function(){
 
 /*
 fourier expansion of the triangle function
+normalized (Oscillating between -1 and 1)
 */
 FastFunction.prototype.triangleExpansion=function(n,x){
 	var sign=1;
 	var sum=0;
 	var tIP1;
+    var maximum=0;
 	for (var i=0;i<n;i++){
 		tIP1=2*i+1;
 		sum+=sign*Math.sin(tIP1*x)/tIP1/tIP1;
 		sign=-sign;
+        maximum+=1/tIP1/tIP1;
 	}
-	return sum;
+	return sum/maximum;
 }
 
 /*
@@ -414,6 +417,13 @@ FastFunction.prototype.makeTriangleExpansionTable=function(nHarmonics){
 	})
 }
 
+/*
+periodic mapping: period length is 1, mapping the real axis to 0 to 1, 0 is mapped to 0
+mirror symmetric around 0.5, using fourierexpansion of triangle function
+*/
+FastFunction.prototype.periodicMapping=function(x){
+    return 0.5*(1-this.cosLike(6.28318*x));
+}
 
 
 // fast functions with elementary sin function

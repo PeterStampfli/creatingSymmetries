@@ -3,5 +3,5 @@
 
 var finalCanvas=new PixelCanvas("finalCanvas");
 
-	  	finalCanvas.setSize(2*initialOutputWidth,2*initialOutputHeight);
+	  	finalCanvas.setSize(horizontalRepetitions*outputCanvas.width,verticalRepetitions*outputCanvas.height);
 	  	finalCanvas.blueScreen();

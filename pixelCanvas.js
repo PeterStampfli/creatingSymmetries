@@ -117,14 +117,13 @@ PixelCanvas.prototype.makeColor=function(color,index){
 periodic repetition of another canvas/image
 */
 PixelCanvas.prototype.periodic=function(inputImage){
-	var verticalRepetitions=Math.floor(this.width/inputImage.width)+1;
-	var xStart=0.5*(this.width-verticalRepetitions*inputImage.width);
-	var horizontalRepetitions=Math.floor(this.height/inputImage.height)+1;
-	var yStart=0.5*(this.height-horizontalRepetitions*inputImage.height);
 
-	for (var i=0;i<verticalRepetitions;i++){
-		for (var j=0;j<horizontalRepetitions;j++){
-			this.canvasImage.drawImage(inputImage,xStart+i*inputImage.width,yStart+j*inputImage.height);
+	for (var i=0;i<horizontalRepetitions;i++){
+		for (var j=0;j<verticalRepetitions;j++){
+			console.log("rep "+i+" "+j);
+			console.log(i*inputImage.width-i);
+			console.log(inputImage.width);
+			this.canvasImage.drawImage(inputImage,i*inputImage.width-i,j*inputImage.height-j);
 		}
 	}
 	

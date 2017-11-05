@@ -291,6 +291,13 @@ makeMax.combine=function(result,term){
     return Math.max(result,term);
 }
 
+// minimum of the waves
+var makeMin=new Object();
+makeMin.start=100000;
+makeMin.combine=function(result,term){
+    return Math.min(result,term);
+}
+
 // the product
 var makeProduct=new Object();
 makeProduct.start=1;

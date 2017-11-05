@@ -92,7 +92,7 @@ Vector2.prototype.circleInversion=function(centerX,centerY,radius){
 	var pointR2=dx*dx+dy*dy;
 	var circleR2=radius*radius;
 	var factor;
-	if (pointR2>circleR2){
+	if (pointR2+0.0001>=circleR2){
 		return false;
 	}
 	else {
