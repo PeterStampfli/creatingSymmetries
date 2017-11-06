@@ -123,7 +123,7 @@ PixelCanvas.prototype.periodic=function(inputImage){
 			console.log("rep "+i+" "+j);
 			console.log(i*inputImage.width-i);
 			console.log(inputImage.width);
-			this.canvasImage.drawImage(inputImage,i*inputImage.width-i,j*inputImage.height-j);
+			this.canvasImage.drawImage(inputImage,i*inputImage.width,j*inputImage.height);
 		}
 	}
 	

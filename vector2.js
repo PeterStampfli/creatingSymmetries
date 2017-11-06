@@ -50,6 +50,13 @@ Vector2.prototype.periodXUnit=function(){
 }
 
 /*
+periodic length 1 in x-direction, basic zone is 0...1
+*/
+Vector2.prototype.periodYUnit=function(){
+	this.y=this.y-Math.floor(this.y);
+}
+
+/*
 mirror from left to right if point is at right
 */
 Vector2.prototype.leftToRightAt=function(x){
@@ -136,4 +143,42 @@ Vector2.prototype.isInsidePolygon=function(coordinates){
 		}
 		return true;
 	}
+}
+
+// reducing the angle
+
+Vector2.prototype.angle=function(){
+	return elementaryFastFunction.atan2(this.y,this.x);
+}
+
+Vector2.prototype.radius=function(){
+	return Math.sqrt(this.x*this.x+this.y*this.y);
+}
+
+Vector2.prototype.setPolar=function(r,angle){
+	this.x=r*elementaryFastFunction.cos(angle);
+	this.y=r*elementaryFastFunction.sin(angle);
+}
+
+
+Vector2.prototype.reduceAngle=function(nCorners){
+	var angle=this.angle();
+	angle*=nCorners*0.159154;                        // n/2pi
+	angle=angle-Math.floor(angle);
+	if (angle>0.5){
+		angle=1-angle;
+	}
+	angle*=6.28318/nCorners;
+	this.setPolar(this.radius(),angle);
+}
+
+
+Vector2.prototype.reduceAngleSmooth=function(nCorners){
+	var angle=this.angle();
+	angle*=nCorners*0.159154;                        // n/2pi
+
+	angle=0.5*imageFastFunction.periodicMapping(angle);
+
+	angle*=6.28318/nCorners;
+	this.setPolar(this.radius(),angle);
 }

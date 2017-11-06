@@ -4,7 +4,7 @@
 function totalMap(){
   	if (!map.isValid){
 
-  		map.transform.shiftY=0;
+  	//	map.transform.shiftY=0;
 
 		map.make(mappingFunction);                    // recalculates only if necessary
 	//	map.makeRegion(mappingFunction,0,0,40,250);                    // recalculates only if necessary
@@ -66,35 +66,91 @@ inputImagePosition.y=imageSum.cosines1(k);
 
 }
 
-function testHyper(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+var nSymmPoincarePlane=4;
+var radiusPoincarePlane=0.5/Math.cos(Math.PI/nSymmPoincarePlane);
 
+
+function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
 	var iterMax=10;
-				inputImagePosition.set(spacePosition);
-
-
-
+	inputImagePosition.set(spacePosition);
 	while (!isFinished){
-
-
-
-	inputImagePosition.periodXUnit();
+		inputImagePosition.periodXUnit();
 		inputImagePosition.leftToRightAt(0.5);
-
-
 		iter++;
 		if (iter>iterMax){
 			isFinished=true;
 			inputImagePosition.y=1000000;
 		}
-
-		else if (!inputImagePosition.circleInversion(0.5,0,1)){
+		else if (!inputImagePosition.circleInversion(0.0,0,radiusPoincarePlane)){
 			isFinished=true;
 		}
+	}
+	inputImagePosition.x=0.5*imageFastFunction.periodicMapping(inputImagePosition.x);
+}
 
+var nCorners=8;
+var radiusPoincarePolygon=0.5*Math.tan(3.14159/nCorners);
+
+function poincarePolygon(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+
+	var isFinished=false;
+	var iter=0;
+	var iterMax=10;
+				
+	inputImagePosition.set(spacePosition);
+
+	while (!isFinished){
+
+	inputImagePosition.reduceAngle(nCorners);
+	iter++;
+		if (iter>iterMax){
+			isFinished=true;
+			inputImagePosition.y=1000000;
+		}
+
+	else if (!inputImagePosition.circleInversion(0.5,0,radiusPoincarePolygon)){
+		isFinished=true;
 	}
 
-	inputImagePosition.x=0.5*imageFastFunction.periodicMapping(inputImagePosition.x);
+}
 
+	if (inputImagePosition.x>0.5){
+		inputImagePosition.x=100000;
+	}
+	else {
+		inputImagePosition.reduceAngleSmooth(nCorners);
+	}
+}
+
+function otherPoincarePolygon(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+
+	var isFinished=false;
+	var iter=0;
+	var iterMax=10;
+				
+	inputImagePosition.set(spacePosition);
+
+	while (!isFinished){
+
+	inputImagePosition.reduceAngle(nCorners);
+	iter++;
+		if (iter>iterMax){
+			isFinished=true;
+			inputImagePosition.y=1000000;
+		}
+
+	else if (!inputImagePosition.circleInversion(0.5,radiusPoincarePolygon,2*radiusPoincarePolygon)){
+		isFinished=true;
+	}
+
+}
+
+	if (inputImagePosition.x>0.5){
+		inputImagePosition.x=100000;
+	}
+	else {
+		inputImagePosition.reduceAngleSmooth(nCorners);
+	}
 }

@@ -5,7 +5,7 @@
 
 
 // the output canvas size
-var initialOutputWidth=200;
+var initialOutputWidth=500;
 var initialOutputHeight=500;
 
 // the map transform makes that the x-coordinate on the outputCanvas
@@ -14,8 +14,8 @@ var initialOutputHeight=500;
 var initialMapRange=1; 
 
 // the initial relative origin
-var initialRelativeOriginX=0.0;
-var initialRelativeOriginY=0.0;
+var initialRelativeOriginX=0.5;
+var initialRelativeOriginY=0.5;
 
 
 var orientationCanvasSize=200;
@@ -62,5 +62,5 @@ colorSymmetry.transSmoothing=0.05;
 var k=1;
 
 // mapping default for test
-var mappingFunction=testHyper;
+var mappingFunction=otherPoincarePolygon;
 
