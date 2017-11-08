@@ -62,5 +62,5 @@ colorSymmetry.transSmoothing=0.05;
 var k=1;
 
 // mapping default for test
-var mappingFunction=otherPoincarePolygon;
+var mappingFunction=poincareDisc;
 

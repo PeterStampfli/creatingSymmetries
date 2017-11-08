@@ -26,6 +26,14 @@ Vector2.prototype.set=function(v){
 }
 
 /*
+scale the vector
+*/
+Vector2.prototype.scale=function(factor){
+	this.x*=factor;
+	this.y*=factor;
+}
+
+/*
 set a vector to average of 2 other vectors
 use for image smoothing
 return the vector
