@@ -4,7 +4,7 @@
 function totalMap(){
   	if (!map.isValid){
 
-  	//	map.transform.shiftY=0;
+  		//map.transform.shiftY=0;
 
 		map.make(mappingFunction);                    // recalculates only if necessary
 	//	map.makeRegion(mappingFunction,0,0,40,250);                    // recalculates only if necessary

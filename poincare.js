@@ -2,28 +2,33 @@
 
 // parameters
 var scale=20;
-// multiplicity of the symmetry at intersection of circles
-var nSymmCircleIntersection=8;
-//poincare circle
-// number of corners= rotational symmetry at center
-var nSymmCenter=3;
+// poincare circle: rotational symmetry at center
+var nSymmCenter=5;
+//poincare circle and plane
+// rotational symmetry at left corner
+var nSymmLeft=5;
+// rotational symmetry at right corner
+var nSymmRight=6;
 
-// radius of circles for distance between circle centers equal to 1
-var radiusPoincarePlane=0.5/Math.cos(Math.PI/nSymmCircleIntersection);
-
-//length of the side of a polygon with given number of corners and vertical side at distance 0.5 from center
-// 0.5 is radius of inscribed circle
-var sideLength=Math.tan(3.14159/nSymmCenter);
-
-// radius for inversion disc of first model
-var radiusDisc=Math.sin(Math.PI/nSymmCenter)*radiusPoincarePlane;
-
-// radius for inversion disc of second model
-var radiusInversion=sideLength*radiusPoincarePlane;
+// angles
+var alpha=Math.PI/nSymmLeft;
+var beta=Math.PI/nSymmRight;
+var gamma=Math.PI/nSymmCenter;
 
 // the poincare plane
 // distance between circle centers is 1
 // limit nSymmCenter -> infinity
+
+var rPlane=0.5/(Math.cos(alpha)+Math.cos(beta));
+var xCenterPlane=rPlane*Math.cos(alpha);
+
+console.log(rPlane+" "+xCenterPlane);
+
+// poincare disc
+// 0.5 is radius of inscribed circle of the polygon bearing the center of inversion circles
+
+var yCenterCircle=0.5*Math.tan(gamma)/(1+Math.cos(beta)*(1+Math.tan(gamma)*Math.tan(gamma)));
+var rCircle=yCenterCircle/Math.cos(alpha);
 
 function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
@@ -38,7 +43,7 @@ function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosi
 			isFinished=true;
 			inputImagePosition.y=1000000;
 		}
-		else if (!inputImagePosition.circleInversion(0.0,0,radiusPoincarePlane)){
+		else if (!inputImagePosition.circleInversion(xCenterPlane,0,rPlane)){
 			isFinished=true;
 		}
 	}
@@ -62,7 +67,7 @@ function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosit
 			isFinished=true;
 			inputImagePosition.y=1000000;
 		}
-		else if (!inputImagePosition.circleInversion(0.5,0.5*sideLength,radiusInversion)){
+		else if (!inputImagePosition.circleInversion(0.5,yCenterCircle,rCircle)){
 			isFinished=true;
 		}
 	}

@@ -38,7 +38,7 @@ backgroundColor.setRgb(70,70,100);
 // repetitions: use entire number to get center of tile at center of image
 //  use slighly smaller than integer to get seams at center
 var verticalRepetitions=1;
-var horizontalRepetitions=4;
+var horizontalRepetitions=3;
 
 var initialHarmonics=1;
 
