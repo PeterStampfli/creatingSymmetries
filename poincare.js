@@ -6,9 +6,9 @@ var scale=20;
 var nSymmCenter=5;
 //poincare circle and plane
 // rotational symmetry at left corner
-var nSymmLeft=5;
+var nSymmLeft=2;
 // rotational symmetry at right corner
-var nSymmRight=6;
+var nSymmRight=3;
 
 // angles
 var alpha=Math.PI/nSymmLeft;
@@ -22,29 +22,45 @@ var gamma=Math.PI/nSymmCenter;
 var rPlane=0.5/(Math.cos(alpha)+Math.cos(beta));
 var xCenterPlane=rPlane*Math.cos(alpha);
 
-console.log(rPlane+" "+xCenterPlane);
-
 // poincare disc
 // 0.5 is radius of inscribed circle of the polygon bearing the center of inversion circles
 
 var yCenterCircle=0.5*Math.tan(gamma)/(1+Math.cos(beta)*(1+Math.tan(gamma)*Math.tan(gamma)));
 var rCircle=yCenterCircle/Math.cos(alpha);
 
+console.log("inversionCircleRadius "+rCircle);
+var dCircle=Math.sqrt(0.25+yCenterCircle*yCenterCircle);
+console.log("center inversion distance from origin "+dCircle);
+var worldRadius=Math.sqrt(dCircle*dCircle-rCircle*rCircle);
+console.log("world radius "+worldRadius);
+
+rCircle*=0.5/worldRadius;
+yCenterCircle*=0.5/worldRadius;
+var xCenterCircle=0.25/worldRadius;
+
+
 function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
 	var iterMax=10;
+	colorPosition.x=1;                                        // as parity for 2 colors
 	inputImagePosition.set(spacePosition);
 	while (!isFinished){
-		inputImagePosition.periodXUnit();
-		inputImagePosition.leftToRightAt(0.5);
 		iter++;
+		inputImagePosition.periodXUnit();
+		if (inputImagePosition.x>0.5){
+			inputImagePosition.x=1-inputImagePosition.x;
+			colorPosition.x=-colorPosition.x;
+		}
 		if (iter>iterMax){
 			isFinished=true;
 			inputImagePosition.y=1000000;
 		}
 		else if (!inputImagePosition.circleInversion(xCenterPlane,0,rPlane)){
 			isFinished=true;
+		}
+		else {
+			colorPosition.x=-colorPosition.x;
 		}
 	}
 	inputImagePosition.x=0.5*imageFastFunction.periodicMapping(inputImagePosition.x);
@@ -56,19 +72,19 @@ function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosit
 	var iter=0;
 	var iterMax=10;		
 	inputImagePosition.set(spacePosition);
+	colorPosition.x=1;                                        // as parity for 2 colors
 	while (!isFinished){
-		inputImagePosition.reduceAngle(nSymmCenter);
+		colorPosition.x*=inputImagePosition.reduceAngle(nSymmCenter);
 		iter++;
-		if (inputImagePosition.x>0.5){
-			inputImagePosition.x=100000;
-			isFinished=true;
-		}
-		if (iter>iterMax){
+		if ((inputImagePosition.radius2>0.25)||(iter>iterMax)){
 			isFinished=true;
 			inputImagePosition.y=1000000;
 		}
-		else if (!inputImagePosition.circleInversion(0.5,yCenterCircle,rCircle)){
+		else if (!inputImagePosition.circleInversion(xCenterCircle,yCenterCircle,rCircle)){
 			isFinished=true;
+		}
+		else {
+			colorPosition.x=-colorPosition.x;
 		}
 	}
 	inputImagePosition.reduceAngleSmooth(nSymmCenter);

@@ -25,10 +25,10 @@ only called if size changes
 Map.prototype.setSize=function(width,height){
 	var oldLength,newLength;
 	var oldWidth,oldHeight;
+	oldWidth=this.width;
+	oldHeight=this.height;
 	width=Math.round(width);
 	height=Math.round(height);
-	oldWidth=width;
-	oldHeight=height;
 	this.width=width;
 	this.height=height;
 	this.isValid=false;                            // presumable size changes and map has to be redone
@@ -74,6 +74,8 @@ for limited range given by corner components in map pixel space
 */
 Map.prototype.makeMapRegion=function(mapMethod,xMin,yMin,xMax,yMax){
 	console.log("remap");
+		console.log("set map size - scale is "+this.transform.scale);
+
 	this.isValid=true;
 	var h;
 	xMin=Math.min(Math.max(0,xMin),this.width-1);

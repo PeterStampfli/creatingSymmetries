@@ -6,7 +6,7 @@
 
 // the output canvas size
 var initialOutputWidth=500;
-var initialOutputHeight=500;
+var initialOutputHeight=1000;
 
 // the map transform makes that the x-coordinate on the outputCanvas
 // has an intervall length of initialMapRange
@@ -15,7 +15,7 @@ var initialMapRange=1;
 
 // the initial relative origin
 var initialRelativeOriginX=0.5;
-var initialRelativeOriginY=0.5;
+var initialRelativeOriginY=0.0;
 
 
 var orientationCanvasSize=200;
@@ -24,7 +24,7 @@ var orientationCanvasSize=200;
 var referenceCanvasBaseSize=300;
 
 // for the input number of pixels per geometric unit
-var initialInputScale=100;           
+var initialInputScale=10;           
 
 
 // background color, for hitting outside
@@ -46,7 +46,7 @@ var initialHarmonics=1;
 elementaryFastFunction.makeTriangleExpansionTable(initialHarmonics);
 
 var p=5;
-var nColorSymmetry=1;
+var nColorSymmetry=2;
 
 var imageSum=new SumWaves(imageFastFunction);
 imageSum.set(p,nColorSymmetry);
@@ -62,5 +62,5 @@ colorSymmetry.transSmoothing=0.05;
 var k=1;
 
 // mapping default for test
-var mappingFunction=poincareDisc;
+var mappingFunction=poincarePlane;
 

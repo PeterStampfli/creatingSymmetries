@@ -120,9 +120,6 @@ PixelCanvas.prototype.periodic=function(inputImage){
 
 	for (var i=0;i<horizontalRepetitions;i++){
 		for (var j=0;j<verticalRepetitions;j++){
-			console.log("rep "+i+" "+j);
-			console.log(i*inputImage.width-i);
-			console.log(inputImage.width);
 			this.canvasImage.drawImage(inputImage,i*inputImage.width,j*inputImage.height);
 		}
 	}

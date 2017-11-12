@@ -163,21 +163,29 @@ Vector2.prototype.radius=function(){
 	return Math.sqrt(this.x*this.x+this.y*this.y);
 }
 
+Vector2.prototype.radius2=function(){
+	return this.x*this.x+this.y*this.y;
+}
+
 Vector2.prototype.setPolar=function(r,angle){
 	this.x=r*elementaryFastFunction.cos(angle);
 	this.y=r*elementaryFastFunction.sin(angle);
 }
 
-
+// make angle periodic, as in a polygon with nCorners
+//  returns -1 if odd number of mirror reflections, 1 if even number
 Vector2.prototype.reduceAngle=function(nCorners){
 	var angle=this.angle();
+	var parity=1;
 	angle*=nCorners*0.159154;                        // n/2pi
 	angle=angle-Math.floor(angle);
 	if (angle>0.5){
 		angle=1-angle;
+		parity=-1;
 	}
 	angle*=6.28318/nCorners;
 	this.setPolar(this.radius(),angle);
+	return parity;
 }
 
 
