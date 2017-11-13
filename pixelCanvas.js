@@ -24,10 +24,12 @@ PixelCanvas.prototype.setSize=function(width,height){
 	var canvasData;
 	width=Math.round(width);
 	height=Math.round(height);
-	this.width=width;
-	this.height=height;
-	this.canvas.width=width;
-	this.canvas.height=height;
+	if ((this.width!=width)||(this.height!=height)){    // avoid page reflow if change does not change
+		this.width=width;
+		this.height=height;
+		this.canvas.width=width;
+		this.canvas.height=height;
+	}
 }
 
 /*
@@ -117,7 +119,7 @@ PixelCanvas.prototype.makeColor=function(color,index){
 periodic repetition of another canvas/image
 */
 PixelCanvas.prototype.periodic=function(inputImage){
-
+	this.setSize(inputImage.width*horizontalRepetitions,inputImage.height*verticalRepetitions);
 	for (var i=0;i<horizontalRepetitions;i++){
 		for (var j=0;j<verticalRepetitions;j++){
 			this.canvasImage.drawImage(inputImage,i*inputImage.width,j*inputImage.height);
