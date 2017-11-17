@@ -40,8 +40,8 @@ function createImage(){
 		outputCanvas.blueScreen();
 		outputCanvas.createPixels();
 	  	map.setSize(width,height);
-	  	finalCanvas.setSize(2*width,2*height);
-	  	finalCanvas.blueScreen();
+	  //	finalCanvas.setSize(2*width,2*height);
+	  	//finalCanvas.blueScreen();
   	}
   	totalMap();
   	referenceCanvas.setAlpha(128);
@@ -53,7 +53,7 @@ function createImage(){
 	}
   	outputCanvas.showPixels();
   	referenceCanvas.showPixels();
-  	finalCanvas.periodic(outputCanvas.canvas);
+  //	finalCanvas.periodic(outputCanvas.canvas);
   	progressMessage();
 }
 

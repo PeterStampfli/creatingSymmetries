@@ -6,6 +6,7 @@
 var referenceCanvas=new PixelCanvas('referenceCanvas');
 
 var inputTransform=new Transform(elementaryFastFunction);
+    inputTransform.setScale(initialInputScale);
 
 // mouse control to change the input transform
 var referenceMouseEvents=new MouseEvents('referenceCanvas');

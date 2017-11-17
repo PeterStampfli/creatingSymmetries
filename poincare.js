@@ -6,9 +6,9 @@ var scale=20;
 var nSymmCenter=5;
 //poincare circle and plane
 // rotational symmetry at left corner
-var nSymmLeft=2;
+var nSymmLeft=4;
 // rotational symmetry at right corner
-var nSymmRight=3;
+var nSymmRight=2;
 
 // angles
 var alpha=Math.PI/nSymmLeft;
@@ -23,20 +23,27 @@ var rPlane=0.5/(Math.cos(alpha)+Math.cos(beta));
 var xCenterPlane=rPlane*Math.cos(alpha);
 
 // poincare disc
-// 0.5 is radius of inscribed circle of the polygon bearing the center of inversion circles
 
-var yCenterCircle=0.5*Math.tan(gamma)/(1+Math.cos(beta)*(1+Math.tan(gamma)*Math.tan(gamma)));
-var rCircle=yCenterCircle/Math.cos(alpha);
+var xCenterCircle,yCenterCircle,rCircle,worldRadius;
 
-console.log("inversionCircleRadius "+rCircle);
-var dCircle=Math.sqrt(0.25+yCenterCircle*yCenterCircle);
-console.log("center inversion distance from origin "+dCircle);
-var worldRadius=Math.sqrt(dCircle*dCircle-rCircle*rCircle);
+// intersection of straight lines with unit circle (radius=1)
+// find position of unit circle
+
+yCenterCircle=Math.cos(alpha);
+xCenterCircle=(Math.cos(alpha)*Math.cos(gamma)+Math.cos(beta))/Math.sin(gamma);
+var r2=xCenterCircle*xCenterCircle+yCenterCircle*yCenterCircle;
+console.log("unit circle at ("+xCenterCircle+","+yCenterCircle+")");
+console.log("distance, should be greater than 1 "+Math.sqrt(r2));
+
+worldRadius=Math.sqrt(r2-1);
 console.log("world radius "+worldRadius);
 
-rCircle*=0.5/worldRadius;
+// rescale world radius to be 0.5
+rCircle=0.5/worldRadius;
 yCenterCircle*=0.5/worldRadius;
-var xCenterCircle=0.25/worldRadius;
+xCenterCircle*=0.5/worldRadius;
+
+var cutoff=false;
 
 
 function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosition){
@@ -73,10 +80,14 @@ function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosit
 	var iterMax=10;		
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
+		if (inputImagePosition.radius2()>0.25){
+			//isFinished=true;
+			//inputImagePosition.y=1000000;
+		}
 	while (!isFinished){
 		colorPosition.x*=inputImagePosition.reduceAngle(nSymmCenter);
 		iter++;
-		if ((inputImagePosition.radius2>0.25)||(iter>iterMax)){
+		if ((inputImagePosition.radius2()>0.25)&&cutoff||(iter>iterMax)){
 			isFinished=true;
 			inputImagePosition.y=1000000;
 		}
