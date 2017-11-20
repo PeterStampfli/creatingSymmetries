@@ -3,12 +3,12 @@
 // parameters
 var scale=20;
 // poincare circle: rotational symmetry at center
-var nSymmCenter=5;
+var nSymmCenter=4;
 //poincare circle and plane
 // rotational symmetry at left corner
-var nSymmLeft=4;
+var nSymmLeft=2;
 // rotational symmetry at right corner
-var nSymmRight=2;
+var nSymmRight=3;
 
 // angles
 var alpha=Math.PI/nSymmLeft;
@@ -33,7 +33,7 @@ yCenterCircle=Math.cos(alpha);
 xCenterCircle=(Math.cos(alpha)*Math.cos(gamma)+Math.cos(beta))/Math.sin(gamma);
 var r2=xCenterCircle*xCenterCircle+yCenterCircle*yCenterCircle;
 console.log("unit circle at ("+xCenterCircle+","+yCenterCircle+")");
-console.log("distance, should be greater than 1 "+Math.sqrt(r2));
+console.log("distance "+Math.sqrt(r2));
 
 worldRadius=Math.sqrt(r2-1);
 console.log("world radius "+worldRadius);
@@ -80,18 +80,18 @@ function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosit
 	var iterMax=10;		
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
-		if (inputImagePosition.radius2()>0.25){
-			//isFinished=true;
-			//inputImagePosition.y=1000000;
-		}
+	if ((inputImagePosition.radius2()>0.25)&&cutoff){
+		isFinished=true;
+		inputImagePosition.y=1000000;
+	}
 	while (!isFinished){
 		colorPosition.x*=inputImagePosition.reduceAngle(nSymmCenter);
 		iter++;
-		if ((inputImagePosition.radius2()>0.25)&&cutoff||(iter>iterMax)){
+		if (iter>iterMax){
 			isFinished=true;
 			inputImagePosition.y=1000000;
 		}
-		else if (!inputImagePosition.circleInversion(xCenterCircle,yCenterCircle,rCircle)){
+		else if (!inputImagePosition.circleInversionInsideOut(xCenterCircle,yCenterCircle,rCircle)){
 			isFinished=true;
 		}
 		else {

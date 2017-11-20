@@ -101,7 +101,7 @@ inversion at a circle
 change vector only if point is inside the circle, 
 return true if inversion , false if point is outside
 */
-Vector2.prototype.circleInversion=function(centerX,centerY,radius){
+Vector2.prototype.circleInversionInsideOut=function(centerX,centerY,radius){
 	var dx=this.x-centerX;
 	var dy=this.y-centerY;
 	var pointR2=dx*dx+dy*dy;
@@ -118,6 +118,27 @@ Vector2.prototype.circleInversion=function(centerX,centerY,radius){
 	}
 }
 
+/*
+inversion at a circle
+change vector only if point is outside the circle, 
+return true if inversion , false if point is inside
+*/
+Vector2.prototype.circleInversionOutsideIn=function(centerX,centerY,radius){
+	var dx=this.x-centerX;
+	var dy=this.y-centerY;
+	var pointR2=dx*dx+dy*dy;
+	var circleR2=radius*radius;
+	var factor;
+	if (pointR2-0.0001<=circleR2){
+		return false;
+	}
+	else {
+		factor=circleR2/pointR2;
+		this.x=centerX+dx*factor;
+		this.y=centerY+dy*factor;
+		return true;
+	}
+}
 /*
 check if a point is at left of a given line, looking from a to b
 attention: inverted y-axis mirrors, left appears to be right
