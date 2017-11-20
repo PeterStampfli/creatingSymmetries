@@ -90,7 +90,8 @@ MouseEvents.prototype.addOutAction=function(action){
 add action for a mouse wheel event
 */
 MouseEvents.prototype.addWheelAction=function(action){
-	this.addAction("mousewheel",action);
+	this.addAction("mousewheel",action);                // chrome, opera
+	this.addAction("wheel",action);                     // firefox
 }
 
 
