@@ -6,9 +6,9 @@ var scale=20;
 var nSymmCenter=6;
 //poincare circle and plane
 // rotational symmetry at left corner
-var nSymmLeft=3;
+var nSymmLeft=2;
 // rotational symmetry at right corner
-var nSymmRight=3;
+var nSymmRight=2;
 
 // angles
 var alpha=Math.PI/nSymmLeft;
@@ -77,7 +77,7 @@ function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosi
 function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
-	var iterMax=10;		
+	var iterMax=20;		
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	if ((inputImagePosition.radius2()>0.25)&&cutoff){
