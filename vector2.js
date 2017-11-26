@@ -1,10 +1,12 @@
 "use strict";
 
-// vector object for positions, for java use libgdx Vector2
+// vector object for positions, for java use libgdx Vector2 ???
+// with a control variable for valid , not runaway vectors ...
 
 function Vector2(){
 	this.x=0;
 	this.y=0;
+	this.valid=true;
 }
 
 /*
@@ -22,6 +24,7 @@ set vector based on another vector
 Vector2.prototype.set=function(v){
 	this.x=v.x;
 	this.y=v.y;
+	this.valid=v.valid;
 	return this;
 }
 
@@ -43,6 +46,7 @@ Vector2.prototype.average=function(one,two){
 	this.y=0.5*(one.y+two.y);
 	this.x=two.x;
 	this.y=two.y;
+	this.valid=(one.valid&&two.valid);
 	return this;
 }
 

@@ -4,13 +4,22 @@
 // set the color depending on the given vector2 position
 // mark reference pixel
 // change color for color symmetries
+// call only if position is valid
+
+var makeColorPosition=new Vector2();
 
 function makeColor(color,colorPosition,inputImagePosition){
 	var x=inputTransform.scaleRotateShiftX(inputImagePosition);
 	var y=inputTransform.scaleRotateShiftY(inputImagePosition);
-	referenceCanvas.setOpaquePixel(x*referenceCanvas.scaleFromInputImage,
-		                           y*referenceCanvas.scaleFromInputImage);
-	inputImage.interpolation(color,x,y);
+	var position=makeColorPosition;
+	position.set(inputImagePosition);
+	inputTransform.scaleRotateShift(position);
+
+
+
+	referenceCanvas.setOpaquePixel(position.x*referenceCanvas.scaleFromInputImage,
+		                           position.y*referenceCanvas.scaleFromInputImage);
+	inputImage.interpolation(color,position.x,position.y);
 	if (color.red<0){
 		color.set(backgroundColor);
 	}
@@ -65,6 +74,7 @@ function simplePixels(){
 	var colorPositionX=map.colorPositionX;
 	var colorPositionY=map.colorPositionY;
 	var colorPosition=new Vector2();
+	var positionValid=map.positionValid;
 	var outputPixels=outputCanvas.pixels;
 	var color=new Color();
     var outputIndex=0;
@@ -74,9 +84,11 @@ function simplePixels(){
         // translation, rotation and scaling
         colorPosition.x=colorPositionX[mapIndex];
         colorPosition.y=colorPositionY[mapIndex];
+        colorPosition.valid=true;
 
         imagePosition.x=imagePositionX[mapIndex];
         imagePosition.y=imagePositionY[mapIndex];
+        imagePosition.valid=positionValid[mapIndex];
 
         makeColor(color,colorPosition,imagePosition);
 
@@ -96,6 +108,7 @@ function smoothedPixels(){
 	var colorPositionX=map.colorPositionX;
 	var colorPositionY=map.colorPositionY;
 	var colorPosition=new Vector2();
+	var positionValid=map.positionValid;
 
 	var baseImagePositionX;
 	var baseImagePositionY;

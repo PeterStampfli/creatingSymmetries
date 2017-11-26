@@ -43,7 +43,7 @@ rCircle=0.5/worldRadius;
 yCenterCircle*=0.5/worldRadius;
 xCenterCircle*=0.5/worldRadius;
 
-var cutoff=false;
+var cutoff=true;
 
 
 function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosition){

@@ -70,18 +70,18 @@ function quad2(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	colorPosition.x=1;                                        // as parity for 2 colors
 	if ((inputImagePosition.radius2()>0.25)&&cutoff){
 		isFinished=true;
-		inputImagePosition.y=1000000;
+		inputImagePosition.valid=false;
 	}
 	while (!isFinished){
 		colorPosition.x*=inputImagePosition.reduceAngle(nSymmCenter);
 		iter++;
 		if (iter>iterMax){
 			isFinished=true;
-			inputImagePosition.y=1000000;
+			inputImagePosition.valid=false;
 		}
-		// two different mirrors
+		// two different mirrors, is finished=true means there is no inversion
 			isFinished=!inputImagePosition.circleInversionInsideOut(quadCenterX,quadCenterY,quadRadius);
-		if (isFinished) {
+		if (isFinished) {   // first circle did not invert, try next
 			isFinished=!inputImagePosition.circleInversionInsideOut(quadDistance,0,quadRadius);
 		}
 

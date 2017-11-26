@@ -3,6 +3,8 @@
 
 // standard parameters
 
+var inputImagePeriodic=true;
+
 
 // the output canvas size
 var initialOutputWidth=500;
@@ -63,4 +65,6 @@ var k=1;
 
 // mapping default for test
 var mappingFunction=quad2;
+
+mappingFunction=Map.prototype.identity;
 

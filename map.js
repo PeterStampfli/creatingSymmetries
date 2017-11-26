@@ -4,6 +4,7 @@
 creating the mapping data
 with a transform of the coordinates
 that is: (i,j) are translated and scaled to give (x,y)
+additional boolean for distinguishing valid/invalid positions
 */
 
 function Map(fastFunction){
@@ -14,6 +15,7 @@ function Map(fastFunction){
 	this.imagePositionY=[];              // for each pixel a pixel position on the input image
 	this.colorPositionX=[];
 	this.colorPositionY=[];
+	this.positionValid=[];
 	this.isValid=false;                   // flag, to request remapping
 }
 
@@ -47,6 +49,7 @@ Map.prototype.setSize=function(width,height){
 	this.imagePositionY.length=newLength;
 	this.colorPositionX.length=newLength;
 	this.colorPositionY.length=newLength;
+	this.positionValid.length=newLength;
 	}
 }
 
@@ -107,6 +110,7 @@ Map.prototype.makeMapRegion=function(mapMethod,xMin,yMin,xMax,yMax){
 	var colorPositionX=this.colorPositionX;
 	var colorPositionY=this.colorPositionY;
 	var colorPosition=new Vector2();
+	var positionValid=this.positionValid;
 	var scale=this.transform.scale;
 	var scaleShiftX=scale*this.transform.shiftX;
 	var scaleShiftY=scale*this.transform.shiftY;
@@ -128,6 +132,7 @@ Map.prototype.makeMapRegion=function(mapMethod,xMin,yMin,xMax,yMax){
 			imagePositionY[index]=imagePosition.y;
 			colorPositionX[index]=colorPosition.x;
 			colorPositionY[index]=colorPosition.y;
+			positionValid[index]=imagePosition.valid;
 			index++;
 			canvasPositionX+=iWidth;
 			spacePositionX+=scale;
@@ -148,8 +153,9 @@ Map.prototype.make=function(mapMethod){
 trivial test method: identity
 */
 Map.prototype.identity=function(inputImagePosition,colorPosition,spacePosition,canvasPosition){
-	inputImagePosition.x=spacePosition.x+10;
-	inputImagePosition.y=spacePosition.y+100;
+	inputImagePosition.x=spacePosition.x;
+	inputImagePosition.y=spacePosition.y;
+	inputImagePosition.valid=true;
 }
 
 /*

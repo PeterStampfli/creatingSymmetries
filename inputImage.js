@@ -9,11 +9,18 @@ object for reading images and getting their pixels
 
 // we might want to read more than one single image
 
+// read only inside the basic region or use periodic repetition with mirror
+
 function InputImage(){
 	this.image=null;
 	this.width=0;
+    this.limitX=0;
+    this.periodX=0;
 	this.height=0;
+    this.limitY=0;
+    this.periodY=0;
 	this.pixels=null;
+    this.periodic=false;
 }
 
 // we use an off-screen canvas to get the data of the input image
@@ -23,7 +30,11 @@ InputImage.prototype.makePixels=function(){
     var offScreenCanvasImage;
     var inputData;
     this.width=this.image.width;
+    this.limitX=this.width-2.1;
+    this.periodX=2*(this.limitX-1);
     this.height=this.image.height;
+    this.limitY=this.height-2.1;
+    this.periodX=2*(this.limitY-1);
     offScreenCanvas = document.createElement("canvas");
     offScreenCanvas.width = this.width;
     offScreenCanvas.height = this.height;
@@ -58,6 +69,32 @@ InputImage.prototype.read=function(file,action){
 	};
 	fileReader.readAsDataURL(file);
 }
+
+/*
+check if point is inside the image
+if not and if periodic: use mirroring to get an image point
+if not and if not periodic return false
+returns true if we have a point on the image
+*/
+
+InputImage.prototype.adjustToLimits=function(position){
+    var u=position.x;
+    if (u<1||u>this.limitX){
+        if (this.periodic){
+            u-=1;
+            u=
+        }
+        else {
+            return false;
+        }
+    }
+
+
+}
+
+
+
+
 
 /*
 get color of nearest pixel

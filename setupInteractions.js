@@ -2,6 +2,8 @@
 
 // make the input image object, set initial interpolation method
 var inputImage=new InputImage();
+inputImage.periodic=inputImagePeriodic;
+
 var interpolation="nearest";
 inputImage.interpolation=inputImage.getNearest;
 
