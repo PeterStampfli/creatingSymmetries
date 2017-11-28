@@ -1,14 +1,32 @@
 "use strict";
 
-console.log(gamma);
-console.log(alpha);
+
+
+// parameters
+var quadScale=20;
+
+//  rotational symmetry at center
+var quadNCenter=6;
+// rotational symmetry at left corner
+var quadNLeft=3;
+// rotational symmetry at right corner
+var quadNRight=4;
+
+// cutoff around disc
+var quadCutoff=false;
+
+// angles
+var quadAlpha=Math.PI/quadNLeft;
+var quadBeta=Math.PI/quadNRight;
+var quadGamma=Math.PI/quadNCenter;
+
 // separating the two mirrors
-var quadTanGamma=Math.tan(0.5*Math.PI/nSymmCenter);
+var quadTanGamma=Math.tan(0.5*Math.PI/quadNCenter);
 
 // mirror circles
 var quadRadius=0.2;
 
-var quadDistance=quadRadius*Math.cos(0.5*alpha)/Math.sin(0.5*gamma);
+var quadDistance=quadRadius*Math.cos(0.5*quadAlpha)/Math.sin(0.5*quadGamma);
 console.log(quadDistance);
 
 var quadWorldRadius=Math.sqrt(quadDistance*quadDistance-quadRadius*quadRadius);
@@ -18,8 +36,8 @@ quadRadius*=0.5/quadWorldRadius;
 quadDistance*=0.5/quadWorldRadius;
 
 // center of second circle
-var quadCenterX=quadDistance*Math.cos(gamma);
-var quadCenterY=quadDistance*Math.sin(gamma);
+var quadCenterX=quadDistance*Math.cos(quadGamma);
+var quadCenterY=quadDistance*Math.sin(quadGamma);
 console.log("cc "+quadCenterX+" "+quadCenterY);
 
 
@@ -30,16 +48,14 @@ function quad(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var iterMax=20;		
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
-	if ((inputImagePosition.radius2()>0.25)&&cutoff){
-		isFinished=true;
-		inputImagePosition.y=1000000;
+	if ((inputImagePosition.radius2()>0.25)&&quadCutoff){
+		return false;
 	}
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.reduceAngle(nSymmCenter);
+		colorPosition.x*=inputImagePosition.reduceAngle(quadNCenter);
 		iter++;
 		if (iter>iterMax){
-			isFinished=true;
-			inputImagePosition.y=1000000;
+			return false;
 		}
 		// two different mirrors
 		if (inputImagePosition.y>quadTanGamma*inputImagePosition.x){
@@ -56,28 +72,27 @@ function quad(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 		}
 		isFinished=true;
 	}
-	inputImagePosition.reduceAngleSmooth(nSymmCenter);
-	inputImagePosition.scale(scale);
+	inputImagePosition.reduceAngleSmooth(quadNCenter);
+	inputImagePosition.scale(quadScale);
+	return true;
 }
 
 
-// poincare disc
+
 function quad2(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
 	var iterMax=20;		
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
-	if ((inputImagePosition.radius2()>0.25)&&cutoff){
-		isFinished=true;
-		inputImagePosition.valid=false;
+	if ((inputImagePosition.radius2()>0.25)&&quadCutoff){
+		return false;
 	}
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.reduceAngle(nSymmCenter);
+		colorPosition.x*=inputImagePosition.reduceAngle(quadNCenter);
 		iter++;
 		if (iter>iterMax){
-			isFinished=true;
-			inputImagePosition.valid=false;
+			return false;
 		}
 		// two different mirrors, is finished=true means there is no inversion
 			isFinished=!inputImagePosition.circleInversionInsideOut(quadCenterX,quadCenterY,quadRadius);
@@ -92,6 +107,7 @@ function quad2(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 		}
 		isFinished=true;
 	}
-	inputImagePosition.reduceAngleSmooth(nSymmCenter);
-	inputImagePosition.scale(scale);
+	inputImagePosition.reduceAngleSmooth(quadNCenter);
+	inputImagePosition.scale(quadScale);
+	return true;
 }

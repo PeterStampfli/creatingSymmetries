@@ -35,13 +35,16 @@ outputHeightChooser.setValue(initialOutputHeight);
 // the smoothing variants
 
 var smoothing=false;
+var smoothingText="No"
 var smoothingChoosers=new Chooser('smoothing');
 smoothingChoosers.add(function(){
     smoothing=false;
+    smoothingText="No";
     console.log("smoothing "+smoothing);
 });
 smoothingChoosers.add(function(){
     smoothing=true;
+    smoothingText="2x2",
     console.log("smoothing "+smoothing);
 });
 
@@ -149,7 +152,7 @@ progress.innerHTML="Waiting for input image.";
 
 function progressMessage(){
 	progress.innerHTML="Width "+outputWidthChooser.getValue()+", height "+outputHeightChooser.getValue()+
-    ". No smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
+    ". "+smoothingText+" smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 }
 
 var saveImageButton=new Button("outputOutputCanvas");

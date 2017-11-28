@@ -1,9 +1,20 @@
 "use strict";
 
+// parameters
+var euclidScale=20;
+// poincare circle: rotational symmetry at center
+var euclidNCenter=6;
+//poincare circle and plane
+// rotational symmetry at left corner
+var euclidNLeft=3;
+// rotational symmetry at right corner
+var euclidNRight=2;
+
+var euclidAlpha=Math.PI/euclidNLeft;
 // normal unit vector for third line
 var normalX,normalY;
-normalX=-Math.sin(alpha);
-normalY=-Math.cos(alpha);
+normalX=-Math.sin(euclidAlpha);
+normalY=-Math.cos(euclidAlpha);
 
 // position of third line
 var lineX=0.2;
@@ -20,11 +31,10 @@ function euclid(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.reduceAngle(nSymmCenter);
+		colorPosition.x*=inputImagePosition.reduceAngle(euclidNCenter);
 		iter++;
 		if (iter>iterMax){
-			isFinished=true;
-			inputImagePosition.y=1000000;
+			return false;
 		}
 		else {
 			distance=normalX*(inputImagePosition.x-lineX)+normalY*inputImagePosition.y;
@@ -38,6 +48,7 @@ function euclid(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 			}
 		}
 	}
-	inputImagePosition.reduceAngleSmooth(nSymmCenter);
-	inputImagePosition.scale(scale);
+	inputImagePosition.reduceAngleSmooth(euclidNCenter);
+	inputImagePosition.scale(euclidScale);
+	return true;
 }

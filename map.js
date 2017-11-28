@@ -74,6 +74,10 @@ Map.prototype.setRange=function(range){
 make the mapp based on supplied map method(inputImagePosition,colorPosition,spacePosition,canvasPosition)
 includes efficient offset and scaling
 for limited range given by corner components in map pixel space
+
+mapMethod sets inputImagePosition and colorPosition
+returns true if all ok , false if position not valid
+=========================================================
 */
 Map.prototype.makeMapRegion=function(mapMethod,xMin,yMin,xMax,yMax){
 	console.log("remap");
@@ -125,14 +129,14 @@ Map.prototype.makeMapRegion=function(mapMethod,xMin,yMin,xMax,yMax){
 		for (i=xMin;i<=xMax;i++){
 			spacePosition.x=spacePositionX;
 			spacePosition.y=spacePositionY;
+			spacePosition.valid=true
 			canvasPosition.x=canvasPositionX;
 			canvasPosition.y=canvasPositionY;
-			mapMethod(imagePosition,colorPosition,spacePosition,canvasPosition);
+			positionValid[index]=mapMethod(imagePosition,colorPosition,spacePosition,canvasPosition);
 			imagePositionX[index]=imagePosition.x;
 			imagePositionY[index]=imagePosition.y;
 			colorPositionX[index]=colorPosition.x;
 			colorPositionY[index]=colorPosition.y;
-			positionValid[index]=imagePosition.valid;
 			index++;
 			canvasPositionX+=iWidth;
 			spacePositionX+=scale;

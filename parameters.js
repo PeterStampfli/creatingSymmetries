@@ -64,7 +64,7 @@ colorSymmetry.transSmoothing=0.05;
 var k=1;
 
 // mapping default for test
-var mappingFunction=quad2;
+var mappingFunction=euclid;
 
-mappingFunction=Map.prototype.identity;
+//mappingFunction=Map.prototype.identity;
 

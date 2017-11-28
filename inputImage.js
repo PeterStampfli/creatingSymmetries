@@ -82,7 +82,7 @@ InputImage.prototype.adjustToLimits=function(position){
     if (u<1||u>this.limitX){
         if (this.periodic){
             u-=1;
-            u=
+            u=1111;
         }
         else {
             return false;

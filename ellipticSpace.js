@@ -1,5 +1,21 @@
 "use strict";
 
+
+
+var ellipticScale=20;
+
+//  rotational symmetry at center
+var ellipticNCenter=6;
+// rotational symmetry at left corner
+var ellipticNRight=2;
+// rotational symmetry at right corner
+var ellipticNLeft=2;
+
+// angles
+var ellipticAlpha=Math.PI/ellipticNLeft;
+var ellipticBeta=Math.PI/ellipticNRight;
+var ellipticGamma=Math.PI/ellipticNCenter;
+
 // parameters for elliptic space
 var rCircleElliptic,xCenterCircleElliptic,yCenterCircleElliptic;
 
@@ -7,8 +23,8 @@ var rCircleElliptic,xCenterCircleElliptic,yCenterCircleElliptic;
 // find position of unit circle
 // inverted for elliptic case
 
-yCenterCircleElliptic=-Math.cos(alpha);
-xCenterCircleElliptic=-(Math.cos(alpha)*Math.cos(gamma)+Math.cos(beta))/Math.sin(gamma);
+yCenterCircleElliptic=-Math.cos(ellipticAlpha);
+xCenterCircleElliptic=-(Math.cos(ellipticAlpha)*Math.cos(ellipticGamma)+Math.cos(ellipticBeta))/Math.sin(ellipticGamma);
 
 // rescale to smaller circle, space goes initially from -0.5 to 0.5
 
@@ -25,11 +41,10 @@ function elliptic(inputImagePosition,colorPosition,spacePosition,canvasPosition)
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.reduceAngle(nSymmCenter);
+		colorPosition.x*=inputImagePosition.reduceAngle(ellipticNCenter);
 		iter++;
 		if (iter>iterMax){
-			isFinished=true;
-			inputImagePosition.y=1000000;
+			return false;
 		}
 		else if (!inputImagePosition.circleInversionOutsideIn(xCenterCircleElliptic,yCenterCircleElliptic,rCircleElliptic)){
 			isFinished=true;
@@ -38,6 +53,7 @@ function elliptic(inputImagePosition,colorPosition,spacePosition,canvasPosition)
 			colorPosition.x=-colorPosition.x;
 		}
 	}
-	inputImagePosition.reduceAngleSmooth(nSymmCenter);
-	inputImagePosition.scale(scale);
+	inputImagePosition.reduceAngleSmooth(ellipticNCenter);
+	inputImagePosition.scale(ellipticScale);
+	return true;
 }
