@@ -6,9 +6,9 @@ var scale=20;
 var nSymmCenter=6;
 //poincare circle and plane
 // rotational symmetry at left corner
-var nSymmLeft=2;
+var nSymmLeft=3;
 // rotational symmetry at right corner
-var nSymmRight=2;
+var nSymmRight=3;
 
 // angles
 var alpha=Math.PI/nSymmLeft;
@@ -60,10 +60,9 @@ function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosi
 			colorPosition.x=-colorPosition.x;
 		}
 		if (iter>iterMax){
-			isFinished=true;
-			inputImagePosition.y=1000000;
+			return false;
 		}
-		else if (!inputImagePosition.circleInversion(xCenterPlane,0,rPlane)){
+		else if (!inputImagePosition.circleInversionInsideOut(xCenterPlane,0,rPlane)){
 			isFinished=true;
 		}
 		else {
@@ -71,6 +70,7 @@ function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosi
 		}
 	}
 	inputImagePosition.x=0.5*imageFastFunction.periodicMapping(inputImagePosition.x);
+	return true;
 }
 
 // poincare disc
@@ -85,7 +85,7 @@ function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosit
 		inputImagePosition.y=1000000;
 	}
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.reduceAngle(nSymmCenter);
+		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(nSymmCenter);
 		iter++;
 		if (iter>iterMax){
 			isFinished=true;
@@ -98,8 +98,9 @@ function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosit
 			colorPosition.x=-colorPosition.x;
 		}
 	}
-	inputImagePosition.reduceAngleSmooth(nSymmCenter);
+	inputImagePosition.rotationMirrorSmooth(nSymmCenter);
 	inputImagePosition.scale(scale);
+	return true;
 }
 
 // only the polygon
@@ -108,12 +109,13 @@ function polygon(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var iter=0;
 	var iterMax=10;		
 	inputImagePosition.set(spacePosition);
-	inputImagePosition.reduceAngle(nSymmCenter);
+	inputImagePosition.rotationMirrorSymmetry(nSymmCenter);
 	if (inputImagePosition.x>0.5){
-		inputImagePosition.x=100000;
+		return false;
 	}
 	else {
-		inputImagePosition.reduceAngleSmooth(nSymmCenter);
+		inputImagePosition.rotationMirrorSmooth(nSymmCenter);
 	}
 	inputImagePosition.scale(scale);
+	return true;
 }

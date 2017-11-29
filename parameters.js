@@ -63,8 +63,11 @@ colorSymmetry.transSmoothing=0.05;
 
 var k=1;
 
+rosettePowerR=3;
+basicRosette=rosetteRotation;
+
 // mapping default for test
-var mappingFunction=euclid;
+var mappingFunction=rosette;
 
 //mappingFunction=Map.prototype.identity;
 

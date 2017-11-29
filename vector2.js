@@ -193,29 +193,53 @@ Vector2.prototype.setPolar=function(r,angle){
 	this.y=r*elementaryFastFunction.sin(angle);
 }
 
-// make angle periodic, as in a polygon with nCorners
+// make n-fold rotational symmetry with mirror symmetry
 //  returns -1 if odd number of mirror reflections, 1 if even number
-Vector2.prototype.reduceAngle=function(nCorners){
+
+// by replicating the first sector  phi in(0,PI/n)
+
+Vector2.prototype.rotationMirrorSymmetry=function(n){
 	var angle=this.angle();
 	var parity=1;
-	angle*=nCorners*0.159154;                        // n/2pi
+	angle*=n*0.159154;                        // n/2pi
 	angle=angle-Math.floor(angle);
 	if (angle>0.5){
 		angle=1-angle;
 		parity=-1;
 	}
-	angle*=6.28318/nCorners;
+	angle*=6.28318/n;
 	this.setPolar(this.radius(),angle);
 	return parity;
 }
 
 
-Vector2.prototype.reduceAngleSmooth=function(nCorners){
+// make n-fold rotational symmetry 
+
+// by replicating the first sector  phi in(0,2PI/n)
+
+Vector2.prototype.rotationSymmetry=function(n){
 	var angle=this.angle();
-	angle*=nCorners*0.159154;                        // n/2pi
+	angle*=n*0.159154;                        // n/2pi
+	angle=angle-Math.floor(angle);
+	angle*=6.28318/n;
+	this.setPolar(this.radius(),angle);
+}
+
+
+
+
+
+
+
+
+
+// make smooth n-fold rotational symmetry with mirror symmetry
+Vector2.prototype.rotationMirrorSmooth=function(n){
+	var angle=this.angle();
+	angle*=n*0.159154;                        // n/2pi
 
 	angle=0.5*imageFastFunction.periodicMapping(angle);
 
-	angle*=6.28318/nCorners;
+	angle*=6.28318/n;
 	this.setPolar(this.radius(),angle);
 }

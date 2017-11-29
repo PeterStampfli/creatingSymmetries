@@ -52,7 +52,7 @@ function quad(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 		return false;
 	}
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.reduceAngle(quadNCenter);
+		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(quadNCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
@@ -64,15 +64,12 @@ function quad(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 		else {
 			isFinished=!inputImagePosition.circleInversionInsideOut(quadDistance,0,quadRadius);
 		}
-
-		
-
 		if (!isFinished) {
 			colorPosition.x=-colorPosition.x;
 		}
 		isFinished=true;
 	}
-	inputImagePosition.reduceAngleSmooth(quadNCenter);
+	inputImagePosition.rotationMirrorSmooth(quadNCenter);
 	inputImagePosition.scale(quadScale);
 	return true;
 }
@@ -89,7 +86,7 @@ function quad2(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 		return false;
 	}
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.reduceAngle(quadNCenter);
+		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(quadNCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
@@ -99,15 +96,12 @@ function quad2(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 		if (isFinished) {   // first circle did not invert, try next
 			isFinished=!inputImagePosition.circleInversionInsideOut(quadDistance,0,quadRadius);
 		}
-
-		
-
 		if (!isFinished) {
 			colorPosition.x=-colorPosition.x;
 		}
 		isFinished=true;
 	}
-	inputImagePosition.reduceAngleSmooth(quadNCenter);
+	inputImagePosition.rotationMirrorSmooth(quadNCenter);
 	inputImagePosition.scale(quadScale);
 	return true;
 }

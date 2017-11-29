@@ -32,8 +32,7 @@ rCircleElliptic=0.7;
 xCenterCircleElliptic*=rCircleElliptic;
 yCenterCircleElliptic*=rCircleElliptic;
 
-
-// poincare disc
+// elliptic kaleidoscope
 function elliptic(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
@@ -41,7 +40,7 @@ function elliptic(inputImagePosition,colorPosition,spacePosition,canvasPosition)
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.reduceAngle(ellipticNCenter);
+		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(ellipticNCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
@@ -53,7 +52,7 @@ function elliptic(inputImagePosition,colorPosition,spacePosition,canvasPosition)
 			colorPosition.x=-colorPosition.x;
 		}
 	}
-	inputImagePosition.reduceAngleSmooth(ellipticNCenter);
+	inputImagePosition.rotationMirrorSmooth(ellipticNCenter);
 	inputImagePosition.scale(ellipticScale);
 	return true;
 }

@@ -20,9 +20,7 @@ normalY=-Math.cos(euclidAlpha);
 var lineX=0.2;
 
 
-
-
-// poincare disc
+// standard kaleidoscope
 function euclid(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
@@ -31,7 +29,7 @@ function euclid(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.reduceAngle(euclidNCenter);
+		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(euclidNCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
@@ -48,7 +46,7 @@ function euclid(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 			}
 		}
 	}
-	inputImagePosition.reduceAngleSmooth(euclidNCenter);
+	inputImagePosition.rotationMirrorSmooth(euclidNCenter);
 	inputImagePosition.scale(euclidScale);
 	return true;
 }
