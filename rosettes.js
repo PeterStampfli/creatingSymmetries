@@ -4,7 +4,7 @@
 
 var rosettePowerR=1;
 
-var nCenter=3;
+var nCenter=5;
 
 
 // rosette maps inputImagePosition only
@@ -36,7 +36,7 @@ function rosettePeriodicMirrorPhi(position,n){
 // simple analytic, with mirror symmetry
 function rosetteRotationMirror(position,n){
 	var angle=position.angle();
-	var rPow=imageFastFunction.exp(rosettePowerR* imageFastFunction.log(position.radius()));
+	var rPow=10*imageFastFunction.exp(rosettePowerR* imageFastFunction.log(position.radius()));
 	position.x=rPow*imageFastFunction.cosLike(n*angle);
 	position.y=rPow*imageFastFunction.cosLike(2*n*angle);
 }

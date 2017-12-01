@@ -45,7 +45,7 @@ console.log("cc "+quadCenterX+" "+quadCenterY);
 function quad(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
-	var iterMax=20;		
+	var iterMax=iterMaximum;		
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	if ((inputImagePosition.radius2()>0.25)&&quadCutoff){
@@ -69,7 +69,7 @@ function quad(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 		}
 		isFinished=true;
 	}
-	inputImagePosition.rotationMirrorSmooth(quadNCenter);
+	basicRosette(inputImagePosition,nSymmCenter);
 	inputImagePosition.scale(quadScale);
 	return true;
 }
@@ -79,7 +79,7 @@ function quad(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 function quad2(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
-	var iterMax=20;		
+	var iterMax=iterMaximum;		
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	if ((inputImagePosition.radius2()>0.25)&&quadCutoff){
@@ -101,7 +101,7 @@ function quad2(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 		}
 		isFinished=true;
 	}
-	inputImagePosition.rotationMirrorSmooth(quadNCenter);
+	basicRosette(inputImagePosition,nSymmCenter);
 	inputImagePosition.scale(quadScale);
 	return true;
 }

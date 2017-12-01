@@ -63,11 +63,13 @@ colorSymmetry.transSmoothing=0.05;
 
 var k=1;
 
-rosettePowerR=3;
-basicRosette=rosetteRotation;
+var iterMaximum=100;
+
+rosettePowerR=2;
+basicRosette=rosettePeriodicMirrorPhi;
 
 // mapping default for test
-var mappingFunction=rosette;
+var mappingFunction=poincareDisc;
 
 //mappingFunction=Map.prototype.identity;
 

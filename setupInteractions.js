@@ -145,6 +145,27 @@ combinationChooser.add(function(){
     createImage();
 });
 
+// rosette for poincare disc etc.
+
+var rosetteChooser=new Chooser('rosette');
+
+rosetteChooser.add(function(){
+    basicRosette=rosettePeriodicMirrorPhi;
+    map.isValid=false;
+    createImage();    
+})
+
+rosetteChooser.add(function(){
+    basicRosette=rosetteRotationMirror;
+    map.isValid=false;
+    createImage();    
+})
+
+rosetteChooser.add(function(){
+    basicRosette=rosetteRotation;
+    map.isValid=false;
+    createImage();    
+})
 
 // the message
 var progress=document.getElementById("progress");

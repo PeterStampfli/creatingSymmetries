@@ -3,12 +3,12 @@
 // parameters
 var scale=20;
 // poincare circle: rotational symmetry at center
-var nSymmCenter=6;
+var nSymmCenter=3;
 //poincare circle and plane
 // rotational symmetry at left corner
-var nSymmLeft=3;
+var nSymmLeft=2;
 // rotational symmetry at right corner
-var nSymmRight=3;
+var nSymmRight=30000;
 
 // angles
 var alpha=Math.PI/nSymmLeft;
@@ -49,7 +49,7 @@ var cutoff=true;
 function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
-	var iterMax=10;
+	var iterMax=iterMaximum;
 	colorPosition.x=1;                                        // as parity for 2 colors
 	inputImagePosition.set(spacePosition);
 	while (!isFinished){
@@ -77,19 +77,17 @@ function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosi
 function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
-	var iterMax=20;		
+	var iterMax=iterMaximum;		
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	if ((inputImagePosition.radius2()>0.25)&&cutoff){
-		isFinished=true;
-		inputImagePosition.y=1000000;
+		return false;
 	}
 	while (!isFinished){
 		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(nSymmCenter);
 		iter++;
 		if (iter>iterMax){
-			isFinished=true;
-			inputImagePosition.y=1000000;
+			return false;
 		}
 		else if (!inputImagePosition.circleInversionInsideOut(xCenterCircle,yCenterCircle,rCircle)){
 			isFinished=true;
@@ -98,7 +96,7 @@ function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosit
 			colorPosition.x=-colorPosition.x;
 		}
 	}
-	inputImagePosition.rotationMirrorSmooth(nSymmCenter);
+	basicRosette(inputImagePosition,nSymmCenter);
 	inputImagePosition.scale(scale);
 	return true;
 }
@@ -107,7 +105,6 @@ function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosit
 function polygon(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
-	var iterMax=10;		
 	inputImagePosition.set(spacePosition);
 	inputImagePosition.rotationMirrorSymmetry(nSymmCenter);
 	if (inputImagePosition.x>0.5){

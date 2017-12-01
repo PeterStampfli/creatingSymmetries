@@ -31,38 +31,36 @@
 		</h1>
 	</noscript>
 		<p>
-			Choose the input image file:
-			<input type="file" accept="image/*" id="imageInput" 
-				>
-		</p>
-		<p>
-			Choose the size of the generated image: width
+
+			Size of the generated image: width
 			<input type="text" class="numbers" id="outputWidthChooser" maxlength="4" />
 			, height 
 			<input type="text" class="numbers" id="outputHeightChooser" maxlength="4" />
 			.
-		</p>
-		<p>			
-			<form action="">
-				Choose image smoothing:
+			&emsp;
+			Input image file:
+			<input type="file" accept="image/*" id="imageInput" >
+	
+		
+			<form action="" style="display: inline;">
+				Smoothing:
 				<input type="radio" name="smoothing" class='smoothing' checked>none
 				<input type="radio" name="smoothing" class='smoothing'>2x2
 			</form>
-		</p>
-		<p>			
-			<form action="">
-				Choose image interpolation:
+			
+			<form action="" style="display: inline;">
+				&emsp;
+				Interpolation:
 				<input type="radio" name="interpolation" class='interpolation' checked>nearest
 				<input type="radio" name="interpolation" class='interpolation'>linear
 				<input type="radio" name="interpolation" class='interpolation'>cubic
 			</form>
-		</p>
-		</p>
-			To get the result of new settings: 
+
+			&emsp; 
 			<button type="button" id="update">
 				update image
 			</button>
-		<p>
+		</p>
 		<p>	
 			<form action="">
 				Choose color modification:
@@ -70,14 +68,11 @@
 				<input type="radio" name="inversion" class='inversion'>first
 				<input type="radio" name="inversion" class='inversion'>second
 			</form>
-		<p>
+
 			Choose the number of harmonics, negative or zero for triangle wave
 			<input type="text" class="numbers" id="harmonics" maxlength="4" />
 			.
-		</p>
-
-
-		<p>	
+		
 			<form action="">
 				Choose combination method:
 				<input type="radio" name="combination" class='combination' checked>sum
@@ -87,17 +82,23 @@
 				<input type="radio" name="combination" class='combination'>absMin
 				<input type="radio" name="combination" class='combination'>absSum
 			</form>
-		<p>
 
-		<p>
-			Drag the mouse on the three images and turn the mouse wheel to adjust the view.
+			<form action="="">
+				Rosette:
+				<input type="radio" name="rosette" class='rosette' checked>sharp mirrors
+				<input type="radio" name="rosette" class='rosette'>analytic mirrors
+				<input type="radio" name="rosette" class='rosette'>analytic rotation
+
+			</form>
 		</p>
+
 		<p id="progress">
  		Waiting for input image.
  		</p>
 
 
-		<h4>To download this image <button id="outputOutputCanvas" type="button">click here ! </button>
+		<h4>To download this image 
+			<button id="outputOutputCanvas" type="button">click here ! </button>
 		</h4>
 
 		<p style="text-align:center">
