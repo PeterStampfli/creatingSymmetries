@@ -6,7 +6,7 @@
 var quadScale=20;
 
 //  rotational symmetry at center
-var quadNCenter=6;
+var quadNCenter=4;
 // rotational symmetry at left corner
 var quadNLeft=3;
 // rotational symmetry at right corner
@@ -39,6 +39,8 @@ quadDistance*=0.5/quadWorldRadius;
 var quadCenterX=quadDistance*Math.cos(quadGamma);
 var quadCenterY=quadDistance*Math.sin(quadGamma);
 console.log("cc "+quadCenterX+" "+quadCenterY);
+
+
 
 
 // poincare disc
@@ -94,14 +96,19 @@ function quad2(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 		// two different mirrors, is finished=true means there is no inversion
 			isFinished=!inputImagePosition.circleInversionInsideOut(quadCenterX,quadCenterY,quadRadius);
 		if (isFinished) {   // first circle did not invert, try next
-			isFinished=!inputImagePosition.circleInversionInsideOut(quadDistance,0,quadRadius);
+		//	isFinished=!inputImagePosition.circleInversionInsideOut(quadDistance,0,quadRadius);
 		}
 		if (!isFinished) {
 			colorPosition.x=-colorPosition.x;
 		}
-		isFinished=true;
+		//isFinished=true;
 	}
 	basicRosette(inputImagePosition,nSymmCenter);
 	inputImagePosition.scale(quadScale);
 	return true;
 }
+
+
+// improve
+
+var quadRadiusImproved=1;

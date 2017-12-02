@@ -3,12 +3,12 @@
 // parameters
 var scale=20;
 // poincare circle: rotational symmetry at center
-var nSymmCenter=3;
+var nSymmCenter=5;
 //poincare circle and plane
 // rotational symmetry at left corner
-var nSymmLeft=2;
+var nSymmLeft=3;
 // rotational symmetry at right corner
-var nSymmRight=30000;
+var nSymmRight=3;
 
 // angles
 var alpha=Math.PI/nSymmLeft;
@@ -100,6 +100,7 @@ function poincareDisc(inputImagePosition,colorPosition,spacePosition,canvasPosit
 	inputImagePosition.scale(scale);
 	return true;
 }
+
 
 // only the polygon
 function polygon(inputImagePosition,colorPosition,spacePosition,canvasPosition){

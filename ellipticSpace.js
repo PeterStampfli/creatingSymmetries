@@ -5,11 +5,11 @@
 var ellipticScale=20;
 
 //  rotational symmetry at center
-var ellipticNCenter=6;
+var ellipticNCenter=5;
 // rotational symmetry at left corner
 var ellipticNRight=2;
 // rotational symmetry at right corner
-var ellipticNLeft=2;
+var ellipticNLeft=3;
 
 // angles
 var ellipticAlpha=Math.PI/ellipticNLeft;
