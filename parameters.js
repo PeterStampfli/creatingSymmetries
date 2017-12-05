@@ -69,7 +69,7 @@ rosettePowerR=2;
 basicRosette=rosettePeriodicMirrorPhi;
 
 // mapping default for test
-var mappingFunction=elliptic;
+var mappingFunction=rotationPlus;
 
 //mappingFunction=Map.prototype.identity;
 

@@ -5,7 +5,7 @@
 var ellipticScale=20;
 
 //  rotational symmetry at center
-var ellipticNCenter=5;
+var ellipticNCenter=4;
 // rotational symmetry at left corner
 var ellipticNRight=2;
 // rotational symmetry at right corner
