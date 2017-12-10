@@ -3,12 +3,12 @@
 // parameters
 var euclidScale=20;
 // poincare circle: rotational symmetry at center
-var euclidNCenter=6;
+var euclidNCenter=3;
 //poincare circle and plane
 // rotational symmetry at left corner
 var euclidNLeft=3;
 // rotational symmetry at right corner
-var euclidNRight=2;
+var euclidNRight=3;
 
 var euclidAlpha=Math.PI/euclidNLeft;
 // normal unit vector for third line

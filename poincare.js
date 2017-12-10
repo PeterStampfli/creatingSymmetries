@@ -6,9 +6,9 @@ var scale=20;
 var nSymmCenter=5;
 //poincare circle and plane
 // rotational symmetry at left corner
-var nSymmLeft=3;
+var nSymmLeft=4;
 // rotational symmetry at right corner
-var nSymmRight=3;
+var nSymmRight=2;
 
 // angles
 var alpha=Math.PI/nSymmLeft;
@@ -43,7 +43,6 @@ rCircle=0.5/worldRadius;
 yCenterCircle*=0.5/worldRadius;
 xCenterCircle*=0.5/worldRadius;
 
-var cutoff=true;
 
 
 function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosition){

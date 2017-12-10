@@ -68,8 +68,10 @@ var iterMaximum=100;
 rosettePowerR=2;
 basicRosette=rosettePeriodicMirrorPhi;
 
+var cutoff=false;
+
 // mapping default for test
-var mappingFunction=rotationPlus;
+var mappingFunction=threeCircles;
 
 //mappingFunction=Map.prototype.identity;
 
