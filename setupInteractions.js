@@ -18,7 +18,6 @@ imageInputButton.onChange(function(){
         referenceCanvas.adjust();
         inputTransform.setShift(0.5*inputImage.width,0.5*inputImage.height);
         //inputTransform.setScale(initialInputScale);
-        inputTransform.setAngle(0);
     	createImage();
     });
 });
