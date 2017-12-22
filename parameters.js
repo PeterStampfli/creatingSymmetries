@@ -65,13 +65,13 @@ var k=1;
 
 var iterMaximum=100;
 
-rosettePowerR=1;
+rosettePowerR=2;
 basicRosette=rosettePeriodicMirrorPhi;
 
 var cutoff=true;
 
 // mapping default for test
-var mappingFunction=rotation;
+var mappingFunction=rotationEuklid;
 
 //mappingFunction=Map.prototype.identity;
 
