@@ -6,21 +6,14 @@ var scale=20;
 var nSymmCenter=2;
 //poincare circle and plane
 // rotational symmetry at left corner
-var nSymmLeft=100000;
+var nSymmLeft=2;
 // rotational symmetry at right corner
-var nSymmRight=100000;
+var nSymmRight=3;
 
 // angles
 var alpha=Math.PI/nSymmLeft;
 var beta=Math.PI/nSymmRight;
 var gamma=Math.PI/nSymmCenter;
-
-// the poincare plane
-// distance between circle centers is 1
-// limit nSymmCenter -> infinity
-
-var rPlane=0.5/(Math.cos(alpha)+Math.cos(beta));
-var xCenterPlane=rPlane*Math.cos(alpha);
 
 // poincare disc
 
@@ -45,7 +38,7 @@ xCenterCircle*=0.5/worldRadius;
 
 
 
-function poincarePlane(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+function poincarePlaneMapping(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
 	var iterMax=iterMaximum;
