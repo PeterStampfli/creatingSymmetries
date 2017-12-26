@@ -175,21 +175,17 @@ function progressMessage(){
     ". "+smoothingText+" smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 }
 
-var saveImageButton=new Button("outputOutputCanvas");
+var saveImageButton=new Button("downloadJpg");
 saveImageButton.onClick(function(){
     outputCanvas.canvas.toBlob(function(blob){
         saveAs(blob,"someImage.jpg");
     },'image/jpeg',0.92);
 });
 
-var saveFinalImageButton=new Button("outputFinalCanvas");
-saveFinalImageButton.onClick(function(){
-    finalCanvas.canvas.toBlob(function(blob){
-        saveAs(blob,"someImage.jpg");
-    },'image/jpeg',0.92);
+var saveImageButton=new Button("downloadPng");
+saveImageButton.onClick(function(){
+    outputCanvas.canvas.toBlob(function(blob){
+        saveAs(blob,"someImage.png");
+    },'image/png');
 });
-
-
-
-
 

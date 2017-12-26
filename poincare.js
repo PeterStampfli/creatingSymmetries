@@ -3,7 +3,7 @@
 // parameters
 var scale=20;
 // poincare circle: rotational symmetry at center
-var nSymmCenter=2;
+var nSymmCenter=6;
 //poincare circle and plane
 // rotational symmetry at left corner
 var nSymmLeft=2;

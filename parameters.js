@@ -31,7 +31,7 @@ var initialInputScale=100;
 
 // background color, for hitting outside
 var backgroundColor=new Color;
-backgroundColor.setRgb(70,70,100);
+backgroundColor.setRgb(128,128,128);
 
 
 
@@ -71,7 +71,7 @@ basicRosette=rosettePeriodicMirrorPhi;
 var cutoff=true;
 
 // mapping default for test
-var mappingFunction=rosette.map;
+var mappingFunction=euclid.map;
 //mappingFunction=Map.prototype.identity;
 
 
@@ -79,3 +79,5 @@ var mappingFunction=rosette.map;
 rosette.setup(7,2,3);
 
 poincarePlane.setup(0,2,3);
+
+euclid.setup(4,2,4);

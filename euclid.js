@@ -1,27 +1,26 @@
 "use strict";
 
+var euclid={};
 // parameters
-var euclidScale=20;
-// poincare circle: rotational symmetry at center
-var euclidNCenter=3;
-//poincare circle and plane
-// rotational symmetry at left corner
-var euclidNLeft=3;
-// rotational symmetry at right corner
-var euclidNRight=3;
-
-var euclidAlpha=Math.PI/euclidNLeft;
-// normal unit vector for third line
-var normalX,normalY;
-normalX=-Math.sin(euclidAlpha);
-normalY=-Math.cos(euclidAlpha);
-
+euclid.scale=20;
 // position of third line
-var lineX=0.2;
+euclid.lineX=0.2
 
+euclid.setup=function(center,left,right){
+	euclid.nCenter=center;
+	//poincare circle and plane
+	// rotational symmetry at left corner
+	euclid.nLeft=left;
+	// rotational symmetry at right corner
+	euclid.nRight=right;
+	euclid.alpha=Math.PI/euclid.nLeft;
+	// normal unit vector for third line
+	euclid.normalX=-Math.sin(euclid.alpha);
+	euclid.normalY=-Math.cos(euclid.alpha);
+}
 
 // standard kaleidoscope
-function euclid(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+euclid.map=function (inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
 	var iterMax=10;	
@@ -29,24 +28,24 @@ function euclid(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(euclidNCenter);
+		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(euclid.nCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
 		}
 		else {
-			distance=normalX*(inputImagePosition.x-lineX)+normalY*inputImagePosition.y;
+			distance=euclid.normalX*(inputImagePosition.x-euclid.lineX)+euclid.normalY*inputImagePosition.y;
 			if (distance>=-0.00001){
 				isFinished=true;
 			}
 			else {
-				inputImagePosition.x-=2*distance*normalX;
-				inputImagePosition.y-=2*distance*normalY;
+				inputImagePosition.x-=2*distance*euclid.normalX;
+				inputImagePosition.y-=2*distance*euclid.normalY;
 				colorPosition.x=-colorPosition.x;
 			}
 		}
 	}
-	inputImagePosition.rotationMirrorSmooth(euclidNCenter);
-	inputImagePosition.scale(euclidScale);
+	inputImagePosition.rotationMirrorSmooth(euclid.nCenter);
+	inputImagePosition.scale(euclid.scale);
 	return true;
 }

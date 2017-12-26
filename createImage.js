@@ -19,9 +19,11 @@ function makeColor(color,colorPosition,inputImagePosition){
 	inputImage.interpolation(color,position.x,position.y);
 	if (color.red<0){
 		color.set(backgroundColor);
+		color.alpha=0;
 	}
 	else {
 		colorSymmetry.makeSymmetry(color,colorPosition);
+		color.alpha=255;
 	}
 }
 // function for creating the image
@@ -63,6 +65,7 @@ function createImage(){
 }
 
 // make the pixels without averaging
+// new objects are created only once for the full image
 function simplePixels(){
 	var imagePositionX=map.imagePositionX;
 	var imagePositionY=map.imagePositionY;
@@ -86,12 +89,12 @@ function simplePixels(){
         }
         else {
         	color.set(backgroundColor);
-
+        	color.alpha=0;
         }
         outputPixels[outputIndex++]=color.red;
         outputPixels[outputIndex++]=color.green;
-        outputPixels[outputIndex]=color.blue;
-        outputIndex += 2;
+        outputPixels[outputIndex++]=color.blue;
+        outputPixels[outputIndex++]=color.alpha;
     }
 }
 
@@ -154,7 +157,6 @@ function smoothedPixels(){
 					colorPlusX.set(backgroundColor);
 				}
 				if (positionValid[indexPlusY]){
-
 					imagePosition.x=0.5*(baseImagePositionX+imagePositionX[indexPlusY]);
 					imagePosition.y=0.5*(baseImagePositionY+imagePositionY[indexPlusY]);
 					colorPosition.x=0.5*(baseColorPositionX+colorPositionX[indexPlusY]);
@@ -176,14 +178,15 @@ function smoothedPixels(){
 				}
 				outputPixels[outputIndex++]=(2+baseColor.red+colorPlusX.red+colorPlusY.red+colorPlusXY.red)>>2;
 				outputPixels[outputIndex++]=(2+baseColor.green+colorPlusX.green+colorPlusY.green+colorPlusXY.green)>>2;
-				outputPixels[outputIndex]=(2+baseColor.blue+colorPlusX.blue+colorPlusY.blue+colorPlusXY.blue)>>2;
+				outputPixels[outputIndex++]=(2+baseColor.blue+colorPlusX.blue+colorPlusY.blue+colorPlusXY.blue)>>2;
+				outputPixels[outputIndex++]=(2+baseColor.alpha+colorPlusX.alpha+colorPlusY.alpha+colorPlusXY.alpha)>>2;
 			}
 			else {
 				outputPixels[outputIndex++]=backgroundColor.red;
 				outputPixels[outputIndex++]=backgroundColor.green;
-				outputPixels[outputIndex]=backgroundColor.blue;
+				outputPixels[outputIndex++]=backgroundColor.blue;
+				outputPixels[outputIndex++]=0;
 			}
-	        outputIndex += 2;
 			baseIndex++;
 			indexPlusY++;			
 		}

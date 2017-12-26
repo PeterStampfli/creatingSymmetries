@@ -1,11 +1,11 @@
 "use strict";
 
 /*
-object for rgb-color and manipulation
+object for rgba-color and manipulation
 */
 
 /*
-simply black
+simply black, opaque
 */
 function Color(){
 	this.red=0;
@@ -15,6 +15,7 @@ function Color(){
 	this.hue=0;
 	this.colorIntensity=0;
 	this.grey=0;
+    this.alpha=255;
 }
 
 /*
