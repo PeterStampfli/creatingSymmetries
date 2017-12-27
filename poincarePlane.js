@@ -9,17 +9,17 @@ poincarePlane.scale=20;
 // center is irrelevant (==infinity)
 poincarePlane.setup=function(center,left,right){
 	// rotational symmetry at left corner
-	poincarePlane.nSymmLeft=2;
+	poincarePlane.nSymmLeft=left;
 	// rotational symmetry at right corner
-	poincarePlane.nSymmRight=3;
+	poincarePlane.nSymmRight=right;
 	// angles
-	poincarePlane.alpha=Math.PI/poincarePlane.nSymmLeft;
-	poincarePlane.beta=Math.PI/poincarePlane.nSymmRight;
+	var alpha=Math.PI/poincarePlane.nSymmLeft;
+	var beta=Math.PI/poincarePlane.nSymmRight;
 	// the poincare plane
 	// distance between circle centers is 1
 	// limit nSymmCenter -> infinity
-	poincarePlane.rPlane=0.5/(Math.cos(poincarePlane.alpha)+Math.cos(poincarePlane.beta));
-	poincarePlane.xCenterPlane=poincarePlane.rPlane*Math.cos(poincarePlane.alpha);
+	poincarePlane.rPlane=0.5/(Math.cos(alpha)+Math.cos(beta));
+	poincarePlane.xCenterPlane=poincarePlane.rPlane*Math.cos(alpha);
 }
 
 // the mapping method
@@ -30,6 +30,7 @@ poincarePlane.map=function(inputImagePosition,colorPosition,spacePosition,canvas
 	colorPosition.x=1;                                        // as parity for 2 colors
 	inputImagePosition.set(spacePosition);
 	while (!isFinished){
+		isFinished=true;
 		iter++;
 		inputImagePosition.periodXUnit();
 		if (inputImagePosition.x>0.5){
@@ -39,10 +40,8 @@ poincarePlane.map=function(inputImagePosition,colorPosition,spacePosition,canvas
 		if (iter>iterMax){
 			return false;
 		}
-		else if (!inputImagePosition.circleInversionInsideOut(poincarePlane.xCenterPlane,0,poincarePlane.rPlane)){
-			isFinished=true;
-		}
-		else {
+		if (inputImagePosition.circleInversionInsideOut(poincarePlane.xCenterPlane,0,poincarePlane.rPlane)){
+			isFinished=false;
 			colorPosition.x=-colorPosition.x;
 		}
 	}

@@ -2,31 +2,33 @@
 
 // rotational symmetry only in something like a poincare disk
 // one circle per sector, touching
+var rotation={};
+
+rotation.scale=50;
+
+rotation.setup=function(center,left,right){
+	//  rotational symmetry at center
+	rotation.nCenter=center;
+	var gamma=Math.PI/rotation.nCenter;
+	// rotational symmetry at crossing of circles
+	rotation.nExtra=left;
+	var alpha=Math.PI/rotation.nExtra;
+
+	rotation.centerX=Math.cos(gamma);
+	rotation.centerY=Math.sin(gamma);
 
 
-var rotationScale=20;
+	rotation.circleRadius=rotation.centerY/Math.cos(alpha/2);
 
-//  rotational symmetry at center
-var rotationNCenter=5;
-var rotationGamma=Math.PI/rotationNCenter;
-var rotationNExtra=2;
-var rotationAlpha=Math.PI/rotationNExtra;
-
-var rotationCenterX=Math.cos(rotationGamma);
-var rotationCenterY=Math.sin(rotationGamma);
-
-
-var rotationCircleRadius=rotationCenterY/Math.cos(rotationAlpha/2);
-
-var rotationWorldRadius=Math.sqrt(1-rotationCircleRadius*rotationCircleRadius);
-rotationCenterX*=0.5/rotationWorldRadius;
-rotationCenterY*=0.5/rotationWorldRadius;
-rotationCircleRadius*=0.5/rotationWorldRadius;
-
-
+	var rotationWorldRadius=Math.sqrt(1-rotation.circleRadius*rotation.circleRadius);
+	rotation.centerX*=0.5/rotationWorldRadius;
+	rotation.centerY*=0.5/rotationWorldRadius;
+	rotation.circleRadius*=0.5/rotationWorldRadius;
+	rotation.innerRadius=Math.sqrt(rotation.centerX*rotation.centerX+rotation.centerY*rotation.centerY)-rotation.centerY;
+}
 
 // poincare disc??
-function rotation(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+rotation.map=function(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
 	var iterMax=iterMaximum;		
@@ -36,25 +38,24 @@ function rotation(inputImagePosition,colorPosition,spacePosition,canvasPosition)
 		return false;
 	}
 	while (!isFinished){
-		inputImagePosition.rotationSymmetry(rotationNCenter);
+		inputImagePosition.rotationSymmetry(rotation.nCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
 		}
-		else if (!inputImagePosition.circleInversionInsideOut(rotationCenterX,rotationCenterY,rotationCircleRadius)){
+		else if (!inputImagePosition.circleInversionInsideOut(rotation.centerX,rotation.centerY,rotation.circleRadius)){
 			isFinished=true;
 		}
 		else {
 			colorPosition.x=-colorPosition.x;
 		}
 	}
-	basicRosette(inputImagePosition,rotationNCenter);
-	inputImagePosition.scale(scale);
+	basicRosette(inputImagePosition,rotation.nCenter);
+	inputImagePosition.scale(rotation.scale);
 	return true;
 }
 
 
-var innerRadius=Math.sqrt(rotationCenterX*rotationCenterX+rotationCenterY*rotationCenterY)-rotationCenterY;
 // poincare disc??
 function rotationPlus(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;

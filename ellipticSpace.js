@@ -1,58 +1,55 @@
 "use strict";
 
+var elliptic={};
 
+elliptic.scale=100;
 
-var ellipticScale=20;
+elliptic.setup=function(center,left,right){
+	//  rotational symmetry at center
+	elliptic.nCenter=center;
+	// rotational symmetry at left corner
+	elliptic.nRight=right;
+	// rotational symmetry at right corner
+	elliptic.nLeft=left;
 
-//  rotational symmetry at center
-var ellipticNCenter=3;
-// rotational symmetry at left corner
-var ellipticNRight=2;
-// rotational symmetry at right corner
-var ellipticNLeft=3;
+	// angles
+	var alpha=Math.PI/elliptic.nLeft;
+	var beta=Math.PI/elliptic.nRight;
+	var gamma=Math.PI/elliptic.nCenter;
 
-// angles
-var ellipticAlpha=Math.PI/ellipticNLeft;
-var ellipticBeta=Math.PI/ellipticNRight;
-var ellipticGamma=Math.PI/ellipticNCenter;
+	// intersection of straight lines with unit circle (radius=1)
+	// find position of unit circle
+	// inverted for elliptic case
 
-// parameters for elliptic space
-var rCircleElliptic,xCenterCircleElliptic,yCenterCircleElliptic;
+	elliptic.yCenter=-Math.cos(alpha);
+	elliptic.xCenter=-(Math.cos(alpha)*Math.cos(gamma)+Math.cos(beta))/Math.sin(gamma);
 
-// intersection of straight lines with unit circle (radius=1)
-// find position of unit circle
-// inverted for elliptic case
-
-yCenterCircleElliptic=-Math.cos(ellipticAlpha);
-xCenterCircleElliptic=-(Math.cos(ellipticAlpha)*Math.cos(ellipticGamma)+Math.cos(ellipticBeta))/Math.sin(ellipticGamma);
-
-// rescale to smaller circle, space goes initially from -0.5 to 0.5
-
-rCircleElliptic=0.7;
-xCenterCircleElliptic*=rCircleElliptic;
-yCenterCircleElliptic*=rCircleElliptic;
+	// rescale to circle radius
+	elliptic.rCircle=0.3;
+	elliptic.xCenter*=elliptic.rCircle;
+	elliptic.yCenter*=elliptic.rCircle;
+}
 
 // elliptic kaleidoscope
-function elliptic(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+elliptic.map=function(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
 	var iterMax=iterMaximum;		
 	inputImagePosition.set(spacePosition);
 	colorPosition.x=1;                                        // as parity for 2 colors
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(ellipticNCenter);
+		isFinished=true;
+		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(elliptic.nCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
 		}
-		else if (!inputImagePosition.circleInversionOutsideIn(xCenterCircleElliptic,yCenterCircleElliptic,rCircleElliptic)){
-			isFinished=true;
-		}
-		else {
+		if (inputImagePosition.circleInversionOutsideIn(elliptic.xCenter,elliptic.yCenter,elliptic.rCircle)){
+			isFinished=false;
 			colorPosition.x=-colorPosition.x;
 		}
 	}
-	basicRosette(inputImagePosition,nSymmCenter);
-	inputImagePosition.scale(ellipticScale);
+	basicRosette(inputImagePosition,elliptic.nCenter);
+	inputImagePosition.scale(elliptic.scale);
 	return true;
 }
