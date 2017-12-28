@@ -27,22 +27,22 @@ poincarePlane.map=function(inputImagePosition,colorPosition,spacePosition,canvas
 	var isFinished=false;
 	var iter=0;
 	var iterMax=iterMaximum;
-	colorPosition.x=1;                                        // as parity for 2 colors
+	colorPosition.x=0;                                        // as parity for 2 colors
 	inputImagePosition.set(spacePosition);
 	while (!isFinished){
 		isFinished=true;
 		iter++;
-		inputImagePosition.periodXUnit();
+		colorPosition.x+=inputImagePosition.periodXUnit();
 		if (inputImagePosition.x>0.5){
 			inputImagePosition.x=1-inputImagePosition.x;
-			colorPosition.x=-colorPosition.x;
+			colorPosition.x++;
 		}
 		if (iter>iterMax){
 			return false;
 		}
 		if (inputImagePosition.circleInversionInsideOut(poincarePlane.xCenterPlane,0,poincarePlane.rPlane)){
 			isFinished=false;
-			colorPosition.x=-colorPosition.x;
+			colorPosition.x++;
 		}
 	}
 	inputImagePosition.x=0.5*imageFastFunction.periodicMapping(inputImagePosition.x);

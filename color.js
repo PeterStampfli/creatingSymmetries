@@ -185,3 +185,15 @@ Color.prototype.shiftHue=function(amount){
 	this.hue+=amount;
 	this.rgbFromHig();
 }
+
+/*
+bleach the color
+interpolation to white with given parameter
+x=0 no bleach
+x=1 fully bleached (white)
+*/
+Color.prototype.bleach=function(x){
+    this.red=Math.floor(x*255+(1-x)*this.red);
+    this.green=Math.floor(x*255+(1-x)*this.green);
+    this.blue=Math.floor(x*255+(1-x)*this.blue);
+}

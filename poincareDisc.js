@@ -35,25 +35,26 @@ poincareDisc.setup=function(center,left,right){
 
 
 // poincare disc
+// colorposition: 0 if no mapping, else parity
 poincareDisc.map=function(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
 	var iterMax=iterMaximum;		
 	inputImagePosition.set(spacePosition);
-	colorPosition.x=1;                                        // as parity for 2 colors
+	colorPosition.x=0;                                        // as parity for 2 colors
 	if ((inputImagePosition.radius2()>0.25)&&cutoff){
 		return false;
 	}
 	while (!isFinished){
 		isFinished=true;
-		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(poincareDisc.nSymmCenter);
+		colorPosition.x+=inputImagePosition.rotationMirrorSymmetry(poincareDisc.nSymmCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
 		}
 		if (inputImagePosition.circleInversionInsideOut(poincareDisc.xCenterCircle,poincareDisc.yCenterCircle,poincareDisc.rCircle)){
 			isFinished=false;
-			colorPosition.x=-colorPosition.x;
+			colorPosition.x++;
 		}
 	}
 	basicRosette(inputImagePosition,poincareDisc.nSymmCenter);

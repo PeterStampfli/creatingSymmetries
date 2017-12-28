@@ -19,6 +19,9 @@ function ColorSymmetry(numberOfVariants){
             break;
         case 2:
             this.makeSymmetry=this.make2ColorSymmetry;
+
+            // for mirror symmetries/roptation
+            this.makeSymmetry=this.makeMirrorColors;
             break;
 		case 3:
 			this.makeSymmetry=this.make3ColorSymmetry;
@@ -177,4 +180,32 @@ ColorSymmetry.prototype.make4ColorSymmetry=function(color,colorPosition){
             this.transition(color,Math.min(-colorPosition.x,-colorPosition.y));
         }
     }
+}
+
+// for mirrors
+
+/*
+make 2-color symmetry depending on x-coordinate of color position
+colorPosition.x has number of mirrors:
+0 if in original (triangle)
+color mod 1
+invert color if sum of mirrors is odd
+color mod 2
+bleach color if there are some transformations
+*/
+ColorSymmetry.prototype.makeMirrorColors=function(color,colorPosition){
+    var d=colorPosition.x;
+    // change color if in the changing section
+        switch (nColorMod){
+            case 1:
+                if (d&1==1){
+                    color.simpleInversion();
+                }
+                break;
+            case 2:
+                if (d!=0) {
+                    color.bleach(0.5);
+                } 
+                break;
+        }
 }

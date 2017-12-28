@@ -36,17 +36,17 @@ elliptic.map=function(inputImagePosition,colorPosition,spacePosition,canvasPosit
 	var iter=0;
 	var iterMax=iterMaximum;		
 	inputImagePosition.set(spacePosition);
-	colorPosition.x=1;                                        // as parity for 2 colors
+	colorPosition.x=0;                                        // as parity for 2 colors
 	while (!isFinished){
 		isFinished=true;
-		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(elliptic.nCenter);
+		colorPosition.x+=inputImagePosition.rotationMirrorSymmetry(elliptic.nCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
 		}
 		if (inputImagePosition.circleInversionOutsideIn(elliptic.xCenter,elliptic.yCenter,elliptic.rCircle)){
 			isFinished=false;
-			colorPosition.x=-colorPosition.x;
+			colorPosition.x++;
 		}
 	}
 	basicRosette(inputImagePosition,elliptic.nCenter);

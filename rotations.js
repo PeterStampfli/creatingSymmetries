@@ -33,12 +33,12 @@ rotation.map=function(inputImagePosition,colorPosition,spacePosition,canvasPosit
 	var iter=0;
 	var iterMax=iterMaximum;		
 	inputImagePosition.set(spacePosition);
-	colorPosition.x=1;                                        // as parity for 2 colors
+	colorPosition.x=0;                                        // as parity for 2 colors
 	if ((inputImagePosition.radius2()>0.25)&&cutoff){
 		return false;
 	}
 	while (!isFinished){
-		inputImagePosition.rotationSymmetry(rotation.nCenter);
+		colorPosition.x+=inputImagePosition.rotationSymmetry(rotation.nCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
@@ -47,7 +47,7 @@ rotation.map=function(inputImagePosition,colorPosition,spacePosition,canvasPosit
 			isFinished=true;
 		}
 		else {
-			colorPosition.x=-colorPosition.x;
+			colorPosition.x++;
 		}
 	}
 	basicRosette(inputImagePosition,rotation.nCenter);

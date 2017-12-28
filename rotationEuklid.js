@@ -1,53 +1,51 @@
 "use strict";
 
+var rotationEuklid={};
 // parameters
-var rotationEuklidScale=20;
-// poincare circle: rotational symmetry at center
-var rotationEuklidNCenter=4;
-//poincare circle and plane
+rotationEuklid.scale=20;
+
+rotationEuklid.setup=function(center,left,right){
+	// rotational symmetry at center, only relevant parameter
+	rotationEuklid.nCenter=center;
 
 
-// normal unit vector for third line
-var rotationEuklidNCenterNormalX,rotationEuklidNCenterNormalY;
+	// normal unit vector for third line
 
-var rotationEuklidBeta=0.5*Math.PI*(1-2/rotationEuklidNCenter);
-console.log(rotationEuklidBeta);
-rotationEuklidNCenterNormalX=-Math.sin(rotationEuklidBeta);
-rotationEuklidNCenterNormalY=-Math.cos(rotationEuklidBeta);
-console.log("euk "+rotationEuklidNCenterNormalX);
-console.log("euk "+rotationEuklidNCenterNormalY);
+	var beta=0.5*Math.PI*(1-2/rotationEuklid.nCenter);
+	rotationEuklid.normalX=-Math.sin(beta);
+	rotationEuklid.normalY=-Math.cos(beta);
 
-// position of third line
-var rotationEuklidLineX=0.2;
-
+	// position of third line
+	rotationEuklid.lineX=0.2;
+}
 
 // standard kaleidoscope
-function rotationEuklid(inputImagePosition,colorPosition,spacePosition,canvasPosition){
+function rotationEuklidMap(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	var isFinished=false;
 	var iter=0;
 	var iterMax=10;	
 	var distance;                                            // distance to plane, normal pointing inside triangle	
 	inputImagePosition.set(spacePosition);
-	colorPosition.x=1;                                        // as parity for 2 colors
+	colorPosition.x=0;                                        // as parity for 2 colors
 	while (!isFinished){
-		inputImagePosition.rotationSymmetry(rotationEuklidNCenter);
+		colorPosition.x+=inputImagePosition.rotationSymmetry(rotationEuklid.nCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
 		}
 		else {
-			distance=rotationEuklidNCenterNormalX*(inputImagePosition.x-rotationEuklidLineX)+rotationEuklidNCenterNormalY*inputImagePosition.y;
+			distance=rotationEuklid.normalX*(inputImagePosition.x-rotationEuklid.lineX)+rotationEuklid.normalY*inputImagePosition.y;
 			if (distance>=-0.00001){
 				isFinished=true;
 			}
 			else {
-				inputImagePosition.x-=2*distance*rotationEuklidNCenterNormalX;
-				inputImagePosition.y-=2*distance*rotationEuklidNCenterNormalY;
-				colorPosition.x=-colorPosition.x;
+				inputImagePosition.x-=2*distance*rotationEuklid.normalX;
+				inputImagePosition.y-=2*distance*rotationEuklid.normalY;
+				colorPosition.x++;
 			}
 		}
 	}
-	basicRosette(inputImagePosition,rotationEuklidNCenter);
-	inputImagePosition.scale(rotationEuklidScale);
+	basicRosette(inputImagePosition,rotationEuklid.nCenter);
+	inputImagePosition.scale(rotationEuklid.scale);
 	return true;
 }

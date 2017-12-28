@@ -52,9 +52,15 @@ symmetries
 
 /*
 periodic length 1 in x-direction, basic zone is 0...1
+return 0 if no change, 2 else
 */
 Vector2.prototype.periodXUnit=function(){
-	this.x=this.x-Math.floor(this.x);
+	var result=Math.floor(this.x);
+	this.x=this.x-result;
+	if (result==0){
+		return 0;
+	}
+	return 2;
 }
 
 /*
@@ -194,18 +200,22 @@ Vector2.prototype.setPolar=function(r,angle){
 }
 
 // make n-fold rotational symmetry with mirror symmetry
-//  returns -1 if odd number of mirror reflections, 1 if even number
+//  returns 0 if no mapping, even number if rotation without mirror, 1 if mirror only
 
 // by replicating the first sector  phi in(0,PI/n)
 
 Vector2.prototype.rotationMirrorSymmetry=function(n){
 	var angle=this.angle();
-	var parity=1;
+	var parity;
 	angle*=n*0.159154;                        // n/2pi
-	angle=angle-Math.floor(angle);
+	parity=Math.floor(angle);
+	angle=angle-parity;
+	if (parity!=0){
+		parity=2;
+	}
 	if (angle>0.5){
 		angle=1-angle;
-		parity=-1;
+		parity=1;
 	}
 	angle*=6.28318/n;
 	this.setPolar(this.radius(),angle);
@@ -219,10 +229,16 @@ Vector2.prototype.rotationMirrorSymmetry=function(n){
 
 Vector2.prototype.rotationSymmetry=function(n){
 	var angle=this.angle();
+	var parity;
 	angle*=n*0.159154;                        // n/2pi
-	angle=angle-Math.floor(angle);
+	parity=Math.floor(angle);
+	angle=angle-parity;
+	if (parity!=0){
+		parity=2;
+	}
 	angle*=6.28318/n;
 	this.setPolar(this.radius(),angle);
+	return parity;
 }
 
 

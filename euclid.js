@@ -26,9 +26,9 @@ euclid.map=function (inputImagePosition,colorPosition,spacePosition,canvasPositi
 	var iterMax=10;	
 	var distance;                                            // distance to plane, normal pointing inside triangle	
 	inputImagePosition.set(spacePosition);
-	colorPosition.x=1;                                        // as parity for 2 colors
+	colorPosition.x=0;                                        // as parity for 2 colors
 	while (!isFinished){
-		colorPosition.x*=inputImagePosition.rotationMirrorSymmetry(euclid.nCenter);
+		colorPosition.x+=inputImagePosition.rotationMirrorSymmetry(euclid.nCenter);
 		iter++;
 		if (iter>iterMax){
 			return false;
@@ -41,7 +41,7 @@ euclid.map=function (inputImagePosition,colorPosition,spacePosition,canvasPositi
 			else {
 				inputImagePosition.x-=2*distance*euclid.normalX;
 				inputImagePosition.y-=2*distance*euclid.normalY;
-				colorPosition.x=-colorPosition.x;
+				colorPosition.x++;
 			}
 		}
 	}

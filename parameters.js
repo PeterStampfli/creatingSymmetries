@@ -71,7 +71,7 @@ basicRosette=rosettePeriodicMirrorPhi;
 var cutoff=true;
 
 // mapping default for test
-var mappingFunction=rotation.map;
+var mappingFunction=rotationEuklidMap;
 //mappingFunction=Map.prototype.identity;
 
 
@@ -79,8 +79,9 @@ var mappingFunction=rotation.map;
 rosette.setup(7,2,3);
 
 poincarePlane.setup(0,3,3);
-poincareDisc.setup(7,2,3);
+poincareDisc.setup(5,2,4);
 
 euclid.setup(4,2,4);
 elliptic.setup(5,3,2);
 rotation.setup(5,2,2);
+rotationEuklid.setup(4,2,2);
