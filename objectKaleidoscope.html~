@@ -139,7 +139,6 @@
 	<script src="ellipticSpace.js"></script>
 	<script src="euclid.js"></script>
 	<script src="euclidPolygon.js"></script>
-	<script src="ellipticPolygon.js"></script>
 	<script src="hyperbolicQuad.js"></script>
 	<script src="rotations.js"></script>
 	<script src="rotationElliptic.js"></script>

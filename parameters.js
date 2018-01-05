@@ -71,10 +71,14 @@ basicRosette=rosettePeriodicMirrorPhi;
 var cutoff=true;
 
 // mapping default for test
-var mappingFunction=elliptic.map;
+var mappingFunction=rotationElliptic.map;
 //mappingFunction=Map.prototype.identity;
 
 
+euclidPolygon.setup(4,2,4);
+ellipticPolygon.setup(3,2,4);
+rotationElliptic.setup(3,2,4);
+hyperbolicPolygon.setup(3,4,0);
 
 rosette.setup(7,2,3);
 

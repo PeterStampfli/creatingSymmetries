@@ -24,7 +24,7 @@ rotationElliptic.map=function(inputImagePosition,colorPosition,spacePosition,can
 	var iter=0;
 	var iterMax=iterMaximum;		
 	inputImagePosition.set(spacePosition);
-	colorPosition.x=0;                                        // as parity for 2 colors
+	colorPosition.x=1;                                        // as parity for 2 colors
 	while (!isFinished){
 		inputImagePosition.rotationSymmetry(rotationElliptic.nCenter);
 		iter++;
@@ -35,7 +35,7 @@ rotationElliptic.map=function(inputImagePosition,colorPosition,spacePosition,can
 			isFinished=true;
 		}
 		else {
-			colorPosition.x++;
+			colorPosition.x=-colorPosition.x;
 		}
 	}
 	basicRosette(inputImagePosition,rotationElliptic.nCenter);
