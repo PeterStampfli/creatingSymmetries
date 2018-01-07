@@ -204,7 +204,7 @@ ColorSymmetry.prototype.makeMirrorColors=function(color,colorPosition){
                 break;
             case 2:
                 if (d!=0) {
-                    color.bleach(bleach);
+                    color.bleach(0.5);
                 } 
                 break;
         }

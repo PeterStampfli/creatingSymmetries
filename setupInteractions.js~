@@ -46,7 +46,6 @@ smoothingChoosers.add(function(){
     smoothingText="2x2",
     console.log("smoothing "+smoothing);
 });
-smoothingChoosers.setCheckedFirst();
 
 // the interpolation method
 
@@ -63,7 +62,7 @@ interpolationChoosers.add(function(){
 	inputImage.interpolation=inputImage.getCubic;
     interpolation="cubic";
 });
-interpolationChoosers.setCheckedFirst();
+
 
 // do the changes
 var updateButton=new Button("update");
@@ -91,7 +90,7 @@ inversionChoosers.add(function(){
     colorMod="second";
     createImage();
 });
-inversionChoosers.setCheckedFirst();
+inversionChoosers.setChecked(1);
 
 // the harmonics
 var harmonicsChooser=new Button("harmonics");
@@ -146,7 +145,7 @@ combinationChooser.add(function(){
     map.isValid=false;
     createImage();
 });
-combinationChooser.setCheckedFirst();
+
 // rosette for poincare disc etc.
 
 var rosetteChooser=new Chooser('rosette');
@@ -168,7 +167,6 @@ rosetteChooser.add(function(){
     map.isValid=false;
     createImage();    
 })
-rosetteChooser.setCheckedFirst();
 
 // the message
 var progress=document.getElementById("progress");

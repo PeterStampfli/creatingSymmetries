@@ -12,6 +12,9 @@ hyperbolicPolygon.setup=function(center,theLeft,right){
 console.log(hyperbolicPolygon.nSymmCenter);
 	// rotational symmetry at left corner (and right corner)
 	hyperbolicPolygon.nSymmLeft=theLeft;
+	
+	// rotational symmetry
+	hyperbolicPolygon.nRotation=right;
 
 
 	// angles
@@ -62,6 +65,9 @@ hyperbolicPolygon.map=function(inputImagePosition,colorPosition,spacePosition,ca
 			isFinished=false;
 			colorPosition.x++;
 		}
+	}
+	if (hyperbolicPolygon.nRotation>0){
+		basicRosette(inputImagePosition,hyperbolicPolygon.nRotation);
 	}
 	inputImagePosition.scale(hyperbolicPolygon.scale);
 	return true;

@@ -51,6 +51,7 @@ hyperbolicPolygon.map=function(inputImagePosition,colorPosition,spacePosition,ca
 		if (iter>iterMax){
 			return false;
 		}
+		// find the center angle of the point
 		circleAngle=Math.floor(elementaryFastFunction.atan2(inputImagePosition.y,inputImagePosition.x)*0.5/hyperbolicPolygon.theGamma);
 		circleAngle=hyperbolicPolygon.theGamma*(2*circleAngle+1);
 
