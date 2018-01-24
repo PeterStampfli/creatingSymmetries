@@ -15,7 +15,7 @@ rosette.setup=function(center,left,right){
 rosette.map=function(inputImagePosition,colorPosition,spacePosition,canvasPosition){
 	inputImagePosition.set(spacePosition);
 
-	colorPosition.x=inputImagePosition.rotationMirrorSymmetry(rosette.nCenter);
+	colorPosition.x=inputImagePosition.rotationMirrorSymmetry(poincareDisc.nCenter);
 
 	basicRosette(inputImagePosition,rosette.nCenter);
 	inputImagePosition.scale(rosette.scale);

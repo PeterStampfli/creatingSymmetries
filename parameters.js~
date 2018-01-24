@@ -59,7 +59,7 @@ var colorSymmetry=new ColorSymmetry(nColorSymmetry);
 colorSymmetry.transWidth=-0.2;
 colorSymmetry.transSmoothing=0.05;
 
-var bleach=0.4;
+var bleach=0.3;
 
 var k=1;
 
@@ -71,21 +71,21 @@ basicRosette=rosettePeriodicMirrorPhi;
 var cutoff=true;
 
 // mapping default for test
-var mappingFunction=hyperbolicPolygon.map;
+var mappingFunction=rotation.map;
 //mappingFunction=Map.prototype.identity;
 
 
 euclidPolygon.setup(4,2,4);
 ellipticPolygon.setup(3,2,4);
 rotationElliptic.setup(3,2,4);
-hyperbolicPolygon.setup(5,2,0);
+hyperbolicPolygon.setup(5,2,5);
 
-rosette.setup(7,2,3);
+rosette.setup(5,2,3);
 
 poincarePlane.setup(0,3,3);
-poincareDisc.setup(2,4.5,4.5);
+poincareDisc.setup(5,3,3);
 
-euclid.setup(4,2,4);
-elliptic.setup(4,3,2);
-rotation.setup(5,2,2);
+euclid.setup(6,2,3);
+elliptic.setup(4,2,3);
+rotation.setup(5,2,5);
 rotationEuklid.setup(4,2,2);

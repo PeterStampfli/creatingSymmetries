@@ -24,11 +24,11 @@ imageInputButton.onChange(function(){
 
 // choosing the output width
 var outputWidthChooser=new Button('outputWidthChooser');
-var outputHeightChooser=new Button('outputHeightChooser');
+//var outputHeightChooser=new Button('outputHeightChooser');
 
 // set the start values
 outputWidthChooser.setValue(initialOutputWidth);
-outputHeightChooser.setValue(initialOutputHeight);
+//outputHeightChooser.setValue(initialOutputHeight);
 
 
 // the smoothing variants
@@ -46,6 +46,7 @@ smoothingChoosers.add(function(){
     smoothingText="2x2",
     console.log("smoothing "+smoothing);
 });
+smoothingChoosers.setCheckedFirst();
 
 // the interpolation method
 
@@ -62,7 +63,7 @@ interpolationChoosers.add(function(){
 	inputImage.interpolation=inputImage.getCubic;
     interpolation="cubic";
 });
-
+interpolationChoosers.setCheckedFirst();
 
 // do the changes
 var updateButton=new Button("update");
@@ -90,7 +91,7 @@ inversionChoosers.add(function(){
     colorMod="second";
     createImage();
 });
-inversionChoosers.setChecked(1);
+inversionChoosers.setCheckedFirst();
 
 // the harmonics
 var harmonicsChooser=new Button("harmonics");
@@ -145,7 +146,7 @@ combinationChooser.add(function(){
     map.isValid=false;
     createImage();
 });
-
+combinationChooser.setCheckedFirst();
 // rosette for poincare disc etc.
 
 var rosetteChooser=new Chooser('rosette');
@@ -167,27 +168,25 @@ rosetteChooser.add(function(){
     map.isValid=false;
     createImage();    
 })
+rosetteChooser.setCheckedFirst();
 
 // the message
 var progress=document.getElementById("progress");
 progress.innerHTML="Waiting for input image.";
 
 function progressMessage(){
-	progress.innerHTML="Width "+outputWidthChooser.getValue()+", height "+outputHeightChooser.getValue()+
+	progress.innerHTML="Size "+outputWidthChooser.getValue()+
     ". "+smoothingText+" smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 }
 
-var saveImageButton=new Button("downloadJpg");
-saveImageButton.onClick(function(){
-    outputCanvas.canvas.toBlob(function(blob){
-        saveAs(blob,"someImage.jpg");
-    },'image/jpeg',0.92);
+var saveOutputImageJpgButton=new Button("downloadOutputJpg");
+saveOutputImageJpgButton.onClick(function(){
+    outputCanvas.saveImageJpg("outputImage");
 });
 
-var saveImageButton=new Button("downloadPng");
-saveImageButton.onClick(function(){
-    outputCanvas.canvas.toBlob(function(blob){
-        saveAs(blob,"someImage.png");
-    },'image/png');
+var saveOutputImagePngButton=new Button("downloadOutputPng");
+saveOutputImagePngButton.onClick(function(){
+    outputCanvas.saveImagePng("outputImage");
+
 });
 

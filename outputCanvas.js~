@@ -4,7 +4,6 @@
 var outputCanvas=new PixelCanvas('outputCanvas');
 var map=new Map(elementaryFastFunction);
 
-/*
 // mouse control to change map position and scale
 var outputMouseEvents=new MouseEvents('outputCanvas');
 outputMouseEvents.addBasicDownUpOutActions();
@@ -29,8 +28,6 @@ outputMouseEvents.addMoveAction(function(event, mouseEvents){
   	map.isValid=false;
   	createImage();
 });
-
-*/
 
 outputCanvas.setSize(initialOutputWidth,initialOutputHeight);
 outputCanvas.blueScreen();

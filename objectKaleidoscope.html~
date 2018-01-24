@@ -32,10 +32,8 @@
 	</noscript>
 		<p>
 
-			Size of the generated image: width
+			Size of the generated image:
 			<input type="text" class="numbers" id="outputWidthChooser" maxlength="4" />
-			, height 
-			<input type="text" class="numbers" id="outputHeightChooser" maxlength="4" />
 			.
 			&emsp;
 			Input image file:
@@ -97,8 +95,8 @@
  		</p>
 
 
-			<button id="downloadJpg" type="button">Download as JPG ! </button>
-			<button id="downloadPng" type="button">Download as PNG ! </button>
+			<button id="downloadOutputJpg" type="button">Download as JPG ! </button>
+			<button id="downloadOutputPng" type="button">Download as PNG ! </button>
 
 		<p style="text-align:center">
 		<canvas id="outputCanvas"></canvas>
@@ -139,6 +137,7 @@
 	<script src="ellipticSpace.js"></script>
 	<script src="euclid.js"></script>
 	<script src="euclidPolygon.js"></script>
+	<script src="ellipticPolygon.js"></script>
 	<script src="hyperbolicQuad.js"></script>
 	<script src="rotations.js"></script>
 	<script src="rotationElliptic.js"></script>

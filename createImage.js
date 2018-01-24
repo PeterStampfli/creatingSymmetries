@@ -40,7 +40,7 @@ function createImage(){
 	}
 	// do resize tasks if output is resized
 	var width=outputWidthChooser.getValue();
-	var height=outputHeightChooser.getValue();
+	var height=width;
   	if ((width!=outputCanvas.width)||(height!=outputCanvas.height)){
 		outputCanvas.setSize(width,height);
 	  //	finalCanvas.setSize(horizontalRepetitions*(width-1),verticalRepetitions*(height-1));

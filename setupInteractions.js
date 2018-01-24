@@ -24,11 +24,11 @@ imageInputButton.onChange(function(){
 
 // choosing the output width
 var outputWidthChooser=new Button('outputWidthChooser');
-var outputHeightChooser=new Button('outputHeightChooser');
+//var outputHeightChooser=new Button('outputHeightChooser');
 
 // set the start values
 outputWidthChooser.setValue(initialOutputWidth);
-outputHeightChooser.setValue(initialOutputHeight);
+//outputHeightChooser.setValue(initialOutputHeight);
 
 
 // the smoothing variants
@@ -175,21 +175,17 @@ var progress=document.getElementById("progress");
 progress.innerHTML="Waiting for input image.";
 
 function progressMessage(){
-	progress.innerHTML="Width "+outputWidthChooser.getValue()+", height "+outputHeightChooser.getValue()+
+	progress.innerHTML="Size "+outputWidthChooser.getValue()+
     ". "+smoothingText+" smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 }
 
-var saveImageButton=new Button("downloadJpg");
-saveImageButton.onClick(function(){
-    outputCanvas.canvas.toBlob(function(blob){
-        saveAs(blob,"someImage.jpg");
-    },'image/jpeg',0.92);
+var saveOutputImageJpgButton=new Button("downloadOutputJpg");
+saveOutputImageJpgButton.onClick(function(){
+    outputCanvas.saveImageJpg("outputImage");
 });
 
-var saveImageButton=new Button("downloadPng");
-saveImageButton.onClick(function(){
-    outputCanvas.canvas.toBlob(function(blob){
-        saveAs(blob,"someImage.png");
-    },'image/png');
+var saveOutputImagePngButton=new Button("downloadOutputPng");
+saveOutputImagePngButton.onClick(function(){
+    outputCanvas.saveImagePng("outputImage");
 });
 
