@@ -15,7 +15,12 @@ inputImage.interpolation=inputImage.getNearest;
 var imageInputButton = new Button('imageInput');
 imageInputButton.onChange(function(){
     inputImage.read(imageInputButton.button.files[0],function(){
-        referenceCanvas.adjust();
+    	
+    	
+    	
+       // referenceCanvas.adjust();
+
+referenceCanvas.adjustWidth();
         inputTransform.setShift(0.5*inputImage.width,0.5*inputImage.height);
         //inputTransform.setScale(initialInputScale);
     	createImage();
@@ -25,6 +30,9 @@ imageInputButton.onChange(function(){
 // choosing the output width
 var outputWidthChooser=new Button('outputWidthChooser');
 //var outputHeightChooser=new Button('outputHeightChooser');
+
+// the reference image height
+var referenceHeightChooser=new Button('referenceHeightChooser');
 
 // set the start values
 outputWidthChooser.setValue(initialOutputWidth);
@@ -187,6 +195,10 @@ saveOutputImageJpgButton.onClick(function(){
 var saveOutputImagePngButton=new Button("downloadOutputPng");
 saveOutputImagePngButton.onClick(function(){
     outputCanvas.saveImagePng("outputImage");
+});
 
+var saveReferenceImagePngButton=new Button("downloadReferencePng");
+saveReferenceImagePngButton.onClick(function(){
+    referenceCanvas.saveImagePng("referenceImage");
 });
 

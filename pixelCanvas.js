@@ -18,7 +18,7 @@ function PixelCanvas(idName){
 }
 
 /*
-set the size, and create pixels, inialize to blue screen of nirvana
+set the size
 */
 PixelCanvas.prototype.setSize=function(width,height){
 	var canvasData;

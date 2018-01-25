@@ -28,6 +28,23 @@ referenceCanvas.adjust=function(){
 	referenceCanvas.canvasImage.drawImage(inputImage.image,0,0,referenceCanvas.width,referenceCanvas.height);
 	referenceCanvas.createPixels();
 }
+
+// adjust width fitting to input image and given height, draw new input, make pixels
+referenceCanvas.adjustWidth=function(){
+		referenceCanvas.setSize(Math.round(referenceCanvasHeight*inputImage.width/inputImage.height),
+			                    referenceCanvasHeight);
+
+	referenceCanvas.scaleFromInputImage=referenceCanvas.width/inputImage.width;
+	referenceCanvas.canvasImage.drawImage(inputImage.image,0,0,referenceCanvas.width,referenceCanvas.height);
+	referenceCanvas.createPixels();
+	
+	console.log(" ref can height "+referenceCanvas.height)
+	referenceHeightChooser.setValue(referenceCanvas.height);
+}
+
+
+
+
 referenceMouseEvents.addBasicDownUpOutActions();
 
 

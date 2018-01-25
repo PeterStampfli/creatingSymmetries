@@ -25,6 +25,8 @@ var orientationCanvasSize=200;
 // the referenceCanvas
 var referenceCanvasBaseSize=300;
 
+var referenceCanvasHeight=100;
+
 // for the input number of pixels per geometric unit
 var initialInputScale=100;           
 
@@ -71,7 +73,7 @@ basicRosette=rosettePeriodicMirrorPhi;
 var cutoff=true;
 
 // mapping default for test
-var mappingFunction=rotation.map;
+var mappingFunction=poincareDisc.map;
 //mappingFunction=Map.prototype.identity;
 
 

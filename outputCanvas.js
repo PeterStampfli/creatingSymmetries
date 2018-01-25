@@ -4,14 +4,14 @@
 var outputCanvas=new PixelCanvas('outputCanvas');
 var map=new Map(elementaryFastFunction);
 
-/*
+
 // mouse control to change map position and scale
 var outputMouseEvents=new MouseEvents('outputCanvas');
 outputMouseEvents.addBasicDownUpOutActions();
 
 // wheel action for changing the scale
 outputMouseEvents.addWheelAction(function(event, mouseEvents){
-	var factor=1.0;
+	var factor=1.1;
 	var transform=map.transform;
 	if (event.deltaY<0){
 		factor=1/factor;
@@ -30,7 +30,7 @@ outputMouseEvents.addMoveAction(function(event, mouseEvents){
   	createImage();
 });
 
-*/
+
 
 outputCanvas.setSize(initialOutputWidth,initialOutputHeight);
 outputCanvas.blueScreen();
