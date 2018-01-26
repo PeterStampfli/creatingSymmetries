@@ -42,7 +42,7 @@ function createImage(){
 	var width=outputWidthChooser.getValue();
 	var height=width;
 	
-	
+	/*
 	
 	referenceCanvasHeight=referenceHeightChooser.getValue();
 	
@@ -51,13 +51,14 @@ function createImage(){
 	console.log("adjust height");
 	
 	}
-	
+	*/
 	
   	if ((width!=outputCanvas.width)||(height!=outputCanvas.height)){
 		outputCanvas.setSize(width,height);
 	  //	finalCanvas.setSize(horizontalRepetitions*(width-1),verticalRepetitions*(height-1));
 		outputCanvas.blueScreen();
 		outputCanvas.createPixels();
+		referenceCanvas.adjustToOutput();
 	  	map.setSize(width,height);
 	  //	finalCanvas.setSize(2*width,2*height);
 	  	//finalCanvas.blueScreen();

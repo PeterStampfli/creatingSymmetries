@@ -29,6 +29,21 @@ referenceCanvas.adjust=function(){
 	referenceCanvas.createPixels();
 }
 
+// adjust size fitting to output image smaller dimension half of output
+referenceCanvas.adjustToOutput=function(){
+	var outputSize=outputWidthChooser.getValue()*0.5;   // reduced size
+	if (inputImage.width<inputImage.height){
+		referenceCanvas.setSize(outputSize,
+			                    Math.round(outputSize*inputImage.height/inputImage.width));
+	}
+	else {
+		referenceCanvas.setSize(Math.round(outputSize*inputImage.width/inputImage.height),
+			                    outputSize);
+	}
+	referenceCanvas.scaleFromInputImage=referenceCanvas.width/inputImage.width;
+	referenceCanvas.canvasImage.drawImage(inputImage.image,0,0,referenceCanvas.width,referenceCanvas.height);
+	referenceCanvas.createPixels();
+}
 // adjust width fitting to input image and given height, draw new input, make pixels
 referenceCanvas.adjustWidth=function(){
 		referenceCanvas.setSize(Math.round(referenceCanvasHeight*inputImage.width/inputImage.height),
@@ -39,7 +54,7 @@ referenceCanvas.adjustWidth=function(){
 	referenceCanvas.createPixels();
 	
 	console.log(" ref can height "+referenceCanvas.height)
-	referenceHeightChooser.setValue(referenceCanvas.height);
+	//referenceHeightChooser.setValue(referenceCanvas.height);
 }
 
 

@@ -20,7 +20,7 @@ imageInputButton.onChange(function(){
     	
        // referenceCanvas.adjust();
 
-referenceCanvas.adjustWidth();
+referenceCanvas.adjustToOutput();
         inputTransform.setShift(0.5*inputImage.width,0.5*inputImage.height);
         //inputTransform.setScale(initialInputScale);
     	createImage();
@@ -30,10 +30,11 @@ referenceCanvas.adjustWidth();
 // choosing the output width
 var outputWidthChooser=new Button('outputWidthChooser');
 //var outputHeightChooser=new Button('outputHeightChooser');
-
+/*
 // the reference image height
 var referenceHeightChooser=new Button('referenceHeightChooser');
 	referenceHeightChooser.setValue(referenceCanvasHeight);
+	*/
 // set the start values
 outputWidthChooser.setValue(initialOutputWidth);
 //outputHeightChooser.setValue(initialOutputHeight);
@@ -186,19 +187,22 @@ function progressMessage(){
 	progress.innerHTML="Size "+outputWidthChooser.getValue()+
     ". "+smoothingText+" smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 }
-
+/*
 var saveOutputImageJpgButton=new Button("downloadOutputJpg");
 saveOutputImageJpgButton.onClick(function(){
     outputCanvas.saveImageJpg("outputImage");
 });
+*/
 
 var saveOutputImagePngButton=new Button("downloadOutputPng");
 saveOutputImagePngButton.onClick(function(){
     outputCanvas.saveImagePng("outputImage");
+    referenceCanvas.saveImagePng("referenceImage");
 });
-
+/*
 var saveReferenceImagePngButton=new Button("downloadReferencePng");
 saveReferenceImagePngButton.onClick(function(){
     referenceCanvas.saveImagePng("referenceImage");
 });
+*/
 

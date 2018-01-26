@@ -9,6 +9,7 @@ rotation.scale=50;
 rotation.setup=function(center,left,right){
 	//  rotational symmetry at center
 	rotation.nCenter=center;
+	rotation.symmetry=right;
 	var gamma=Math.PI/rotation.nCenter;
 	// rotational symmetry at crossing of circles
 	rotation.nExtra=left;
@@ -50,7 +51,7 @@ rotation.map=function(inputImagePosition,colorPosition,spacePosition,canvasPosit
 			colorPosition.x++;
 		}
 	}
-	basicRosette(inputImagePosition,rotation.nCenter);
+	basicRosette(inputImagePosition,rotation.symmetry);
 	inputImagePosition.scale(rotation.scale);
 	return true;
 }
