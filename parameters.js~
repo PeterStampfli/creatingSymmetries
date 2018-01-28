@@ -25,7 +25,7 @@ var orientationCanvasSize=200;
 // the referenceCanvas
 var referenceCanvasBaseSize=300;
 
-var referenceCanvasHeight=100;
+var referenceCanvasHeight=200;
 
 // for the input number of pixels per geometric unit
 var initialInputScale=100;           
@@ -34,6 +34,10 @@ var initialInputScale=100;
 // background color, for hitting outside
 var backgroundColor=new Color;
 backgroundColor.setRgb(128,128,128);
+
+var backgroundRed=128;
+var backgroundGreen=128;
+var backgroundBlue=128;
 
 
 
@@ -80,7 +84,7 @@ var mappingFunction=hyperbolicPolygon.map;
 euclidPolygon.setup(4,2,4);
 ellipticPolygon.setup(2,2,3);
 rotationElliptic.setup(3,2,4);
-hyperbolicPolygon.setup(6,2,3);
+hyperbolicPolygon.setup(3,4,3);
 
 rosette.setup(5,2,3);
 

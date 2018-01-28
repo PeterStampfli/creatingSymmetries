@@ -11,7 +11,7 @@ outputMouseEvents.addBasicDownUpOutActions();
 
 // wheel action for changing the scale
 outputMouseEvents.addWheelAction(function(event, mouseEvents){
-	var factor=1.1;
+	var factor=1.05;
 	var transform=map.transform;
 	if (event.deltaY<0){
 		factor=1/factor;

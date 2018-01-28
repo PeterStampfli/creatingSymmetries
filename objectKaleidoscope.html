@@ -36,11 +36,19 @@
 		<p>
 				Input image file:
 			<input type="file" accept="image/*" id="imageInput" >
-<br>
+
 			Size of the output image:
 			<input type="text" class="numbers" id="outputWidthChooser" maxlength="4" />
 			.
+		<br>
 		
+		Background color: red 
+					<input type="text" class="numbers" id="backgroundRed" maxlength="4" /> 
+					green 
+					<input type="text" class="numbers" id="backgroundGreen" maxlength="4" /> 
+					blue
+					<input type="text" class="numbers" id="backgroundBlue" maxlength="4" /> 
+		<br>
 			<form action="" style="display: inline;">
 				Smoothing:
 				<input type="radio" name="smoothing" class='smoothing' checked>none
@@ -96,8 +104,15 @@
  		</p>
 
 
+		<p id="averageColor">
+ 		Average color.
+ 		
 
-			<button id="downloadOutputPng" type="button">Download output as PNG ! </button>
+ 		</p>
+
+<p>
+
+			<button id="downloadOutputJpg" type="button">Download output as jpg ! </button>
 
 
 		<p style="text-align:left">

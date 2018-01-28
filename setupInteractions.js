@@ -20,7 +20,7 @@ imageInputButton.onChange(function(){
     	
        // referenceCanvas.adjust();
 
-referenceCanvas.adjustToOutput();
+//referenceCanvas.adjustToOutput();
         inputTransform.setShift(0.5*inputImage.width,0.5*inputImage.height);
         //inputTransform.setScale(initialInputScale);
     	createImage();
@@ -39,7 +39,14 @@ var referenceHeightChooser=new Button('referenceHeightChooser');
 outputWidthChooser.setValue(initialOutputWidth);
 //outputHeightChooser.setValue(initialOutputHeight);
 
+var backgroundRedChooser=new Button('backgroundRed');
+backgroundRedChooser.setValue(backgroundRed);
 
+var backgroundGreenChooser=new Button('backgroundGreen');
+backgroundGreenChooser.setValue(backgroundGreen);
+
+var backgroundBlueChooser=new Button('backgroundBlue');
+backgroundBlueChooser.setValue(backgroundBlue);
 // the smoothing variants
 
 var smoothing=false;
@@ -183,22 +190,47 @@ rosetteChooser.setCheckedFirst();
 var progress=document.getElementById("progress");
 progress.innerHTML="Waiting for input image.";
 
+// the message
+var averageColor=document.getElementById("averageColor");
+averageColor.innerHTML="Average color.";
+
 function progressMessage(){
 	progress.innerHTML="Size "+outputWidthChooser.getValue()+
     ". "+smoothingText+" smoothing. Interpolation "+interpolation+". Color modification "+colorMod+".";
 }
-/*
+
+
+var averageAsBackground=null;
+
+function colorMessage(red,green,blue){
+	averageColor.innerHTML="average color: red "+red+", green "+green+", blue "+blue+".";
+	averageColor.innerHTML+="<button type='button' id='asBackground'>as background</button>";
+
+		averageAsBackground=new Button("asBackground");
+			averageAsBackground.onClick(function(){
+			backgroundRedChooser.setValue(averageRed);
+			backgroundGreenChooser.setValue(averageGreen);
+			backgroundBlueChooser.setValue(averageBlue);
+    		createImage();
+		});
+
+}
+
+
+
+
 var saveOutputImageJpgButton=new Button("downloadOutputJpg");
 saveOutputImageJpgButton.onClick(function(){
     outputCanvas.saveImageJpg("outputImage");
 });
-*/
 
+/*
 var saveOutputImagePngButton=new Button("downloadOutputPng");
 saveOutputImagePngButton.onClick(function(){
     outputCanvas.saveImagePng("outputImage");
     referenceCanvas.saveImagePng("referenceImage");
 });
+*/
 /*
 var saveReferenceImagePngButton=new Button("downloadReferencePng");
 saveReferenceImagePngButton.onClick(function(){

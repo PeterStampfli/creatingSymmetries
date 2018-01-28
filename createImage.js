@@ -19,11 +19,15 @@ function makeColor(color,colorPosition,inputImagePosition){
 	inputImage.interpolation(color,position.x,position.y);
 	if (color.red<0){
 		color.set(backgroundColor);
-		color.alpha=0;
+		color.alpha=255;
 	}
 	else {
 		colorSymmetry.makeSymmetry(color,colorPosition);
 		color.alpha=255;
+		averageSum++;
+		averageRed+=color.red;
+		averageGreen+=color.green;		
+		averageBlue+=color.blue;
 	}
 }
 // function for creating the image
@@ -33,6 +37,11 @@ function makeColor(color,colorPosition,inputImagePosition){
 
 // test if output dimensions have changed: adjust output canvas and map
 // make the output image 
+
+var averageRed;
+var averageGreen;
+var averageBlue;
+var averageSum;
 
 function createImage(){
 	if (inputImage.pixels==null){                    // no input image, no output
@@ -53,18 +62,30 @@ function createImage(){
 	}
 	*/
 	
+		referenceCanvas.adjustWidth();
+		
+		backgroundRed=backgroundRedChooser.getValue();
+		backgroundGreen=backgroundGreenChooser.getValue();	
+		backgroundBlue=backgroundBlueChooser.getValue();
+		backgroundColor.setRgb(backgroundRed,backgroundGreen,backgroundBlue);
+	
   	if ((width!=outputCanvas.width)||(height!=outputCanvas.height)){
 		outputCanvas.setSize(width,height);
 	  //	finalCanvas.setSize(horizontalRepetitions*(width-1),verticalRepetitions*(height-1));
 		outputCanvas.blueScreen();
 		outputCanvas.createPixels();
-		referenceCanvas.adjustToOutput();
+		//referenceCanvas.adjustToOutput();
 	  	map.setSize(width,height);
 	  //	finalCanvas.setSize(2*width,2*height);
 	  	//finalCanvas.blueScreen();
   	}
   	totalMap();
   	referenceCanvas.setAlpha(128);
+  	
+  	averageRed=0;
+  	averageGreen=0;
+  	averageBlue=0;
+  	averageSum=0;
 	if (smoothing){
 		smoothedPixels();
 	}
@@ -75,6 +96,10 @@ function createImage(){
   	referenceCanvas.showPixels();
   //	finalCanvas.periodic(outputCanvas.canvas);
   	progressMessage();
+  	averageRed=Math.round(averageRed/averageSum);
+  	averageGreen=Math.round(averageGreen/averageSum);
+  	averageBlue=Math.round(averageBlue/averageSum);
+  	colorMessage(averageRed,averageGreen,averageBlue);
 }
 
 // make the pixels without averaging
@@ -98,11 +123,11 @@ function simplePixels(){
 	        colorPosition.y=colorPositionY[mapIndex];
 	        imagePosition.x=imagePositionX[mapIndex];
 	        imagePosition.y=imagePositionY[mapIndex];
-        	makeColor(color,colorPosition,imagePosition);
+           makeColor(color,colorPosition,imagePosition);
         }
         else {
         	color.set(backgroundColor);
-        	color.alpha=0;
+        	color.alpha=255;
         }
         outputPixels[outputIndex++]=color.red;
         outputPixels[outputIndex++]=color.green;
@@ -198,7 +223,7 @@ function smoothedPixels(){
 				outputPixels[outputIndex++]=backgroundColor.red;
 				outputPixels[outputIndex++]=backgroundColor.green;
 				outputPixels[outputIndex++]=backgroundColor.blue;
-				outputPixels[outputIndex++]=0;
+				outputPixels[outputIndex++]=255;
 			}
 			baseIndex++;
 			indexPlusY++;			
