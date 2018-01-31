@@ -87,6 +87,41 @@ updateButton.onClick(function(){
     createImage();
 });
 
+
+
+// do the changes
+var exploreButton=new Button("explore");
+exploreButton.onClick(function(){
+	outputWidthChooser.setValue(500);
+	    smoothing=false;
+    smoothingText="no",
+	inputImage.interpolation=inputImage.getNearest;
+    interpolation="nearest";
+
+	console.log("explore");
+    createImage();
+});
+
+
+// do the changes
+var posterButton=new Button("poster");
+posterButton.onClick(function(){
+	outputWidthChooser.setValue(1000);
+		    smoothing=true;
+    smoothingText="2x2",
+
+		inputImage.interpolation=inputImage.getCubic;
+    interpolation="cubic";
+
+	console.log("poster");
+    createImage();
+});
+
+
+
+
+
+
 // the color modification (inversion)
 	
 var nColorMod=0;

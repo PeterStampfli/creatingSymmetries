@@ -8,6 +8,7 @@ function FastFunction(){
     // sin function
     this.sinTabFactor;
     this.sinTable=[];
+    this.cosTable=[];
     this.nSinIntervalsM1;
 
 
@@ -56,6 +57,7 @@ FastFunction.prototype.makeTable=function(table,start,end,nIntervals,theFunction
 
 /*
 make a table for a sin function with a power of 2 number of intervalls
+and for a cos function too
 period length is 2pi
 */
 FastFunction.prototype.makeSinTable=function(){
@@ -63,6 +65,7 @@ FastFunction.prototype.makeSinTable=function(){
     this.nSinIntervalsM1=nIntervals-1;
     this.sinTabFactor=nIntervals/2/Math.PI;
     this.makeTable(this.sinTable,0,2*Math.PI,nIntervals,Math.sin);
+    this.makeTable(this.cosTable,0,2*Math.PI,nIntervals,Math.cos);
 }
 
 
@@ -85,11 +88,11 @@ assuming that table is a sine-like function you get this cos-like function
 */
 FastFunction.prototype.cos=function(x){
     var index;
-    x=this.sinTabFactor*(x+1.570796);                            //pi/2
+    x*=this.sinTabFactor;
     index=Math.floor(x);
     x-=index;
     index=index&this.nSinIntervalsM1;
-    return this.sinTable[index]*(1-x)+this.sinTable[index+1]*x;
+    return this.cosTable[index]*(1-x)+this.cosTable[index+1]*x;
 }
 
 /*

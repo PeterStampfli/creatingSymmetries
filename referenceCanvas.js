@@ -53,7 +53,7 @@ referenceCanvas.adjustWidth=function(){
 	referenceCanvas.canvasImage.drawImage(inputImage.image,0,0,referenceCanvas.width,referenceCanvas.height);
 	referenceCanvas.createPixels();
 	
-	console.log(" ref can height "+referenceCanvas.height)
+	//console.log(" ref can height "+referenceCanvas.height)
 	//referenceHeightChooser.setValue(referenceCanvas.height);
 }
 

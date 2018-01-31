@@ -80,9 +80,6 @@ returns true if all ok , false if position not valid
 =========================================================
 */
 Map.prototype.makeMapRegion=function(mapMethod,xMin,yMin,xMax,yMax){
-	console.log("remap");
-		console.log("set map size - scale is "+this.transform.scale);
-
 	this.isValid=true;
 	var h;
 	xMin=Math.min(Math.max(0,xMin),this.width-1);

@@ -87,6 +87,40 @@ updateButton.onClick(function(){
     createImage();
 });
 
+
+
+// do the changes
+var exploreButton=new Button("explore");
+exploreButton.onClick(function(){
+	outputWidthChooser.setValue(400);
+	    smoothing=false;
+    smoothingText="no",
+	inputImage.interpolation=inputImage.getNearest;
+    interpolation="nearest";
+
+	console.log("explore");
+    createImage();
+});
+
+
+// do the changes
+var posterButton=new Button("poster");
+posterButton.onClick(function(){
+	    smoothing=true;
+    smoothingText="2x2",
+
+		inputImage.interpolation=inputImage.getCubic;
+    interpolation="cubic";
+
+	console.log("poster");
+    createImage();
+});
+
+
+
+
+
+
 // the color modification (inversion)
 	
 var nColorMod=0;
@@ -205,7 +239,7 @@ var averageAsBackground=null;
 function colorMessage(red,green,blue){
 	averageColor.innerHTML="average color: red "+red+", green "+green+", blue "+blue+".";
 	averageColor.innerHTML+="<button type='button' id='asBackground'>as background</button>";
-	if (averageAsBackground==null){
+
 		averageAsBackground=new Button("asBackground");
 			averageAsBackground.onClick(function(){
 			backgroundRedChooser.setValue(averageRed);
@@ -213,7 +247,7 @@ function colorMessage(red,green,blue){
 			backgroundBlueChooser.setValue(averageBlue);
     		createImage();
 		});
-	}
+
 }
 
 
