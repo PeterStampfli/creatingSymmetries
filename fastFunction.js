@@ -12,6 +12,7 @@ function FastFunction(){
     this.nSinIntervalsM1;
 
 
+
 	//periodic function (sine with higher harmonics)
 	this.periodicTabFactor;
 	this.periodicTable=[];
