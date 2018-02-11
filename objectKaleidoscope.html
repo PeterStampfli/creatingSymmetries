@@ -127,13 +127,19 @@
 			<button id="downloadOutputJpg" type="button">Download output as jpg ! </button>
 
 
-		<p style="text-align:left">
+
+	<div style=    "display: inline-block;">	
+
+		<canvas id="orientationCanvas" ></canvas>
+		<br>
+		
+		<canvas id="referenceCanvas" ></canvas>
+		</div>
+	<div style=    "display: inline-block;">	
 		<canvas id="outputCanvas"></canvas>
-	</p>
+		</div>
 
 	<p style="text-align:left;">
-		<canvas id="orientationCanvas" style="vertical-align: top;";></canvas>
-		<canvas id="referenceCanvas" style="vertical-align: top;"></canvas>
 	</p>
 
 	
@@ -161,6 +167,9 @@
 	<script src="rosettes.js"></script>
 	<script src="rosetteFunctions.js"></script>
 	<script src="poincareDisc.js"></script>	
+	<script src="cutCorners.js"></script>
+		<script src="cutCornersDouble.js"></script>	
+		<script src="cutCornersSymmetric.js"></script>	
 	<script src="hyperbolicPolygon.js"></script>
 	<script src="poincarePlane.js"></script>
 	<script src="ellipticSpace.js"></script>

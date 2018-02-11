@@ -78,14 +78,14 @@ basicRosette=rosettePeriodicMirrorPhi;
 var cutoff=true;
 
 // mapping default for test
-var mappingFunction=poincareDisc.map;
+var mappingFunction=cutCornersSymmetric.map;
 //mappingFunction=Map.prototype.identity;
 
 
 euclidPolygon.setup(4,2,4);
 ellipticPolygon.setup(2,2,3);
 rotationElliptic.setup(3,2,4);
-hyperbolicPolygon.setup(5,3,0);
+hyperbolicPolygon.setup(3,4,3);
 
 rosette.setup(5,2,3);
 
@@ -96,3 +96,7 @@ euclid.setup(6,2,3);
 elliptic.setup(4,2,3);
 rotation.setup(6,2,3);
 rotationEuklid.setup(4,2,2);
+
+cutCorners.setup(5,2,4);
+cutCornersDouble.setup(5,2,4);
+cutCornersSymmetric.setup(5,3,3);

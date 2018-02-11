@@ -106,7 +106,7 @@ exploreButton.onClick(function(){
 // do the changes
 var posterButton=new Button("poster");
 posterButton.onClick(function(){
-	outputWidthChooser.setValue(1000);
+	outputWidthChooser.setValue(7100);
 		    smoothing=true;
     smoothingText="2x2",
 
